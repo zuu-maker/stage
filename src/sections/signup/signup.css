@@ -34,7 +34,7 @@ form {
 form input {
   background-color: #2B3038;
   border: none;
-  width: 100%;
+  width: 80%;
   height: 70px;
   border-radius: 35px;
   font-family: "Source Sans Pro", sans-serif;
@@ -53,7 +53,7 @@ form input {
   background-position-x: 30px;
 }
 .input-group{
-  padding: 40pt 60pt 0 60pt;
+  /*padding: 40pt 60pt 0 60pt;*/
 }
 
 form button {
