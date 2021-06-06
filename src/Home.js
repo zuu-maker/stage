@@ -12,8 +12,9 @@ import Signup from './sections/signup/form'
 function Home() {
   return (
     <div className="home">
+    <Signup />
       <Hero/>
-      <Signup />
+
       <Features/>
       <Performance/>
       <DownloadLinks/>
