@@ -1,7 +1,6 @@
 import logo from '../../images/logo.png';
 import './header.css';
-
-
+import  {SignupBtn,LoginBtn} from "../modal/modal";
 export default function Header() {
   return (
     <header className="header">
@@ -41,7 +40,9 @@ export default function Header() {
                 </div>
                 <div className="col col-md-3 d-none d-lg-block header_btn_wrapper">
                     <a href="#" className="btn btn-clear">Contact Us</a>
-                        <a href="#" className="btn ml-2 btn-clear">Login</a>
+                <SignupBtn/>
+                <LoginBtn/>
+
                 </div>
 
             </div>

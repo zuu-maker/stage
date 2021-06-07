@@ -8,20 +8,33 @@ import ContactUs from './sections/contactUs/contactUs';
 import Footer from './sections/footer/footer';
 import Signup from './sections/signup/form'
 
+import Login from "./sections/login/login";
+import {AuthProvider} from "./contexts/authContext";
+import {BrowserRouter as Router ,Switch, Route} from 'react-router-dom'
+
 
 function Home() {
   return (
-    <div className="home">
-    <Signup />
-      <Hero/>
+      <Router>
+        <AuthProvider>
 
-      <Features/>
-      <Performance/>
-      <DownloadLinks/>
-      <Testimonials/>
-      <ContactUs/>
-      <Footer/>
-    </div>
+          <Switch>
+              <Route path="/signup" component={Signup} />
+              <div className="home">
+
+                  <Hero/>
+                  <Features/>
+                  <Performance/>
+                  <DownloadLinks/>
+                  <Testimonials/>
+                  <ContactUs/>
+                  <Footer/>
+              </div>
+          </Switch>
+        </AuthProvider>
+
+      </Router>
+
   );
 }
 

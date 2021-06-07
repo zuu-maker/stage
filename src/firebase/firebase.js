@@ -4,14 +4,14 @@ import 'firebase/auth'
 
 // Initialize Firebase
 const app = firebase.initializeApp({
-    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-    databaseURL: process.env.REACT_APP_DATABASE_URL,
-    projectId: process.env.REACT_APP_PROJECT_ID,
-    storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
-    messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
-    appId: process.env.REACT_APP_APPID,
-    measurementId: process.env.REACT_APP_MEASUREMENT_ID
+    apiKey: "AIzaSyAXRsm-FonzmIxTC6DJl5uAIpvNNGcojQk",
+    authDomain: "game-ac16d.firebaseapp.com",
+    databaseURL: "https://game-ac16d-default-rtdb.firebaseio.com",
+    projectId: "game-ac16d",
+    storageBucket: "game-ac16d.appspot.com",
+    messagingSenderId: "220341046428",
+    appId: "1:220341046428:web:941120e4ea7d2011def159",
+    measurementId: "G-09XQ9CTDLD"
 })
 
 
