@@ -43,6 +43,7 @@ export default function Header() {
                 <SignupBtn/>
                 <LoginBtn/>
 
+
                 </div>
 
             </div>

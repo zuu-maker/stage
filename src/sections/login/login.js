@@ -6,61 +6,57 @@ import mail from '../../images/mail.svg';
 import user from '../../images/user.svg';
 import facebook from '../../images/facebook.svg';
 import google from '../../images/google.svg';
-import { Link, useHistory } from "react-router-dom"
+
 import {useAuth} from "../../contexts/authContext";
+import Signup from "../signup/form";
 
 
-function Login(props) {
-    const emailRef = useRef();
-    const passwordRef = useRef();
-    const {login } = useAuth()
-    const [error,setError] = useState("")
-    const [loading,setLoading] = useState(false)
-    const history = useHistory()
+export default function Login() {
+    const emailRef = useRef()
+    const passwordRef = useRef()
+    const { login } = useAuth()
+    const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
+
     async function handleSubmit(e) {
         e.preventDefault()
         try {
             setError('')
             setLoading(true)
             await login(emailRef.current.value, passwordRef.current.value)
-        } catch (e) {
-        setError('Failed to create an account')
-        }
+        } catch (err) {
+            switch (err.code) {
+                case 'auth/invalid-email':
+                    setError(err.message)
+                case 'auth/user-disabled':
+                    setError('Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.')
+                case 'auth/user-not-found':
+                    setError("Account doesn't exist")
+                    break;
+                case 'auth/wrong-password':
+                    setError("Password entered is wrong")
+                    break;        }
         setLoading(false)
 
     }
+    }
 
     return (
-        <div className="form-container">
-            <img className="form-image" src={trophy} alt=""/>
-            <p className="form-title">Fantasy Sport Event</p>
-            <p>Please register your details to continue
-                with Fantasy Sport Event</p>
-            <form className="form" onSubmit={handleSubmit}>
-                <div className="input-group">
-                    <input ref={emailRef} name="email" style={{backgroundImage: `url(${mail})`}} type="Email"
-                           placeholder="Email"/>
-                    <input ref={passwordRef} name="password" style={{backgroundImage: `url(${password})`}}
-                           type="Password" placeholder="Password"/>
-
-                </div>
-
-                <button disabled={loading} type="submit">Log In</button>
-            </form>
-            <h6>CONNECT WITH</h6>
-            <div className='social-icons-container '>
-                <div className='social-icon '>
-                    <img className="text-center" src={facebook} alt=""/>
-                </div>
-                <div className='social-icon '>
-                    <img className="text-center" src={google} alt=""/>
-                </div>
+        <>
+            <p className="text-danger">{error}</p>
+        <form className="form" onSubmit={handleSubmit}>
+            <div className="input-group">
+        <input ref={emailRef} name="email" style={{backgroundImage: `url(${mail})`}} type="Email"
+                       placeholder="Email"/>
+                <input ref={passwordRef} name="password" style={{backgroundImage: `url(${password})`}}
+                       type="Password" placeholder="Password"/>
 
             </div>
-            <h6>Don't have an account?<span className="login-text">Sign Up</span></h6>
-        </div>
 
+            <button disabled={loading} type="submit"><span className='form-text'>Login</span></button>
+        </form>
+</>
     );
 }
 
-export default Login;
+

@@ -24,14 +24,27 @@ function Signup() {
             setError('')
             setLoading(true)
             await signup(emailRef.current.value, passwordRef.current.value)
-        } catch (e) {
-        setError('Failed to create an account')
+        } catch (err) {
+            switch (err.code) {
+                case 'auth/email-already-in-use':
+                    setError('Email already exists')
+                case 'auth/invalid-email':
+                    setError(err.message)
+                    break;
+                case 'auth/weak-password':
+                    setError(err.message)
+                    break;
+
+
+            }
         }
         setLoading(false)
 
     }
 
     return (
+        <>
+        <p className="text-danger">{error}</p>
 
             <form className="form" onSubmit={handleSubmit}>
                 <div className="input-group">
@@ -44,9 +57,9 @@ function Signup() {
 
                 </div>
 
-                <button disabled={loading} type="submit">Sign up</button>
+                <button disabled={loading} type="submit"><span className='form-text'>Sign Up</span></button>
             </form>
-
+</>
     );
 }
 

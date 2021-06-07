@@ -1,4 +1,11 @@
-
+@font-face {
+    font-family: "SpaceGrotesk-Bold";
+    src: url(SpaceGrotesk-Bold.ttf);
+}
+@font-face {
+    font-family: "SpaceGrotesk-Light";
+    src: url(SpaceGrotesk-Light.ttf);
+}
 .custom-modal .modal-content {
     /*margin: 5% auto;*/
     padding: 80px 0;
@@ -106,4 +113,14 @@ form button {
 
 .social-icon:nth-child(2) {
     border: 1px solid #DD4B39;
+}
+
+.form-text{
+    font-size: 14px;
+    font-family: "SpaceGrotesk-Light";
+}
+
+.form-title{
+    font-size: 18px;
+    font-family: "SpaceGrotesk-Bold";
 }
