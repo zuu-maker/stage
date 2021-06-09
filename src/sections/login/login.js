@@ -14,7 +14,7 @@ import Signup from "../signup/form";
 export default function Login() {
     const emailRef = useRef()
     const passwordRef = useRef()
-    const { login } = useAuth()
+    const { login,currentUser } = useAuth()
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
@@ -43,6 +43,7 @@ export default function Login() {
 
     return (
         <>
+            {currentUser && currentUser.email ? <p className="text-light">{currentUser.email} signed in!</p> : ''}
             <p className="text-danger">{error}</p>
         <form className="form" onSubmit={handleSubmit}>
             <div className="input-group">
@@ -53,7 +54,7 @@ export default function Login() {
 
             </div>
 
-            <button disabled={loading} type="submit"><span className='form-text'>Login</span></button>
+            <button disabled={loading} style={{background : loading ? '#ffffff':''}}  type="submit"><span className='form-btn'>Login</span></button>
         </form>
 </>
     );

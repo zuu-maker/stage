@@ -6,75 +6,85 @@
     font-family: "SpaceGrotesk-Light";
     src: url(SpaceGrotesk-Light.ttf);
 }
-.custom-modal .modal-content {
-    /*margin: 5% auto;*/
-    padding: 80px 0;
-    text-align: center;
-    /*width: 37%;*/
-    /*height: 80%;*/
-    background-color: #13161A;
-    border-radius: 30px;
-}
+@media (min-width: 768px) {
 
-.modal-header , .modal-footer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem 1rem;
-    border: 0px;
-    border-radius: 0px;
-}
+    .modal-content {
+        /*margin: 5% auto;*/
+        /*padding: 6% 0;*/
+        text-align: center;
+        /*width: 37%;*/
+        max-height: 90%;
+        overflow: hidden;
+        background-color: #13161A;
+        border-radius: 30px;
+    }
 
-form {
-    /* padding: 20px 0; */
-    position: relative;
+    .modal-backdrop {
 
-}
+        background-color: #ffffff25;
+    }
 
-.login-text {
-    color: #18FF00;
-}
+    .modal-dialog {
+        margin: 0.75rem auto;
+        height: fit-content;
+    }
 
-.form-title {
-    font-size: 30pt;
-    color: #ffffff;
-    font-family: "Space Grotesk";
-}
 
-.form-image {
-    width: 80px;
-    height: 80px;
+    .modal-title {
+        max-width: 68%;
+    }
+
+
 }
 
 form input {
     background-color: #2B3038;
     border: none;
     width: 80%;
-    height: 70px;
+    max-height: 52.5pt;
+    min-height: 45pt;
     border-radius: 35px;
-    font-family: "Source Sans Pro", sans-serif;
+    font-family: "SpaceGrotesk-Light";
     padding: 10px 15px;
     margin: 0 auto 10px auto;
     display: block;
     text-align: left;
-    font-size: 18px;
-    color: white;
+    font-size: 15pt;
+    color: #E7E7E7;
     font-weight: 300;
-
     background-repeat: no-repeat;
     text-indent: 50px;
     background-size: 24px;
     background-position: left center;
     background-position-x: 30px;
 }
+.f-14 {
+    font-size: 10.5pt;
+    font-family: "SpaceGrotesk-Light";
 
-.input-group {
-    /*padding: 40pt 60pt 0 60pt;*/
 }
 
+.f-18 {
+    font-size: 13.5pt;
+    font-family: "SpaceGrotesk-Light";
+
+}
+
+.form-btn {
+    font-size: 15pt;
+    color: #2B3038;
+    font-family: 'SpaceGrotesk-Bold';
+}
+
+.social-header {
+    font-size: 10.5pt;
+    font-family: "SpaceGrotesk-Light";
+    color: #ffffff30;
+}
 form button {
     appearance: none;
     outline: 0;
+    color: #2B3038;
 
     border: 0;
     width: 228px;
@@ -86,7 +96,26 @@ form button {
     margin-top: 33px;
 
 }
+form {
+    /* padding: 20px 0; */
+    position: relative;
 
+}
+.input-group {
+    /*padding: 40pt 60pt 0 60pt;*/
+}
+.pointer {
+    cursor: pointer;
+}
+.login-text {
+    color: #18FF00;
+}
+
+.form-title {
+    font-size: 30pt;
+    color: #ffffff;
+    font-family: "Space Grotesk";
+}
 .social-icons-container {
     display: flex;
     justify-content: center;
@@ -115,12 +144,44 @@ form button {
     border: 1px solid #DD4B39;
 }
 
-.form-text{
-    font-size: 14px;
+.form-text {
+    font-size: 10.5pt;
     font-family: "SpaceGrotesk-Light";
+    color: #B3B3B3;
+}
+.form-image {
+    width: 80px;
+    height: 80px;
 }
 
-.form-title{
-    font-size: 18px;
+.form-title {
+    font-size: 22.5pt;
     font-family: "SpaceGrotesk-Bold";
+}
+.modal-footer {
+    padding: 0px;
+}
+
+
+.modal-header, .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1rem;
+    border: 0px;
+    border-radius: 0px;
+}
+
+.close {
+    color: #ffffff;
+    align-self: flex-start;
+    font-size: 2.6rem;
+
+}
+.close:hover{
+    color: #ffffff50;
+}
+.modal-header .close {
+     padding: 2%;
+     margin: 0;
 }

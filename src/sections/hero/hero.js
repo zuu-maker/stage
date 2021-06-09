@@ -1,11 +1,13 @@
 import Header from '../header/header';
 import hero_mobile from '../../images/hero_mobile.png';
 import './hero.css';
+import LoginMobile from "../login/loginMobile";
 
 export default function Hero() {
   return (
     <div className="hero">
       <Header/>
+
       <div className="hero_wrapper">
         <div className="container">
           <div className="row align-items-center justify-content-center">

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react"
-import { useAuth } from "../contexts/AuthContext"
+import {useAuth} from "../contexts/authContext";
 import mail from "../images/mail.svg";
 
 export default function ForgotPassword() {
@@ -36,7 +36,7 @@ export default function ForgotPassword() {
 
                 </div>
 
-                <button disabled={loading} type="submit"><span className='form-text'>Sign Up</span></button>
+                <button disabled={loading} type="submit"><span className='form-btn'>Send Link</span></button>
             </form>
 
         </>

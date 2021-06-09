@@ -1,20 +1,22 @@
 
-import firebase from "firebase/app";
+import firebase from "firebase";
 import 'firebase/auth'
 
 // Initialize Firebase
 const app = firebase.initializeApp({
-    apiKey: "AIzaSyAXRsm-FonzmIxTC6DJl5uAIpvNNGcojQk",
-    authDomain: "game-ac16d.firebaseapp.com",
-    databaseURL: "https://game-ac16d-default-rtdb.firebaseio.com",
-    projectId: "game-ac16d",
-    storageBucket: "game-ac16d.appspot.com",
-    messagingSenderId: "220341046428",
-    appId: "1:220341046428:web:941120e4ea7d2011def159",
-    measurementId: "G-09XQ9CTDLD"
-})
+                apiKey: "AIzaSyBP0-OF5crcXxZBd3hFynYzggVEmiL1wQA",
+                authDomain: "fantasysports-7117e.firebaseapp.com",
+                databaseURL: "https://fantasysports-7117e.firebaseio.com",
+                projectId: "fantasysports-7117e",
+                storageBucket: "fantasysports-7117e.appspot.com",
+                messagingSenderId: "1046550299001",
+                appId: "1:1046550299001:web:703f884a8e46b80fd22fa8",
+                measurementId: "G-CRGM75XEXX"
+});
 
 
 // firebase.analytics();
-export const auth =app.auth()
-export default app
+const db = app.firestore()
+var realDB = app.database()
+ const auth =app.auth()
+export {db , auth ,realDB}
