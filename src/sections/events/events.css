@@ -1,0 +1,100 @@
+@font-face {
+    font-family: "SpaceGrotesk-SemiBold";
+    src: url(SpaceGrotesk-SemiBold.ttf);
+}
+
+
+body{
+    background-color: #13161A;
+}
+
+form input , form button{
+
+     margin: 0;
+
+}
+form button{
+    font-family: 'SpaceGrotesk-SemiBold';
+}
+
+.search form {
+    display: flex;
+    align-items: center;
+}
+.btn-clear:hover{
+    border-color: #18FF00;
+    color: #18FF00;
+    background-color: transparent;
+}
+
+.event-card {
+	border-radius: 20px;
+	width: auto;
+	margin: 20px;
+}
+.card-title{
+    color: white;
+}
+
+.card-category{
+    color: #B3B3B3;
+}
+.event-card .card-body{
+    background-color: #2B3038;
+}
+
+.spots {
+    color: white;
+    left: 40%;
+    position: relative;
+}
+
+.cost{
+    color: #18FF00;
+
+}
+.thumbnail-wrapper{
+    border-radius: 100%;
+    width: 20pt;
+    height: 20pt;
+    overflow: hidden;
+
+}
+.thumbnail-list{
+    position: relative;
+
+}
+.thumbnail-wrapper {
+    border: 1px #2B3038;
+}
+.thumbnail-wrapper {
+    position: absolute;
+}
+
+.thumbnail-list :nth-child(1){
+    z-index: 1;
+left: 15pt;
+}
+.thumbnail-list :nth-child(2){
+    z-index: 2;
+left: 30pt;
+}
+.thumbnail-list :nth-child(3){
+    z-index: 3;
+left: 45pt;
+}
+.difficulty-btn{
+  color: #ffffff;
+  width: 30%;
+  border-radius: 45pt;
+}
+.card-footer {
+	padding: .75rem ;
+	background-color: 'transparent';
+	border-top: 1px solid rgba(0,0,0,.125);
+}
+.grid-container {
+	display: grid;
+	grid-template-columns: auto auto auto;
+	padding: 0px;
+}

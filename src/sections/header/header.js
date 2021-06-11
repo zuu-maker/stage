@@ -4,9 +4,13 @@ import { LoginBtn} from "../modal/modal";
 import LoginLink from "../login/loginMobile";
 import {useState} from "react";
 import Login from "../login/login";
+import {useAuth} from "../../contexts/authContext";
+import CurrentUserDropdown from "./currentUserDropdown";
 
 export default function Header() {
     const [showForm,setShowForm] = useState(false)
+    const { currentUser } = useAuth()
+
     return (
         <header className="header">
             <div className="container">
@@ -58,7 +62,11 @@ export default function Header() {
                     </div>
                     <div className="col col-md-3 d-none d-lg-block header_btn_wrapper">
                         <a href="#" className="btn btn-clear">Contact Us</a>
-                        <LoginBtn/>
+                        { !currentUser
+                            ? <CurrentUserDropdown/>
+                            : <LoginBtn/>
+                        }
+
 
 
                     </div>

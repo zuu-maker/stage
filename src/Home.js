@@ -7,6 +7,7 @@ import Testimonials from './sections/testimonials/testimonials';
 import ContactUs from './sections/contactUs/contactUs';
 import Footer from './sections/footer/footer';
 import Signup from './sections/signup/form'
+import Events from "./sections/events/events";
 
 import Login from "./sections/login/login";
 import {AuthProvider} from "./contexts/authContext";
@@ -20,6 +21,7 @@ function Home() {
 
           <Switch>
               <Route path="/signup" component={Signup} />
+              <Route path="/events" component={Events} />
               <div className="home">
 
                   <Hero/>
