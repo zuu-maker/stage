@@ -1,11 +1,13 @@
 import logo from '../../images/logo.png';
 import './header.css';
-import { LoginBtn} from "../modal/modal";
+import  LoginBtn from "../modal/modal";
 import LoginLink from "../login/loginMobile";
 import {useState} from "react";
 import Login from "../login/login";
 import {useAuth} from "../../contexts/authContext";
 import CurrentUserDropdown from "./currentUserDropdown";
+import {NavLink} from 'react-router-dom'
+
 
 export default function Header() {
     const [showForm,setShowForm] = useState(false)
@@ -17,9 +19,9 @@ export default function Header() {
                 <div className="row align-items-center">
                     <div className="col col-sm-12 col-lg-9 ">
                         <nav className="navbar navbar-expand-lg">
-                            <a className="navbar-brand col col-sm-3" href="#">
+                            <NavLink className="navbar-brand col col-sm-3" href="#">
                                 <img alt="" src={logo} width="75"/>
-                            </a>
+                            </NavLink>
                             <button className="navbar-toggler" type="button" data-toggle="collapse"
                                     data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false"
                                     aria-label="Toggle navigation">
@@ -35,33 +37,33 @@ export default function Header() {
                             <div className="collapse navbar-collapse" id="navbarToggler">
                                 <ul className="navbar-nav ml-auto">
                                     <li className="nav-item active">
-                                        <a className="nav-link" href="#">Home</a>
+                                        <NavLink className="nav-link" to='/'>Home</NavLink>
                                     </li>
                                     <li className="nav-item">
-                                        <a className="nav-link" href="#">Funerals</a>
+                                        <NavLink className="nav-link" href="#">Funerals</NavLink>
                                     </li>
                                     <li className="nav-item">
-                                        <a className="nav-link" href="#">Celebrants</a>
+                                        <NavLink className="nav-link" href="#">Celebrants</NavLink>
                                     </li>
                                     <li className="nav-item">
-                                        <a className="nav-link" href="#">Headstones</a>
+                                        <NavLink className="nav-link" href="#">Headstones</NavLink>
                                     </li>
                                     <li className="nav-item">
-                                        <a className="nav-link" href="#">Guides</a>
+                                        <NavLink className="nav-link" href="#">Guides</NavLink>
                                     </li>
                                     <li className="nav-item d-lg-none">
-                                        <a className="nav-link" href="#">Contact Us</a>
+                                        <NavLink className="nav-link" href="#">Contact Us</NavLink>
                                     </li>
                                     <li className="nav-item d-lg-none">
                                         <LoginLink/>
-                                        {/*<a onClick={() => setShowForm(true)} className="nav-link" href="#">Login</a>*/}
+                                        {/*<NavLink onClick={() => setShowForm(true)} className="nav-link" href="#">Login</NavLink>*/}
                                     </li>
                                 </ul>
                             </div>
                         </nav>
                     </div>
                     <div className="col col-md-3 d-none d-lg-block header_btn_wrapper">
-                        <a href="#" className="btn btn-clear">Contact Us</a>
+                        <NavLink href="#" className="btn btn-clear">Contact Us</NavLink>
                         { !currentUser
                             ? <CurrentUserDropdown/>
                             : <LoginBtn/>

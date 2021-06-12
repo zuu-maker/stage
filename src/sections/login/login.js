@@ -9,9 +9,12 @@ import google from '../../images/google.svg';
 
 import {useAuth} from "../../contexts/authContext";
 import Signup from "../signup/form";
+import {useHistory} from 'react-router-dom'
+
 
 
 export default function Login() {
+    const history = useHistory()
     const emailRef = useRef()
     const passwordRef = useRef()
     const { login,currentUser } = useAuth()
@@ -43,7 +46,6 @@ export default function Login() {
 
     return (
         <>
-            {currentUser && currentUser.email ? <p className="text-light">{currentUser.email} signed in!</p> : ''}
             <p className="text-danger">{error}</p>
         <form className="form" onSubmit={handleSubmit}>
             <div className="input-group">
@@ -59,5 +61,3 @@ export default function Login() {
 </>
     );
 }
-
-

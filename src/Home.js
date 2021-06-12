@@ -21,6 +21,7 @@ function Home() {
 
           <Switch>
               <Route path="/signup" component={Signup} />
+              <Route path="/" exact component={Home} />
               <Route path="/events" component={Events} />
               <div className="home">
 

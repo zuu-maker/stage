@@ -7,10 +7,15 @@ import google from "../../images/google.svg";
 import './modal.css'
 import Login from "../login/login";
 import ForgotPassword from "../../utility/resetPassword";
+import EventForm from '../events/events'
+
+import {useAuth} from "../../contexts/authContext";
+
 
 
 function LoginModal(props) {
-    const [showForm, setShowForm] = useState({login: true, signup: false, forgotPassword: false})
+    const [showForm, setShowForm] = useState({login: true, signup: false, forgotPassword: false, eventForm : false})
+    const [formType,setFormType] = useState('')
     return (
         <Modal
             {...props}
@@ -54,7 +59,7 @@ function LoginModal(props) {
                                     forgotPassword: false
                                 })} className="login-text pointer">Log In</span></p>
                             </>
-                            : ''}
+                            : showForm.eventForm ? <EventForm />:''}
                 {showForm.forgotPassword ? '' : <p className='text-light pointer' onClick={() => setShowForm({
                     forgotPassword: true,
                     signup: false,
@@ -103,4 +108,5 @@ function LoginBtn() {
 }
 
 
-export {LoginBtn}
+
+export default LoginBtn

@@ -7,7 +7,6 @@ import Card from "./card";
 import thumb from '../../images/dummy.png'
 import basketball from'../../images/basketball.png'
 
-
 function Events(props) {
     return (
         <div className='container body'>
@@ -15,19 +14,22 @@ function Events(props) {
                 <div className=' d-flex align-items-center pt-4'>
                     <h4 className='text-light'>All Events</h4>
                 <div className="search-container flex-grow-1 ">
-                    <Search/>
+                <div className='search d-flex float-right'>
+                <Search/>
+                </div>
+
 
                 </div>
             </div>
             <Category/>
             <div className='grid-container'>
-                <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
-                <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
-                <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
-                <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
-                <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
-                <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
-                <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
+            <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' spotsLeft='56' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
+            <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' spotsLeft='56' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
+            <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' spotsLeft='56' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
+            <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' spotsLeft='56' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
+            <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' spotsLeft='56' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
+            <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' spotsLeft='56' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
+            <Card className='grid-item'title='Basketball Tournament' coverImage={basketball} category='Basketball' spotsLeft='56' cost='45' attendees='56' userThumbnail={thumb} prize='400' difficulty='Normal'/>
 
             </div>
 
