@@ -1,27 +1,41 @@
 import logo from '../../images/logo.png';
 import './header.css';
-import  LoginBtn from "../modal/modal";
+import  {LoginBtn} from "../modal/modal";
 import LoginLink from "../login/loginMobile";
 import {useState} from "react";
 import Login from "../login/login";
 import {useAuth} from "../../contexts/authContext";
 import CurrentUserDropdown from "./currentUserDropdown";
-import {NavLink} from 'react-router-dom'
+import {Link} from 'react-router-dom'
+import {FormProvider} from "../../contexts/formContext";
+import {useLoader} from "../../contexts/loaderContext";
+
 
 
 export default function Header() {
     const [showForm,setShowForm] = useState(false)
-    const { currentUser } = useAuth()
+    const {loader} =useLoader()
+
+    const { currentUser,loading } = useAuth()
 
     return (
+
         <header className="header">
+            {loader || loading ? <>
+                <div className="loader">
+                    <div className="bar">
+
+                    </div>
+                </div>
+                    </>
+                : <div></div>}
             <div className="container">
                 <div className="row align-items-center">
                     <div className="col col-sm-12 col-lg-9 ">
                         <nav className="navbar navbar-expand-lg">
-                            <NavLink className="navbar-brand col col-sm-3" href="#">
+                            <Link className="navbar-brand col col-sm-3" href="#">
                                 <img alt="" src={logo} width="75"/>
-                            </NavLink>
+                            </Link>
                             <button className="navbar-toggler" type="button" data-toggle="collapse"
                                     data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false"
                                     aria-label="Toggle navigation">
@@ -37,34 +51,34 @@ export default function Header() {
                             <div className="collapse navbar-collapse" id="navbarToggler">
                                 <ul className="navbar-nav ml-auto">
                                     <li className="nav-item active">
-                                        <NavLink className="nav-link" to='/'>Home</NavLink>
+                                        <Link className="nav-link" to='/events'>Home</Link>
                                     </li>
                                     <li className="nav-item">
-                                        <NavLink className="nav-link" href="#">Funerals</NavLink>
+                                        <Link className="nav-link" href="#">Funerals</Link>
                                     </li>
                                     <li className="nav-item">
-                                        <NavLink className="nav-link" href="#">Celebrants</NavLink>
+                                        <Link className="nav-link" href="#">Celebrants</Link>
                                     </li>
                                     <li className="nav-item">
-                                        <NavLink className="nav-link" href="#">Headstones</NavLink>
+                                        <Link className="nav-link" href="#">Headstones</Link>
                                     </li>
                                     <li className="nav-item">
-                                        <NavLink className="nav-link" href="#">Guides</NavLink>
+                                        <Link className="nav-link" href="#">Guides</Link>
                                     </li>
                                     <li className="nav-item d-lg-none">
-                                        <NavLink className="nav-link" href="#">Contact Us</NavLink>
+                                        <Link className="nav-link" href="#">Contact Us</Link>
                                     </li>
                                     <li className="nav-item d-lg-none">
                                         <LoginLink/>
-                                        {/*<NavLink onClick={() => setShowForm(true)} className="nav-link" href="#">Login</NavLink>*/}
+                                        {/*<Link onClick={() => setShowForm(true)} className="nav-link" href="#">Login</Link>*/}
                                     </li>
                                 </ul>
                             </div>
                         </nav>
                     </div>
                     <div className="col col-md-3 d-none d-lg-block header_btn_wrapper">
-                        <NavLink href="#" className="btn btn-clear">Contact Us</NavLink>
-                        { !currentUser
+                        <Link href="#" className="btn btn-clear">Contact Us</Link>
+                        { currentUser && currentUser.email
                             ? <CurrentUserDropdown/>
                             : <LoginBtn/>
                         }

@@ -10,6 +10,7 @@ import google from '../../images/google.svg';
 import {useAuth} from "../../contexts/authContext";
 import Signup from "../signup/form";
 import {useHistory} from 'react-router-dom'
+import {Modal} from "react-bootstrap";
 
 
 
@@ -27,6 +28,7 @@ export default function Login() {
             setError('')
             setLoading(true)
             await login(emailRef.current.value, passwordRef.current.value)
+            history.push('/user/dashboard')
         } catch (err) {
             switch (err.code) {
                 case 'auth/invalid-email':
@@ -48,6 +50,10 @@ export default function Login() {
         <>
             <p className="text-danger">{error}</p>
         <form className="form" onSubmit={handleSubmit}>
+            <img className="form-image" src={trophy} alt=""/>
+            <p className="form-title pt-4">Fantasy Sport Event</p>
+            <p className='form-text f-18'>Please register your details to continue
+                with Fantasy Sport Event</p>
             <div className="input-group">
         <input ref={emailRef} name="email" style={{backgroundImage: `url(${mail})`}} type="Email"
                        placeholder="Email"/>

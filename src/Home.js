@@ -8,21 +8,33 @@ import ContactUs from './sections/contactUs/contactUs';
 import Footer from './sections/footer/footer';
 import Signup from './sections/signup/form'
 import Events from "./sections/events/events";
+import EventDetails from "./sections/events/eventDetails";
 
 import Login from "./sections/login/login";
 import {AuthProvider} from "./contexts/authContext";
+import {FormProvider} from "./contexts/formContext";
+
 import {BrowserRouter as Router ,Switch, Route} from 'react-router-dom'
+import {EventProvider} from "./contexts/eventsContext";
+import {LoaderProvider} from "./contexts/loaderContext";
+import UserProfile from "./sections/profile/userProfile";
 
 
 function Home() {
   return (
       <Router>
+          <LoaderProvider>
         <AuthProvider>
+            <EventProvider>
+          <FormProvider>
+
+
 
           <Switch>
               <Route path="/signup" component={Signup} />
-              <Route path="/" exact component={Home} />
               <Route path="/events" component={Events} />
+              <Route path="/eventDetails" component={EventDetails} />
+              <Route path="/user/dashboard" component={UserProfile} />
               <div className="home">
 
                   <Hero/>
@@ -34,8 +46,10 @@ function Home() {
                   <Footer/>
               </div>
           </Switch>
+          </FormProvider>
+            </EventProvider>
         </AuthProvider>
-
+          </LoaderProvider>
       </Router>
 
   );

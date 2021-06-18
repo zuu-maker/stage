@@ -1,9 +1,12 @@
 import React, { useRef, useState } from "react"
 import {useAuth} from "../contexts/authContext";
 import mail from "../images/mail.svg";
+import {Modal} from "react-bootstrap";
+import {useForm} from "../contexts/formContext";
 
 export default function ForgotPassword() {
     const emailRef = useRef()
+    const {formType,setFormType}= useForm()
     const { resetPassword } = useAuth()
     const [error, setError] = useState("")
     const [message, setMessage] = useState("")
@@ -38,6 +41,7 @@ export default function ForgotPassword() {
 
                 <button disabled={loading} type="submit"><span className='form-btn'>Send Link</span></button>
             </form>
+             <p className='text-light pointer' onClick={() => setFormType('forgotForm')}>Forgot Password?</p>
 
         </>
     )

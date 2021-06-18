@@ -1,0 +1,96 @@
+@font-face {
+    font-family: "SpaceGrotesk-Medium";
+    src: url(SpaceGrotesk-Medium.ttf);
+}
+
+.event-details .event-card {
+    border-radius: 20px;
+    width: auto;
+    margin: 20px;
+    height: 225pt;
+}
+
+.cover-img-wrapper {
+    /*width: 90%;*/
+}
+
+
+
+.event-details .cover-img-wrapper img {
+    /* max-width: 100%; */
+    width: 100%;
+    border-radius: 15pt;
+}
+.event-details .icon-wrapper{
+    border-radius: 15px;
+    background-color: #2B3038;
+    width: 45pt;
+    height: 45pt;
+    padding: 6%;
+
+}
+
+.event-icon-container{
+    width: 100%;
+}
+
+.commissioner-icon-wrapper{
+    border-radius: 100%;
+    width: 45pt;
+    height: 45pt;
+    overflow: hidden;
+
+}
+
+.event-detail-title{
+    font-size: 26.25pt;
+}
+
+.event-detail-container{
+    width: 70%;
+}
+
+.event-description{
+    font-family: SpaceGrotesk-Light;
+}
+.user-list-sub-section{
+    border-bottom: 1px solid #13161A;
+    padding: 5% 6%;
+    align-items: center;
+}
+.about-low-info{
+    font-family: 'SpaceGrotesk-Light';
+}
+.about-upper-info{
+    font-family: 'SpaceGrotesk-Medium';
+}
+
+.user-list-section{
+    background-color: #2B3038;
+    border-radius: 15pt;
+    height: 85vh;
+}
+.user-list-thumb-wrapper{
+    overflow: hidden;
+    border-radius: 100%;
+    width: 45pt;
+    height: 45pt;
+
+}
+
+.space-light{
+    font-family: 'SpaceGrotesk-Light';
+}
+
+.event-detail-container  .difficulty-btn {
+    position: relative;
+    bottom: 74%;
+    left: 4%;
+    width: fit-content;
+    border-radius: 45pt;
+    padding: 1%;
+}
+.space-medium{
+    font-family: SpaceGrotesk-Medium;
+}
+

@@ -37,7 +37,7 @@
 
 }
 
-form input {
+form input ,  select {
     background-color: #2B3038;
     border: none;
     width: 80%;

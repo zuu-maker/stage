@@ -6,16 +6,18 @@ import facebook from "../../images/facebook.svg";
 import google from "../../images/google.svg";
 import './modal.css'
 import Login from "../login/login";
+import EventsForm from '../events/eventsForm'
 import ForgotPassword from "../../utility/resetPassword";
-import EventForm from '../events/events'
+import {useForm} from "../../contexts/formContext";
 
-import {useAuth} from "../../contexts/authContext";
+
 
 
 
 function LoginModal(props) {
     const [showForm, setShowForm] = useState({login: true, signup: false, forgotPassword: false, eventForm : false})
-    const [formType,setFormType] = useState('')
+    const {formType,setFormType}= useForm()
+
     return (
         <Modal
             {...props}
@@ -27,20 +29,17 @@ function LoginModal(props) {
         >
             <Modal.Header>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    <img className="form-image" src={trophy} alt=""/>
-                    <p className="form-title pt-4">Fantasy Sport Event</p>
-                    <p className='form-text f-18'>Please register your details to continue
-                        with Fantasy Sport Event</p></Modal.Title>
+    </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {showForm.login ?
+                {formType == 'loginForm' ?
                     <>
                         <Login/>
                         <p className='pt-3 form-text f-18'> Don't have an account? <span
                             onClick={() => setShowForm({login: false, signup: true, forgotPassword: false})}
                             className="login-text pointer">Sign Up</span></p>
                     </>
-                    : showForm.signup ?
+                    : formType == 'signupForm' ?
                         <>
 
                             <Signup/>
@@ -50,7 +49,7 @@ function LoginModal(props) {
                                 forgotPassword: false
                             })} className="login-text pointer">Log In</span></p>
                         </>
-                        : showForm.forgotPassword ?
+                        : formType == 'forgotForm' ?
                             <>
                                 <ForgotPassword/>
                                 <p className='pt-3 form-text f-18'>Have an account? <span onClick={() => setShowForm({
@@ -59,12 +58,10 @@ function LoginModal(props) {
                                     forgotPassword: false
                                 })} className="login-text pointer">Log In</span></p>
                             </>
-                            : showForm.eventForm ? <EventForm />:''}
-                {showForm.forgotPassword ? '' : <p className='text-light pointer' onClick={() => setShowForm({
-                    forgotPassword: true,
-                    signup: false,
-                    login: false
-                })}>Forgot Password?</p>}
+
+                            :formType == 'eventForm' ? <EventsForm/>
+                            : <div>failed</div>}
+
 
             </Modal.Body>
             <Modal.Footer>
@@ -91,12 +88,46 @@ function LoginModal(props) {
 
 
 function LoginBtn() {
+  const {formType,setFormType}= useForm()
+  const [modalShow, setModalShow] = React.useState(false);
+
+
+
+  const  HandleLogin = () =>{
+    setFormType('loginForm')
+
+    setModalShow(true)
+  }
+
+    return (
+        <>
+            <button onClick={HandleLogin} className="btn ml-2 btn-clear">Login</button>
+
+
+            <LoginModal
+                show={modalShow}
+                onHide={() => setModalShow(false) }
+            />
+        </>
+    );
+}
+
+function CreateEventBtn() {
+    const {formType,setFormType}= useForm()
     const [modalShow, setModalShow] = React.useState(false);
+
+
+
+    const  HandleCreateEvent = () =>{
+      setFormType('eventForm')
+
+      setModalShow(true)
+    }
 
 
     return (
         <>
-            <button onClick={() => setModalShow(true)} className="btn ml-2 btn-clear">Login</button>
+            <button onClick={HandleCreateEvent } className="btn  ">Create Event</button>
 
 
             <LoginModal
@@ -109,4 +140,4 @@ function LoginBtn() {
 
 
 
-export default LoginBtn
+export  {LoginBtn, CreateEventBtn}

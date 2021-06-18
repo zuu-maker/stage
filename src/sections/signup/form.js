@@ -8,6 +8,7 @@ import facebook from '../../images/facebook.svg';
 import google from '../../images/google.svg';
 import {db, realDB} from '../../firebase/firebase'
 import {useAuth} from "../../contexts/authContext";
+import {Modal} from "react-bootstrap";
 
 
 function Signup() {
@@ -75,7 +76,7 @@ function Signup() {
                             // password : currentUser.passwordHash,
                         }; //user info
                         db.collection('users').add(userInfo)
-                        realDB.ref('/users').push(userInfo)
+                        realDB.ref('/Users').push(userInfo)
                     }
                 )
 
@@ -109,6 +110,10 @@ function Signup() {
             <p className="text-danger">{error}</p>
 
             <form className="form" onSubmit={handleSubmit}>
+                <img className="form-image" src={trophy} alt=""/>
+                <p className="form-title pt-4">Fantasy Sport Event</p>
+                <p className='form-text f-18'>Please register your details to continue
+                    with Fantasy Sport Event</p>
                 <div className="input-group">
                     <input ref={usernameRef} onChange={(e) => setUsername(e.target.value)} name="username"
                            style={{backgroundImage: `url(${user})`}} type="text"
