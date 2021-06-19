@@ -9,6 +9,7 @@ import Login from "../login/login";
 import EventsForm from '../events/eventsForm'
 import ForgotPassword from "../../utility/resetPassword";
 import {useForm} from "../../contexts/formContext";
+import plus from "../../images/plus.svg";
 
 
 
@@ -127,7 +128,8 @@ function CreateEventBtn() {
 
     return (
         <>
-            <button onClick={HandleCreateEvent } className="btn  ">Create Event</button>
+            <button onClick={HandleCreateEvent } className="btn  btn-lg-screen">Create Event</button>
+            <button onClick={HandleCreateEvent } style={{backgroundImage: `url(${plus})`}} className="  btn-mobile"></button>
 
 
             <LoginModal

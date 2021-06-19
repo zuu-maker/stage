@@ -14,7 +14,9 @@
     /*width: 90%;*/
 }
 
-
+.user-list a{
+    width: 37%;
+}
 
 .event-details .cover-img-wrapper img {
     /* max-width: 100%; */
@@ -57,6 +59,7 @@
     border-bottom: 1px solid #13161A;
     padding: 5% 6%;
     align-items: center;
+
 }
 .about-low-info{
     font-family: 'SpaceGrotesk-Light';

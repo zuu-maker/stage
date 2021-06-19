@@ -28,8 +28,18 @@
 
 }
 
-.user-info-container{
+.user .user-info-container{
     border-bottom: 1px solid #13161A;
+}
+.followers-container{
+    border-top: 1px  solid #13161A;
+    border-bottom: 1px  solid #13161A;
+    border-color: #13161A;
+
+}
+.followers-container:nth-child(1){
+    border-right: 1px  solid #13161A;
+
 }
 
 .user .card-body {
@@ -73,4 +83,20 @@
 .user .event-card {
 
      margin: 2%;
+}
+
+.other-user-btn button {
+    width: 100%;
+    font-family: "SpaceGrotesk-Light";
+    text-align: center;
+    font-weight: 300;
+    background-repeat: no-repeat;
+    background-position-x: 12%;
+    background-size: 24px;
+    background-position-y: center;
+}
+.other-user .grid-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    padding: 0px;
 }

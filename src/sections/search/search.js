@@ -6,7 +6,7 @@ function Search(props) {
 
     return (
         <div>
-            <div className=' '>
+            <div className=' search-input'>
                 <form className="d-flex">
                     <input  className='' name="search" style={{backgroundImage: `url(${search})`}} type="text"
                            placeholder="Search"/>

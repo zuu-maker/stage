@@ -27,7 +27,7 @@ function Category(props) {
         }
     }
     return (
-        <nav className='mt-4 mb-4 navbar navbar-expand-lg'>
+        <nav className='mt-4 category  mb-4 navbar navbar-expand-lg'>
             {loader  ? <>
                     <div className="loader">
                         <div className="bar">
