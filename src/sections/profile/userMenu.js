@@ -9,6 +9,7 @@ import create_schedule from "../../images/created_schedule.svg";
 import deposit from "../../images/deposit_fund.svg";
 import withdraw from "../../images/withdraw_fund.svg";
 import arrow from "../../images/arrow right.svg";
+import './userProfile.css'
 import {
     BrowserRouter as Router,
     Switch,
@@ -91,21 +92,30 @@ const routes = [
 
 ];
 
-function UserMenu(props) {
+function UserMenu({user}) {
     return (
         <>
         <Router>
 
                 <div className='d-flex flex-column card-body user-side-bar'>
-                    <div className=' ml-auto  menu-icon-wrapper text-center '>
-                        <img src={edit} alt=""/>
+                    <div className='user-sidebar-header'>
+                        <div className='flex-column'>
+                            <h5 className='text-light'>Your Profile</h5>
+
+                            <p className=''>Manage Your Account Info</p>
+
+                        </div>
+                <div className=' ml-auto  menu-icon-wrapper text-center '>
+                            <img src={edit} alt=""/>
+
+                        </div>
 
                     </div>
                     <div className='text-center card-body user-info-container'>
 
                         <div className='position-relative'>
                             <div className='mx-auto d-block user-profile-pic-wrapper'>
-                                <img src={dummy} alt=""/>
+                                <img src={user.userProfileImageUrl} alt=""/>
                             </div>
                             <div className='badge-wrapper'>
                                 <img src={rank} alt=""/>
@@ -115,14 +125,19 @@ function UserMenu(props) {
 
 
                         <div className='mt-3 text-light'>
-                            <div className='space-medium f-18' >Display Name</div>
-                            <div className="space-light ">@username</div>
+                            <div className='space-medium f-18' >{user.Username}</div>
+                            <div className="space-light mb-4">@{user.Username}</div>
+
+                        </div>
+                        <div className='sm-view'>
+                            <Graph/>
 
                         </div>
 
                     </div>
                     <div className='menu-options'>
-                        <Link to='/user/joined-events'><div className='d-flex m-3 pointer align-items-center flex-grow-1'>
+                        <Link to='/user/joined-events'>
+                            <div className=' m-3 pointer  menu-item'>
                             <div className='icon-wrapper'>
                                 <div className='center'>
                                     <img src={join_event} alt=""/>
@@ -136,7 +151,7 @@ function UserMenu(props) {
                                 <img src={arrow} alt=""/>
                             </div>
                         </div></Link>
-                        <Link to='/user/created-events'><div className='d-flex m-3 pointer align-items-center flex-grow-1'>
+                        <Link to='/user/created-events'><div className='menu-item m-3 pointer '>
                             <div className='icon-wrapper'>
                                 <div className='center'>
                                     <img src={create_event} alt=""/>
@@ -150,7 +165,7 @@ function UserMenu(props) {
                                 <img src={arrow} alt=""/>
                             </div>
                         </div></Link>
-                        <Link to='/user/create-schedule'><div className='d-flex m-3 pointer align-items-center flex-grow-1'>
+                        <Link to='/user/create-schedule'><div className='menu-item m-3 pointer '>
                             <div className='icon-wrapper'>
                                 <div className='center'>
                                     <img src={create_schedule} alt=""/>
@@ -164,7 +179,7 @@ function UserMenu(props) {
                                 <img src={arrow} alt=""/>
                             </div>
                         </div></Link>
-                        <Link to='/user/deposit'><div className='d-flex m-3 pointer align-items-center flex-grow-1'>
+                        <Link to='/user/deposit'><div className='menu-item m-3 pointer '>
                             <div className='icon-wrapper'>
                                 <div className='center'>
                                     <img src={deposit} alt=""/>
@@ -178,7 +193,7 @@ function UserMenu(props) {
                                 <img src={arrow} alt=""/>
                             </div>
                         </div></Link>
-                        <Link to='/user/withdraw'><div className='d-flex m-3 pointer align-items-center flex-grow-1'>
+                        <Link to='/user/withdraw'><div className='menu-item m-3 pointer'>
                             <div className='icon-wrapper'>
                                 <div className='center'>
                                     <img src={withdraw} alt=""/>

@@ -19,15 +19,16 @@ import {EventProvider} from "./contexts/eventsContext";
 import {LoaderProvider} from "./contexts/loaderContext";
 import UserProfile from "./sections/profile/userProfile";
 import OtherUser from "./sections/profile/otherUser";
+import Message from "./sections/message/message";
 
 
 function Home() {
-    const  currentUser  = useAuth()
 
     return (
       <Router>
+          <AuthProvider>
+
           <LoaderProvider>
-        <AuthProvider>
             <EventProvider>
           <FormProvider>
 
@@ -36,11 +37,12 @@ function Home() {
           <Switch>
               <Route path="/signup" component={Signup} />
               <Route path="/events" component={Events} />
-              <Route path="/eventDetails" component={EventDetails} />
-              <Route path="/user/other" component={OtherUser} />
-              <Route path="/user/dashboard" component={UserProfile} />
+              <Route path="/eventDetails/:id" component={EventDetails} />
+              <Route path="/user/:id" component={UserProfile} />
+              <Route path="/messages" component={Message} />
+              {/*<Route path="/user/dashboard" component={UserProfile} />*/}
               <div className="home">
-                  { !currentUser ?<Events/>:
+
 <>
                   <Hero/>
                   <Features/>
@@ -50,13 +52,14 @@ function Home() {
                   <ContactUs/>
                   <Footer/>
 </>
-                  }
+
               </div>
           </Switch>
           </FormProvider>
             </EventProvider>
-        </AuthProvider>
           </LoaderProvider>
+          </AuthProvider>
+
       </Router>
 
   );

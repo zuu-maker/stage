@@ -3,6 +3,7 @@ import './userProfile.css'
 import axios from 'axios'
 // === include 'setup' then 'config' above ===
 import {Line,Bar} from 'react-chartjs-2'
+import ProgressBar from 'react-bootstrap/ProgressBar'
 const Graph = () => {
     const [chartData, setChartData] = useState({});
     const [employeeSalary, setEmployeeSalary] = useState([]);
@@ -44,9 +45,8 @@ const Graph = () => {
     }, []);
     return (
         <div className="graph">
-            <div>
+            <ProgressBar now={40}/>
 
-            </div>
         </div>
     );
 };

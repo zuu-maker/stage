@@ -1,8 +1,10 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import basketball from '../../images/basketball.png'
 import dummy from '../../images/dummy.png'
 import mail from "../../images/mail.svg";
-import {Link} from 'react-router-dom'
+import {Link, useHistory} from 'react-router-dom'
+import {getRealtimeDoc} from "../../helper/helper";
+
 const difficulty ={
     easy : '#18FF00',
     hard : '#D50000',
@@ -13,10 +15,18 @@ const difficulty ={
 
 
 function Card({ event }) {
+    const history = useHistory()
+    const idRef = useRef()
     const eventLevel = event.EventDifficulty
+    function handleClick(){
+        getRealtimeDoc('Events',idRef.current.id)
+        history.push(`eventDetails/${idRef.current.id}`)
+
+
+    }
 
     return (
-        <Link to='/eventDetails'><card className='card overflow-hidden border-0 grid-item event-card'>
+        <card onClick={handleClick} ref={idRef} id={event.id} className='card pointer overflow-hidden border-0 grid-item event-card'>
 
                 <div className='cover-img-wrapper'>
                     <img src={basketball} alt=""/>
@@ -65,7 +75,7 @@ function Card({ event }) {
                     }
                 </div>
             </card>
-        </card></Link>
+        </card>
     );
 }
 

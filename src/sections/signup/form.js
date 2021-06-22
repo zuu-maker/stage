@@ -9,6 +9,7 @@ import google from '../../images/google.svg';
 import {db, realDB} from '../../firebase/firebase'
 import {useAuth} from "../../contexts/authContext";
 import {Modal} from "react-bootstrap";
+import {pushData} from "../../helper/helper";
 
 
 function Signup() {
@@ -22,50 +23,14 @@ function Signup() {
     const [loading, setLoading] = useState(false)
 
 
-    const  checkUserName = () =>{
-        db.collection('users').get().then(snapshot => {
 
-            let userList = []
-            snapshot.forEach(doc =>{
-                    const data =doc.data()
-                    userList.push(data)
-                if(username === data.username ){
-                    console.log('Username is already taken')
-                    setError('Username is already taken')
-                    setUserNameError(true)
-                    console.log(usernameError)
-
-                }else {
-                    setUserNameError(false)
-                }
-                }
-            )
-
-
-        })
-
-        // return  realDB.ref('users').child("username").equalTo(username).orderByValue()
-
-
-    }
-    async function handleSubmit(e) {
+     async function handleSubmit(e) {
         e.preventDefault()
-        console.log(usernameError)
-        console.log(checkUserName())
-        checkUserName()
-        if(!usernameError){
             try {
                 setError('')
-                // const userRef = realDB.ref('users');
-
-
-                // userRef.on('value',(snapshot) =>{
-                //     let userList = [];
-
-                // })
-
                 setLoading(true)
-                await signup(emailRef.current.value, passwordRef.current.value).then(
+                console.log('before')
+                 await signup(emailRef.current.value, passwordRef.current.value).then(
                     () => {
                         var userInfo = {
                             username: username,
@@ -73,20 +38,18 @@ function Signup() {
                             userId: currentUser.uid,
                             emailVerified: currentUser.emailVerified,
                             providerId: currentUser.providerId,
-                            // password : currentUser.passwordHash,
-                        }; //user info
-                        db.collection('users').add(userInfo)
-                        realDB.ref('/Users').push(userInfo)
+                        };
+                        console.log('reached')
+
+                        pushData('Users',userInfo)
+                        console.log('Added to db')
                     }
                 )
 
-                    .then(() => console.log('Added to db'))
-                    .catch(err => {
-                        setError('Failed to Sign Up')
-                    })
 
             } catch (err) {
                 switch (err.code) {
+
                     case 'auth/email-already-in-use':
                         setError('Email already exists')
                     case 'auth/invalid-email':
@@ -99,7 +62,8 @@ function Signup() {
 
                 }
             }
-            setLoading(false)}
+            setLoading(false)
+        console.log(error)
 
 
 

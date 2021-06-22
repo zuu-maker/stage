@@ -2,10 +2,11 @@ import {db,realDB} from "../firebase/firebase";
 import {useEvent} from "../contexts/eventsContext";
 
 
-export const submitForm = (formData) =>{
+export const pushData = (path,data) =>{
 
-  db.collection('Events').add(formData)
-  realDB.ref('/Events').push(formData)
+  db.collection(path).add(data)
+  realDB.ref(path).push(data)
+  console.log('success')
 }
 export const getOptions = (collection) =>{
   let collectionList = []
@@ -22,6 +23,17 @@ export const getOptions = (collection) =>{
 
   })
   return collectionList
+}
+export const getRealtimeDoc = (path,id) =>{
+  const eventDetails = realDB.ref(path+'/'+id).once("value")
+
+  return eventDetails
+}
+export const getRealtimeChild = (path,child,id) =>{
+
+  const childData = realDB.ref(path).orderByChild(child).equalTo(id)
+
+  return childData
 }
 export const getDoc = (collection,field,value) =>{
   let collectionList = []
@@ -78,4 +90,17 @@ export const eventFilter = (filterBy,value) =>{
 
   });
   return eventList
+}
+
+export function timeConverter(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp * 1000);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var year = a.getFullYear();
+  var month = months[a.getMonth()];
+  var date = a.getDate();
+  var hour = a.getHours();
+  var min = a.getMinutes();
+  var sec = a.getSeconds();
+  var time = date + ' ' + month + ' ' + year + ' '  ;
+  return time;
 }

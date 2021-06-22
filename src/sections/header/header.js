@@ -53,18 +53,26 @@ export default function Header() {
                                     <li className="nav-item active">
                                         <Link className="nav-link" to='/events'>Home</Link>
                                     </li>
+                                    { currentUser && currentUser.email
+                                        ? <li className="nav-item">
+                                            <Link to='/events' className="nav-link" href="#">Events</Link>
+                                        </li>
+                                        : <li className="nav-item">
+                                            <Link className="nav-link" href="#">How does it work</Link>
+                                        </li>
+                                    }
+                                    {currentUser && currentUser.email
+                                        ? <li className="nav-item">
+                                            <Link className="nav-link" to='/messages/1' href="#">Messages</Link>
+                                        </li>
+
+                                        : <></>
+                                    }
+
                                     <li className="nav-item">
-                                        <Link className="nav-link" href="#">Funerals</Link>
+                                        <Link className="nav-link" href="#">About us</Link>
                                     </li>
-                                    <li className="nav-item">
-                                        <Link className="nav-link" href="#">Celebrants</Link>
-                                    </li>
-                                    <li className="nav-item">
-                                        <Link className="nav-link" href="#">Headstones</Link>
-                                    </li>
-                                    <li className="nav-item">
-                                        <Link className="nav-link" href="#">Guides</Link>
-                                    </li>
+
                                     <li className="nav-item d-lg-none">
                                         <Link className="nav-link" href="#">Contact Us</Link>
                                     </li>
@@ -76,7 +84,7 @@ export default function Header() {
                             </div>
                         </nav>
                     </div>
-                    <div className="col col-md-3 d-none d-lg-block header_btn_wrapper">
+                    <div className="col col-md-3 d-none d-lg-flex header_btn_wrapper">
                         <Link href="#" className="btn btn-clear">Contact Us</Link>
                         { currentUser && currentUser.email
                             ? <CurrentUserDropdown/>

@@ -41,7 +41,6 @@ export default function ForgotPassword() {
 
                 <button disabled={loading} type="submit"><span className='form-btn'>Send Link</span></button>
             </form>
-             <p className='text-light pointer' onClick={() => setFormType('forgotForm')}>Forgot Password?</p>
 
         </>
     )

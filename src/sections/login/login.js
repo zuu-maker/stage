@@ -18,7 +18,7 @@ export default function Login() {
     const history = useHistory()
     const emailRef = useRef()
     const passwordRef = useRef()
-    const { login,currentUser } = useAuth()
+    const { login,currentUser  } = useAuth()
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
@@ -27,8 +27,10 @@ export default function Login() {
         try {
             setError('')
             setLoading(true)
-            await login(emailRef.current.value, passwordRef.current.value)
-            history.push('/events')
+            await login(emailRef.current.value, passwordRef.current.value).then((user) => {history.push(`/user/${user.user.uid}`);
+                console.log(currentUser)})
+
+
         } catch (err) {
             switch (err.code) {
                 case 'auth/invalid-email':

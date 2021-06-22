@@ -34,7 +34,7 @@ function Events() {
             <div className='sm-view pl-4 pr-4'>
                 <div className='  d-flex justify-content-center align-items-center pt-4'>
                     <div className='flex-grow-1'>
-                        { currentUser.username ? <h4 className='text-light'>Hi {currentUser.username},</h4> :  <h4 className='text-light'>All Events</h4>}
+                        { currentUser ? <h4 className='text-light'>Hi {currentUser.username},</h4> :  <h4 className='text-light'>All Events</h4>}
                     <p>Let's Discover a new Adventure</p>
 
 

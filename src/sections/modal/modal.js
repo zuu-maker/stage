@@ -37,27 +37,28 @@ function LoginModal(props) {
                     <>
                         <Login/>
                         <p className='pt-3 form-text f-18'> Don't have an account? <span
-                            onClick={() => setShowForm({login: false, signup: true, forgotPassword: false})}
+                            onClick={() => {setShowForm({login: false, signup: true, forgotPassword: false});setFormType('signupForm')}}
                             className="login-text pointer">Sign Up</span></p>
+                        <p className='text-light pointer' onClick={() => {setShowForm({login: false, signup: false, forgotPassword: true});setFormType('forgotForm')}}>Forgot Password</p>
                     </>
                     : formType == 'signupForm' ?
                         <>
 
                             <Signup/>
-                            <p className='pt-3 form-text f-18'>Have an account? <span onClick={() => setShowForm({
+                            <p className='pt-3 form-text f-18'>Have an account? <span onClick={() => {setShowForm({
                                 signup: false,
                                 login: true,
                                 forgotPassword: false
-                            })} className="login-text pointer">Log In</span></p>
+                            });setFormType('loginForm')}} className="login-text pointer">Log In</span></p>
                         </>
                         : formType == 'forgotForm' ?
                             <>
                                 <ForgotPassword/>
-                                <p className='pt-3 form-text f-18'>Have an account? <span onClick={() => setShowForm({
+                                <p className='pt-3 form-text f-18'>Have an account? <span onClick={() => { setShowForm({
                                     signup: false,
                                     login: true,
                                     forgotPassword: false
-                                })} className="login-text pointer">Log In</span></p>
+                                });setFormType('loginForm')}} className="login-text pointer">Log In</span></p>
                             </>
 
                             :formType == 'eventForm' ? <EventsForm/>

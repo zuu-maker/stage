@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './events.css';
 import '../../helper/helper'
-import {getDoc, getOptions, submitForm} from "../../helper/helper";
+import {getDoc, getOptions, pushData} from "../../helper/helper";
 import calendar from "../../images/created_schedule.png";
 import dropdown from "../../images/sort.png"
 import {useForm} from "../../contexts/formContext";
@@ -48,7 +48,7 @@ export default function EventsForm() {
 
         }
         try {
-            submitForm(formData)
+            pushData('Events',formData)
         } catch (e) {
             console.log(e.message)
 

@@ -1,37 +1,55 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import edit from "../../images/edit.png";
 import dummy from "../../images/dummy.png";
 import rank from "../../images/rank.svg";
 import follow from "../../images/follow.svg";
+import back_arrow from "../../images/back_arrow.svg";
 import message from "../../images/message_green.svg";
-import {Link} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import arrow from "../../images/arrow right.svg";
+import Graph from "./graph";
+import { getRealtimeDoc} from "../../helper/helper";
 
 
-function OtherUserMenu(props) {
+function OtherUserMenu({user}) {
+
     return (
         <div className='d-flex flex-column text-center card-body user-side-bar'>
+            <div className='text-left w-100 back-arrow'>
+                <img src={back_arrow} alt=""/>
+            </div>
             <div className='text-center card-body user-info-container'>
 
-                <div className='position-relative'>
-                    <div className='mx-auto d-block user-profile-pic-wrapper'>
-                        <img src={dummy} alt=""/>
+                <div className='position-relative d-flex align-items-center '>
+                    <div className='sm-view other-user-btn'>
+                        <button className='btn flex-grow-1 m-2 btn-clear' style={{backgroundImage: `url(${message})`}}></button>
+
+                    </div>
+
+                    <div className='mx-auto user-profile-pic-wrapper' style={{backgroundImage: `url(${user.userProfileImageUrl})`}}>
+                        {/*<img src={user.userProfileImageUrl} alt=""/>*/}
                     </div>
                     <div className='badge-wrapper'>
                         <img src={rank} alt=""/>
                         <span className='ml-2'>235</span>
                     </div>
+                    <div className='sm-view other-user-btn'>
+                        <button className='btn flex-grow-1 m-2' style={{backgroundImage: `url(${follow})`}}></button>
+
+                    </div>
+
                 </div>
 
 
                 <div className='mt-5 mb-4 text-light'>
-                    <div className='space-medium f-18' >Display Name</div>
-                    <div className="space-light ">@username</div>
+                    <div className='space-medium f-18' >{user.userName}</div>
+                    <div className="space-light ">@{user.userName}</div>
 
                 </div>
+                <Graph />
 
             </div>
-            <div className='p-3 d-flex center  followers-container text-light mb-4'>
+            <div className='p-3  center  followers-container text-light mb-4'>
                 <div className='flex-column border-right d-inline-flex text-center flex-grow-1 follow-stats'>
                     <span>100K</span>
                     <span>Followers</span>
@@ -42,9 +60,11 @@ function OtherUserMenu(props) {
                 </div>
 
             </div>
-            <div className='d-flex   center other-user-btn'>
+            <div className='lg-view'>
+            <div className='   center other-user-btn'>
                 <button className='btn flex-grow-1 m-2 btn-clear' style={{backgroundImage: `url(${message})`}}>Message</button>
                 <button className='btn flex-grow-1 m-2' style={{backgroundImage: `url(${follow})`}}>Follow</button>
+            </div>
             </div>
 
 

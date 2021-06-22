@@ -3,6 +3,10 @@
     src: url(SpaceGrotesk-Medium.ttf);
 }
 
+.event-details{
+    display: flex;
+}
+
 .event-details .event-card {
     border-radius: 20px;
     width: auto;
@@ -54,6 +58,7 @@
 
 .event-description{
     font-family: SpaceGrotesk-Light;
+    max-width: 75%;
 }
 .user-list-sub-section{
     border-bottom: 1px solid #13161A;
@@ -80,20 +85,130 @@
     height: 45pt;
 
 }
+.user-list-thumb-wrapper img{
+    height: inherit;
+    width: max-content;
+}
 
 .space-light{
     font-family: 'SpaceGrotesk-Light';
 }
 
+
 .event-detail-container  .difficulty-btn {
-    position: relative;
-    bottom: 74%;
-    left: 4%;
+    position: absolute;
+    bottom: 8%;
+    left: 5%;
     width: fit-content;
     border-radius: 45pt;
-    padding: 1%;
+    padding: 2%;
 }
 .space-medium{
     font-family: SpaceGrotesk-Medium;
+}
+.cost{
+    color: #18ff00;
+}
+.join-btn button{
+    margin-left: auto;
+    margin-right: 0;
+    text-align: right;
+}
+@media (max-width: 985px) {
+.event-details .event-card{
+    border-radius: 0px;
+    height: 30%;
+}
+    .event-detail-container {
+        width: 100%;
+    }
+    .event-details{
+        display: flex;
+        flex-direction: column;
+    }
+    .event-details .cover-img-wrapper img {
+        /* max-width: 100%; */
+        width: 100%;
+        border-radius: 0px;
+        height: 30%;
+
+    }
+    .container{
+        padding: 0;
+        margin: 0;
+    }
+    .header {
+        padding: 0;
+    }
+    .event-info{
+        padding: 3% 4%;
+    }
+    .event-description{
+        max-width: 95%;
+    }
+    .about-section,.commissioner-section{
+        background-color: #2B3038;
+        padding: 3%;
+        border-radius: 18.75pt;
+
+    }
+    .event-icon-container{
+        flex-direction: column;
+    }
+    .event-details .icon-wrapper{
+        height: fit-content;
+        padding: 5%;
+        border-radius: 15px;
+        background-color: #13161A;
+
+    }
+    .icon-item{
+        margin: 0 0 2% 0;
+    }
+    .user-list-section{
+        background-color: #13161A;
+        border-radius: 0;
+        height: fit-content;
+    }
+    .user-list-sub-section{
+        border-bottom: 1px solid #2B3038;
+
+    }
+    .join-btn{
+        background-color: #13161A;
+        padding: 0 5% 5% 5%;
+        height: fit-content;
+        width: 100%;
+    }
+    .join-btn {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 6%;
+        max-height: fit-content;
+    }
+    .join-btn button{
+        width: 100%;
+        text-align: center;
+
+
+    }
+    .event-detail-title{
+        font-size: 18pt;
+    }
+    .sm-view p.cost{
+        color: #18ff00;
+    }
+    .back-arrow{
+        position: absolute;
+        width: 30pt;
+        left: 5%;
+        top: 5%;
+
+
+    }
+
+
 }
 
