@@ -1,41 +1,64 @@
 import React, {useState} from 'react';
 import './events.css'
-import LoginLink from "../login/loginMobile";
-import {eventFilter} from "../../helper/helper";
 import {useEvent} from "../../contexts/eventsContext";
 import {useLoader} from "../../contexts/loaderContext";
+import {realDB} from "../../firebase/firebase";
 
 function Category(props) {
     const {eventsList,setEventsList} = useEvent()
-    const [loader,setLoader] = useState();
+    const {loader, setLoader} =useLoader()
 
 
 
     function handleClick(e) {
-        e.preventDefault()
+        setLoader(true);
+            let eventsRef;
 
-        try {
-            setLoader(true)
-            const l = eventFilter('Eventsport',e.target.value)
-            setEventsList(l)
-            setLoader(false)
+            { e.target.value === 'All' ?  eventsRef = realDB.ref('Events')
 
-        } catch (err) {
-            console.log(err.message)
-            setLoader(false)
+                :   eventsRef = realDB.ref('Events').orderByChild('Eventsport').equalTo(e.target.value);
+            }
 
-        }
+            let eventList = []
+
+            eventsRef.on('value',(snapshot) => {
+
+                snapshot.forEach(function(events) {
+                    eventList.push({
+
+
+                        EventName: events.val().EventName,
+                        EventEntryFee: events.val().EventEntryFee,
+                        eventGame: events.val().EventGame,
+                        eventCurrentParticipants: events.val().EventCurrentParticipants,
+                        EventMaximumParticipants: events.val().EventMaximumParticipants,
+                        EventTotalPrizes: events.val().EventTotalPrizes,
+                        EventDifficulty: events.val().EventDifficulty
+
+
+                    });
+                });
+
+
+                setEventsList(eventList)
+                setLoader(false);
+            });
+
+        // try {
+        //     setLoader(true)
+        //     const l = eventFilter('Eventsport',e.target.value)
+        //     setEventsList(l)
+        //     setLoader(false)
+        //
+        // } catch (err) {
+        //     console.log(err.message)
+        //     setLoader(false)
+        //
+        // }
     }
     return (
         <nav className='mt-4 category  mb-4 navbar navbar-expand-lg'>
-            {loader  ? <>
-                    <div className="loader">
-                        <div className="bar">
 
-                        </div>
-                    </div>
-                </>
-                : <div></div>}
             <div className="" id="">
                 <ul className="navbar-nav ml-auto">
                     <li className="nav-item active">

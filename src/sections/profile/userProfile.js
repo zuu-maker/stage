@@ -13,28 +13,45 @@ import {useAuth} from "../../contexts/authContext";
 import {useParams} from "react-router-dom";
 import OtherUserMenu from "./otherUserMenu";
 import {getDoc, getRealtimeDoc} from "../../helper/helper";
-import {db} from "../../firebase/firebase";
+import {auth, db} from "../../firebase/firebase";
+import {useUser} from "../../contexts/userContext";
 
 function UserProfile() {
-    const {currentUser}  = useAuth()
+    const {currentUser,setCurrentUser}  = useAuth()
     let params = useParams();
-    const [user,setUser] = useState([]);
+    const userId = params.id;
+    const {user, setUser} = useUser();
+    const [curUser,setCurUser] = useState();
 
-    useEffect(async () => {
+    useEffect( async () => {
 
-        getRealtimeDoc('Users', params.id).then(function (snapshot) {
+         await getRealtimeDoc('Users', params.id).then(function (snapshot) {
             const data = snapshot.val();
             // console.log(data)
+             setUser(data)
+
         });
-        await db.collection('Users').where('email', "==", currentUser.email).get()
-            .then((snapshot) => {
-                snapshot.forEach(doc => {
-                    const data = doc.data()
-                    setUser(data)
+        // await auth.onAuthStateChanged(user => {
+        //     // User is signed in.
+        //      db.collection('Users').where('email', "==", user.email).get()
+        //         .then((snapshot) => {
+        //             snapshot.forEach(doc => {
+        //                 const data = doc.data()
+        //                 setUser(data)
+        //                 console.log(user)
+        //
+        //
+        //             })
+        //
+        //         })
+        //
+        //
+        //
+        //
+        // })
+        //
+        // return unsubscribe
 
-                })
-
-            })
 
         console.log(user)
 
@@ -47,7 +64,7 @@ function UserProfile() {
 
             <Header/>
 
-                {currentUser && currentUser.email === user.email ?
+                {currentUser && user.userEmail == currentUser.email?
                     <div className='container user d-flex'>
                         <UserMenu user={user} />
                     </div>

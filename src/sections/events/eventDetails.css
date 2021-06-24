@@ -73,10 +73,12 @@
     font-family: 'SpaceGrotesk-Medium';
 }
 
-.user-list-section{
+.user-list-section {
     background-color: #2B3038;
     border-radius: 15pt;
     height: 85vh;
+    margin-left: 4%;
+    overflow-y: scroll;
 }
 .user-list-thumb-wrapper{
     overflow: hidden;

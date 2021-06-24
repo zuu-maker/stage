@@ -19,17 +19,20 @@ function Events() {
         <>
         <div  className='container events body'>
             <Header/>
-                <div className=' lg-view align-items-center pt-4'>
+            <div className='lg-view'>
+                <div className=' d-flex align-items-center pt-4'>
                     <h4 className=' text-light'>All Events</h4>
 
-                <div className="search-container flex-grow-1 ">
-                <div className='search d-flex float-right'>
-                <Search/>
-                <CreateEventBtn/>
-                </div>
+                    <div className="search-container flex-grow-1 ">
+                        <div className='search d-flex float-right'>
+                            <Search/>
+                            <CreateEventBtn/>
+                        </div>
 
 
+                    </div>
                 </div>
+
             </div>
             <div className='sm-view pl-4 pr-4'>
                 <div className='  d-flex justify-content-center align-items-center pt-4'>

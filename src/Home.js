@@ -20,6 +20,7 @@ import {LoaderProvider} from "./contexts/loaderContext";
 import UserProfile from "./sections/profile/userProfile";
 import OtherUser from "./sections/profile/otherUser";
 import Message from "./sections/message/message";
+import {UserProvider} from "./contexts/userContext";
 
 
 function Home() {
@@ -27,6 +28,7 @@ function Home() {
     return (
       <Router>
           <AuthProvider>
+              <UserProvider>
 
           <LoaderProvider>
             <EventProvider>
@@ -58,6 +60,8 @@ function Home() {
           </FormProvider>
             </EventProvider>
           </LoaderProvider>
+                  </UserProvider>
+
           </AuthProvider>
 
       </Router>

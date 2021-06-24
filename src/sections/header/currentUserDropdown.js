@@ -9,7 +9,7 @@ import {useHistory} from 'react-router-dom'
 
 
 
-function CurrentUserDropdown(props) {
+function CurrentUserDropdown({user}) {
     const { logout,currentUser } = useAuth()
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)

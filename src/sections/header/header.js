@@ -9,6 +9,7 @@ import CurrentUserDropdown from "./currentUserDropdown";
 import {Link} from 'react-router-dom'
 import {FormProvider} from "../../contexts/formContext";
 import {useLoader} from "../../contexts/loaderContext";
+import {useUser} from "../../contexts/userContext";
 
 
 
@@ -17,6 +18,7 @@ export default function Header() {
     const {loader} =useLoader()
 
     const { currentUser,loading } = useAuth()
+    const { user } = useUser()
 
     return (
 
@@ -61,7 +63,7 @@ export default function Header() {
                                             <Link className="nav-link" href="#">How does it work</Link>
                                         </li>
                                     }
-                                    {currentUser && currentUser.email
+                                    {currentUser && currentUser.userEmail
                                         ? <li className="nav-item">
                                             <Link className="nav-link" to='/messages/1' href="#">Messages</Link>
                                         </li>
@@ -87,7 +89,7 @@ export default function Header() {
                     <div className="col col-md-3 d-none d-lg-flex header_btn_wrapper">
                         <Link href="#" className="btn btn-clear">Contact Us</Link>
                         { currentUser && currentUser.email
-                            ? <CurrentUserDropdown/>
+                            ? <CurrentUserDropdown user={''}/>
                             : <LoginBtn/>
                         }
 

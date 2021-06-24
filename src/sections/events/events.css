@@ -28,9 +28,17 @@ form button{
 }
 
 .event-card {
-	border-radius: 20px;
-	width: auto;
-	margin: 20px;
+    border-radius: 20px;
+    width: 30%;
+    margin: 1%;
+    height: fit-content;
+    max-width: 30%;
+
+}
+
+.event-detail-container .event-card,.user .event-card ,.other-user .event-card{
+    max-width: 100%;
+
 }
 .card-title{
     color: white;
@@ -93,11 +101,14 @@ left: 45pt;
 	background-color: transparent;
 	border-top: 1px solid #13161A;
 }
- .grid-container {
-	display: grid;
-	grid-template-columns: auto auto auto;
-	padding: 0px;
+
+.grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    padding: 0px;
 }
+
 
 
 li{
@@ -115,7 +126,17 @@ button{
     background-position: right center;
     background-position-x: 90%;
 }
-
+.search-dropdown {
+    height: fit-content;
+    background-color: #2B3038;
+    border-radius: 18pt;
+    position: absolute;
+    z-index: 100;
+    width: 90%;
+    max-height: 63vh;
+    overflow-y: auto;
+    margin-top: 1%;
+}
 select {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -126,7 +147,7 @@ select {
 }
 
 .lg-view{
-    display: flex;
+    display: block;
 }
 .sm-view{
     display: none;
@@ -167,7 +188,7 @@ input[type=date]::-webkit-outer-spin-button /* down */
         display: flex;
         flex-direction: column;
     }
-    .events .cover-img-wrapper{
+    .events .cover-img-wrapper,.user .cover-img-wrapper ,.other-user .cover-img-wrapper{
         display: none;
     }
     .mobile-navbar{
@@ -223,5 +244,10 @@ input[type=date]::-webkit-outer-spin-button /* down */
         border-radius: 20px;
         width: auto;
         margin: 10px 20px;
+        max-width: 100%;
+    }
+    .search-dropdown{
+
+        height: fit-content;
     }
 }

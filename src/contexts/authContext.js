@@ -35,10 +35,15 @@ export function AuthProvider({ children }) {
         return currentUser.updatePassword(password)
     }
 
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            setCurrentUser(user)
+    useEffect(async () => {
+         const unsubscribe = await auth.onAuthStateChanged(user => {
+                // User is signed in.
+                setCurrentUser(user)
+
+
+
             setLoading(false)
+
         })
           
         return unsubscribe
@@ -46,6 +51,7 @@ export function AuthProvider({ children }) {
 
     const value = {
         currentUser,
+        setCurrentUser,
         login,
         signup,
         logout,

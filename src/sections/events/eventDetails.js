@@ -7,10 +7,13 @@ import UserList from "./userList";
 import {Link, useHistory, useParams} from 'react-router-dom'
 import {getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
 import Card from "./card";
+import {useLoader} from "../../contexts/loaderContext";
 
 const EventDetails = () => {
     const [eventData,setEventData] =useState([]);
     const [participants,setParticipants] =useState([]);
+    const {loader, setLoader} =useLoader();
+
 
 
     let params = useParams();
@@ -18,6 +21,7 @@ const EventDetails = () => {
     let  childList =[]
 
     useEffect(()=>{
+        setLoader(true)
         getRealtimeDoc('Events',params.id).then(function(snapshot) {
             const data = snapshot.val();
             setEventData(data)
@@ -35,6 +39,8 @@ const EventDetails = () => {
             //
             // })
         });
+        setLoader(false)
+
         console.log(participants);
 
 
@@ -47,8 +53,8 @@ const EventDetails = () => {
             <Header/>
             <div className='container event-details '>
                 <EventSection event={eventData} participantList={participants.length}/>
-                <div className='flex-grow-1'>
-                    <div className=' pt-3 user-list-section'>
+                <div className='flex-grow-1 user-list-section'>
+                    <div className=' pt-3 '>
                         <h5 className='pl-4 text-light'>Participants</h5>
                         <div className='user-list'>
                             { participants ? participants?.map(user  =>{

@@ -54,7 +54,10 @@ function CardList() {
 
       { eventsList ? eventsList?.map(event  =>{
           return(
+              <>
+
             <Card event={event} key={event.id} />
+              </>
           )
       }) : 'p'}
 

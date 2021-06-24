@@ -21,12 +21,14 @@ import Card from "../events/card";
 
 const routes = [
     {
-        path: "/user/dashboard",
+        path: "/user/:id",
         exact: true,
         sidebar: () => <></>,
 
         main: () => <div className='flex-column flex-grow-1'>
-            <Graph/>
+           <div className='lg-view'>
+               <Graph/>
+           </div>
             <div className='grid-container'>
                 <Card event={''}/>
                 <Card event={''}/>
@@ -97,7 +99,7 @@ function UserMenu({user}) {
         <>
         <Router>
 
-                <div className='d-flex flex-column card-body user-side-bar'>
+                <div className='d-flex flex-column  card-body user-side-bar'>
                     <div className='user-sidebar-header'>
                         <div className='flex-column'>
                             <h5 className='text-light'>Your Profile</h5>
@@ -125,8 +127,8 @@ function UserMenu({user}) {
 
 
                         <div className='mt-3 text-light'>
-                            <div className='space-medium f-18' >{user.Username}</div>
-                            <div className="space-light mb-4">@{user.Username}</div>
+                            <div className='space-medium f-18' >{user.userName}</div>
+                            <div className="space-light mb-4">@{user.userName}</div>
 
                         </div>
                         <div className='sm-view'>

@@ -21,7 +21,7 @@ function EventSection({event},{participantList}) {
         <>
             <div className=' event-detail-container flex-column'>
                 <div className=' mb-4 position-relative overflow-hidden m-0 border-0 grid-item event-card'>
-                    <img className='  back-arrow' src={back_arrow} alt=""/>
+                    <img className='sm-view  back-arrow' src={back_arrow} alt=""/>
 
                     <div className='cover-img-wrapper'>
                         <img src={basketball} alt=""/>
@@ -33,10 +33,10 @@ function EventSection({event},{participantList}) {
 
                 </div>
                 <div className='event-info'>
-<div className='lg-view'>
+<div className='lg-view flex-column'>
     <div className='d-flex  align-items-center'>
         <p className='event-detail-title text-light'>{event.EventName}</p>
-        <div className='join-btn'>
+        <div className='join-btn mr-0 ml-auto'>
             <button className='   btn  '>Join Event</button>
 
         </div>

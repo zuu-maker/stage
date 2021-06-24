@@ -35,7 +35,7 @@
     transform: scale(1.03);
 }
 .loader {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 15px;
     right: 15px;

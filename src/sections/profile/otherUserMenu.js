@@ -9,22 +9,27 @@ import {Link, useParams} from "react-router-dom";
 import arrow from "../../images/arrow right.svg";
 import Graph from "./graph";
 import { getRealtimeDoc} from "../../helper/helper";
+import Card from "../events/card";
 
 
 function OtherUserMenu({user}) {
 
     return (
+        <div className='d-flex user-menu-container'>
         <div className='d-flex flex-column text-center card-body user-side-bar'>
-            <div className='text-left w-100 back-arrow'>
+            <div className='sm-view text-left w-100 back-arrow'>
                 <img src={back_arrow} alt=""/>
             </div>
-            <div className='text-center card-body user-info-container'>
+            <div className='text-center  user-info-container'>
 
                 <div className='position-relative d-flex align-items-center '>
-                    <div className='sm-view other-user-btn'>
-                        <button className='btn flex-grow-1 m-2 btn-clear' style={{backgroundImage: `url(${message})`}}></button>
+                    <div className='sm-view'>
+                        <div className=' other-user-btn'>
+                            <button className='btn flex-grow-1 m-2 btn-clear' style={{backgroundImage: `url(${message})`}}></button>
 
+                        </div>
                     </div>
+
 
                     <div className='mx-auto user-profile-pic-wrapper' style={{backgroundImage: `url(${user.userProfileImageUrl})`}}>
                         {/*<img src={user.userProfileImageUrl} alt=""/>*/}
@@ -33,10 +38,13 @@ function OtherUserMenu({user}) {
                         <img src={rank} alt=""/>
                         <span className='ml-2'>235</span>
                     </div>
-                    <div className='sm-view other-user-btn'>
-                        <button className='btn flex-grow-1 m-2' style={{backgroundImage: `url(${follow})`}}></button>
+                    <div className='sm-view'>
+                        <div className=' other-user-btn'>
+                            <button className='btn flex-grow-1 m-2' style={{backgroundImage: `url(${follow})`}}></button>
 
+                        </div>
                     </div>
+
 
                 </div>
 
@@ -46,7 +54,10 @@ function OtherUserMenu({user}) {
                     <div className="space-light ">@{user.userName}</div>
 
                 </div>
-                <Graph />
+                <div className='sm-view'>
+                    <Graph />
+                </div>
+
 
             </div>
             <div className='p-3  center  followers-container text-light mb-4'>
@@ -67,6 +78,13 @@ function OtherUserMenu({user}) {
             </div>
             </div>
 
+
+
+        </div>
+            <div className='grid-container'>
+                <Card event={''}/>
+                <Card event={''}/>
+            </div>
 
 
         </div>
