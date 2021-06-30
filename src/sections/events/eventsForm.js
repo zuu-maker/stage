@@ -7,24 +7,152 @@ import dropdown from "../../images/sort.png"
 import {useForm} from "../../contexts/formContext";
 import {db, realDB} from "../../firebase/firebase";
 import Option from "../../components/option";
-import {x} from './test'
 import EventOptions from "../../components/eventOptions";
+import Switch from '@material-ui/core/Switch';
+import PropTypes from 'prop-types';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
+import Slider from '@material-ui/core/Slider';
+import Typography from '@material-ui/core/Typography';
+import Tooltip from '@material-ui/core/Tooltip';
 
+function ValueLabelComponent(props) {
+    const { children, open, value } = props;
+
+    return (
+        <Tooltip open={open} enterTouchDelay={0} placement="top" title={value}>
+            {children}
+        </Tooltip>
+    );
+}
 
 export default function EventsForm() {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
     const [formOptions, setFormOptions] = useState([])
-    const [options, setOptions] = useState([])
+    const [maxParticipants, setMaxParticipants] = useState([])
+    const [eventTotalPrizes, setEventTotalPrizes] = useState(0)
+    const [slider, setSlider] = useState({'s1':0,'s2':0,'s3':0,'s4':0})
+    const {options, setOptions} = useForm([])
+    const [state, setState] = React.useState({checkedA: true, checkedB: true,});
+    var tota, totb, totc,totd, alltot, altval, getslider;
+    var chktot = 100;
+    var scrore = 101;
 
-    const optionList = () =>{
-        const op = [];
-        const result = options.forEach((e) => {op.push(e.Difficulty)})
+    const handleChange = (event) => {
+        setState({ ...state, [event.target.name]: event.target.checked });
+    };
+//On Change event
+    function adjustSlider(e){
+        // Get the sliders Id
+        getslider = e.target.id;
+        setSlider(e.target.ariaValueNow)
+        console.log(slider)
 
-        console.log(op)
-        console.log(result)
-        return op
+        //Gather all slider values
+        tota = parseInt(document.getElementById('range1').ariaValueNow);
+        totb = parseInt(document.getElementById('range2').ariaValueNow);
+        totc = parseInt(document.getElementById('range3').ariaValueNow);
+        totd = parseInt(document.getElementById('range4').ariaValueNow);
 
+        alltot = tota + totb + totc +totd;
+        // console.log(tota)
+        // console.log(alltot)
+        //check sliders total if greater than 100 and re-update slider
+        if (alltot > chktot) {
+            if (getslider == "range1") {
+                altval = chktot - totb - totc-totd;
+                setSlider({'s1':altval,'s2':0,'s3':0,'s4':0});
+
+            }
+            if (getslider == "range2") {
+                altval = chktot - tota - totc-totd;
+                setSlider({'s1':0,'s2':altval,'s3':0,'s4':0});
+            }
+            if (getslider == "range3") {
+                altval = chktot - tota - totb-totd;
+                setSlider({'s1':0,'s2':0,'s3':altval,'s4':0});
+            }
+            if (getslider == "range4") {
+                altval = chktot - tota - totb-totc;
+                setSlider({'s1':0,'s2':0,'s3':0,'s4':altval});
+            }
+        }
+
+    }
+
+    const useStyles = makeStyles((theme) => ({
+        root: {
+            width: 300 + theme.spacing(3) * 2,
+        },
+        margin: {
+            height: theme.spacing(3),
+        },
+    }));
+
+
+    ValueLabelComponent.propTypes = {
+        children: PropTypes.element.isRequired,
+        open: PropTypes.bool.isRequired,
+        value: PropTypes.number.isRequired,
+    };
+
+
+
+
+    const PrettoSlider = withStyles({
+        root: {
+            color: '#52af77',
+            height: 8,
+        },
+        thumb: {
+            height: 24,
+            width: 24,
+            backgroundColor: '#fff',
+            border: '2px solid currentColor',
+            marginTop: -8,
+            marginLeft: -12,
+            '&:focus, &:hover, &$active': {
+                boxShadow: 'inherit',
+            },
+        },
+        active: {},
+        valueLabel: {
+            left: 'calc(-50% + 4px)',
+        },
+        track: {
+            height: 8,
+            borderRadius: 4,
+        },
+        rail: {
+            height: 8,
+            borderRadius: 4,
+        },
+    })(Slider);
+
+
+
+
+
+
+
+    function maximumParticipants() {
+        var e = document.getElementById("event-style");
+        var selectedOption = e.options[e.selectedIndex].text;
+        {
+            selectedOption == 'Exhibition' ? setMaxParticipants(['2'])
+                : selectedOption == 'Season' ? setMaxParticipants(['32'])
+                : selectedOption == 'Tournament' ? setMaxParticipants(['2', '4', '8', '16', '32', '64'])
+                    : selectedOption == 'Franchise' ? setMaxParticipants(['32'])
+                        : setMaxParticipants(['32'])
+        }
+
+    }
+    function totalPrize(e) {
+        var o = document.getElementById("event-participants");
+        var selectedOption = o.options[o.selectedIndex].text;
+        console.log(selectedOption)
+        var computation = (parseInt(selectedOption) * e.target.value) - 7.5;
+        {computation < 0 ? setEventTotalPrizes(0) :setEventTotalPrizes(computation) }
 
     }
 
@@ -32,12 +160,14 @@ export default function EventsForm() {
         e.preventDefault()
         var startDate = new Date(e.target.EventStartDate.value).valueOf();
         var endDate = new Date(e.target.EventEndDate.value).valueOf();
+        var e = document.getElementById("sport");
+        var selectedOption = e.options[e.selectedIndex].text;
 
         var formData = {
 
 
             EventName: e.target.EventName.value,
-            Eventsport: e.target.Eventsport.value,
+            Eventsport: selectedOption,
             EventDifficulty: e.target.EventDifficulty.value,
             EventStyle: e.target.EventStyle.value,
             EventStartDate: startDate,
@@ -48,7 +178,7 @@ export default function EventsForm() {
 
         }
         try {
-            pushData('Events',formData)
+            pushData('Events', formData)
         } catch (e) {
             console.log(e.message)
 
@@ -57,38 +187,57 @@ export default function EventsForm() {
 
     }
 
-    function handleClickOption() {
-        try {
+    async function handleClickOption() {
+        let collectionList = []
+        var e = document.getElementById("event-sport");
+        var selectedOption = e.options[e.selectedIndex].text;
 
-            const docs =getDoc('SportsEvents', 'Sport', this.target.value)
-            setOptions( docs)
-        } catch (e) {
-            console.log(e.message)
-        }
-    }
-
-    useEffect(() => {
+        // const docs = await getDoc('SportsEvents', 'Sport', e.target.value)
 
 
-            const collectionList = []
-
-            db.collection('SportsEvents').get().then(snapshot => {
-
-
+        await db.collection('SportsEvents').where('Sport', "==", selectedOption).get()
+            .then((snapshot) => {
                 snapshot.forEach(doc => {
-                        const data = doc.data()
-                        collectionList.push(data)
+                    const data = doc.data()
+                    collectionList.push(data)
+                    console.log(data)
 
-                    }
-                )
-                console.log(collectionList)
+                })
 
-                setFormOptions(collectionList)
+
+            })
+            .catch((error) => {
+                console.log("Error getting documents: ", error);
+            });
+        console.log(collectionList)
+
+
+        setOptions(collectionList)
+        console.log(options)
+
+    }
+
+    useEffect(async () => {
+
+
+        const collectionList = []
+
+        await db.collection('SportsEvents').get().then(snapshot => {
+
+
+            snapshot.forEach(doc => {
+                const data = doc.data()
+                collectionList.push(data)
 
             })
 
-            setOptions( getDoc('SportsEvents', 'Sport','Football'))
-        }, [])
+
+        })
+        setFormOptions(collectionList)
+
+        console.log(formOptions)
+
+    }, [])
 
     return (
         <>
@@ -100,7 +249,7 @@ export default function EventsForm() {
                     <input name="EventName"
                            type="text" placeholder="Event Name"/>
 
-                    <select className="pointer" onChange={handleClickOption}
+                    <select id='event-sport' className="pointer" onChange={handleClickOption}
                             style={{backgroundImage: `url(${dropdown})`}} name="Eventsport">
                         {formOptions && formOptions.length > 0 ? formOptions.map(option => {
                                 return (<Option option={option}/>)
@@ -111,24 +260,14 @@ export default function EventsForm() {
 
                         }
                     </select>
-                    <select className="pointer" style={{backgroundImage: `url(${dropdown})`}} name="EventDifficulty">
-                        {options  ? options.map(eventOption => {
-                            return (<EventOptions eventOption={eventOption}/>)
-                        }) :
+                    <select className="pointer" style={{backgroundImage: `url(${dropdown})`}} name="QuarterLengths">
+                        {options ? options.map(eventOption => {
+                            return (<EventOptions eventOption={eventOption.QuarterLengths}/>)
+                        }) : <option>Null</option>}
 
-                        <option>Null</option>}
-
-                    </select>
-
-                    <select className="pointer" style={{backgroundImage: `url(${dropdown})`}} name="EventStyle">
-                        <option selected value="Season">Season</option>
-                        <option value="Tournament">Tournament</option>
 
                     </select>
 
-                    <input name="EventQuarterLength"
-                           type="number" min="2" max="60" step="1" placeholder="Quarter Length (minutes)"
-                    />
                     <input name="EventStartDate"
                            type="date" placeholder="Registration Start Date"
                     />
@@ -137,15 +276,61 @@ export default function EventsForm() {
                     <input name="EventEndDate"
                            type="date" placeholder="Registration End Date"
                     />
-                    <input name="EventMaximumParticipants"
-                           type="text" placeholder="Maximum Number of Participant"/>
-                    <input name="EventEntryFee"
-                           type="text" placeholder="Entry Fee"/>
+
+                    <select className="pointer" style={{backgroundImage: `url(${dropdown})`}} name="EventDifficulty">
+                        {options ? options.map(eventOption => {
+                            return (<EventOptions eventOption={eventOption.Difficulty}/>)
+                        }) : <option>Null</option>}
+
+                    </select>
+
+                    <select id='event-style' onChange={maximumParticipants} className="pointer"
+                            style={{backgroundImage: `url(${dropdown})`}} name="EventStyle">
+                        {options ? options.map(eventOption => {
+                            return (<EventOptions eventOption={eventOption.Style}/>)
+                        }) : <option>Null</option>}
+
+
+                    </select>
+
+
+                    <select id='event-participants' className="pointer" style={{backgroundImage: `url(${dropdown})`}} name="EventMaximumParticipants">
+                        {maxParticipants ? <EventOptions eventOption={maxParticipants}/>
+                         : <option>Null</option>}
+
+
+                    </select>
+
+                    <input name="EventEntryFee" type="number" onChange={totalPrize} placeholder="Entry Fee"/>
+                    <input name="EventTotalPrizes" value={eventTotalPrizes} disabled type="text" placeholder="Projected Total Prize"/>
+                    <div className='switch-container d-flex center'>
+                        <span>Default Prize Tier</span>
+                        <Switch className='mr-0 ml-auto'
+                            checked={state.checkedB}
+                            onChange={handleChange}
+                            color="primary"
+                            name="checkedB"
+                            inputProps={{ 'aria-label': 'primary checkbox' }}
+                        />
+                    </div>
+                    {/*<PrettoSlider id='range1' onChange={adjustSlider} valueLabelDisplay="auto" aria-label="pretto slider" defaultValue={20} aria-valuenow={slider} />*/}
+                    {/*<PrettoSlider id='range2' onChange={adjustSlider} valueLabelDisplay="auto" aria-label="pretto slider" defaultValue={20} aria-valuenow={slider} />*/}
+                    {/*<PrettoSlider id='range3' onChange={adjustSlider} valueLabelDisplay="auto" aria-label="pretto slider" defaultValue={20} aria-valuenow={slider} />*/}
+                    {/*<PrettoSlider id='range4' onChange={adjustSlider} valueLabelDisplay="auto" aria-label="pretto slider" defaultValue={20} aria-valuenow={slider} />*/}
+                    {/*<Slider onChange={adjustSlider} id='range1' aria-valuenow={slider.s1} ValueLabelComponent={ValueLabelComponent} aria-label="custom thumb label" aria-labelledby='range1' defaultValue={0}/>*/}
+                    {/*<Slider onChange={adjustSlider} id='range2' aria-valuenow={slider.s2} ValueLabelComponent={ValueLabelComponent} aria-label="custom thumb label" aria-labelledby='range1' defaultValue={0}/>*/}
+                    {/*<Slider onChange={adjustSlider} id='range3' aria-valuenow={slider.s3} ValueLabelComponent={ValueLabelComponent} aria-label="custom thumb label" aria-labelledby='range1' defaultValue={0}/>*/}
+                    {/*<Slider onChange={adjustSlider} id='range4' aria-valuenow={slider.s4} ValueLabelComponent={ValueLabelComponent} aria-label="custom thumb label" aria-labelledby='range1' defaultValue={0}/>*/}
 
                 </div>
                 <button disabled={loading} style={{background: loading ? '#ffffff' : ''}} type="submit"><span
                     className='form-btn'>Create Event</span></button>
             </form>
+            {/*<input id="range1" className="slider" type="range" min="0" max="100" value='0' />*/}
+            {/*<input id="range2" className="slider" type="range" min="0" max="100" value='0' />*/}
+            {/*<input id="range3" className="slider" type="range" min="0" max="100" value='0' />*/}
+            {/*<input id="range4" className="slider" type="range" min="0" max="100" value='0' />*/}
+
         </>
     );
 

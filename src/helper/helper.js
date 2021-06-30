@@ -8,9 +8,46 @@ export const pushData = (path,data) =>{
   realDB.ref(path).push(data)
   console.log('success')
 }
-export const getOptions = (collection) =>{
+export const pushFireStoreData = (path,data) =>{
+
+  db.collection(path).add(data)
+  console.log('success')
+}
+export const pushSubCollection = (collection,doc,subcollection, data) =>{
+
+  db.collection(collection).doc(doc).collection(subcollection).add(data )
+      .then((data) => {
+    console.log("Document has added")
+  }).catch((err) => {
+    console.log(err)
+  })
+}
+export const pushRealData = (path,data) => {
+  realDB.ref(path).push(data)
+  console.log('success')
+
+
+}
+export const getOptions = async (collection) =>{
   let collectionList = []
-  db.collection(collection).get().then(snapshot => {
+  await db.collection(collection).get().then(snapshot => {
+
+
+    snapshot.forEach(doc =>{
+      console.log(doc)
+          const data = doc.data()
+      collectionList.push(data)
+
+        })
+    console.log(collectionList)
+
+
+  })
+  return collectionList
+}
+export const getSubCollection = async (collection,doc,subcollection) =>{
+  let collectionList = []
+  await db.collection(collection).doc(doc).collection(subcollection).get().then(snapshot => {
 
 
     snapshot.forEach(doc =>{
@@ -92,7 +129,7 @@ export const eventFilter = (filterBy,value) =>{
   return eventList
 }
 
-export function timeConverter(UNIX_timestamp){
+export function timeConverter(UNIX_timestamp,type){
   var a = new Date(UNIX_timestamp * 1000);
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var year = a.getFullYear();
@@ -100,7 +137,18 @@ export function timeConverter(UNIX_timestamp){
   var date = a.getDate();
   var hour = a.getHours();
   var min = a.getMinutes();
-  var sec = a.getSeconds();
-  var time = date + ' ' + month + ' ' + year + ' '  ;
+  var sec = a.getSeconds()
+  var time;
+  {type === 'H-M'?
+     time = hour + ':' + min
+    :
+    type === 'D-M-Y'
+        ?
+    time = date + ' ' + month + ' ' + year + ' '
+    :
+    time = date + ' ' + month + ' ' + year + ' '
+
+  }
+
   return time;
 }

@@ -8,7 +8,7 @@ function Option({option}) {
     const optionRef = useRef()
     return (
         <>
-            <option  value={option}>{option.Sport}</option>
+            <option  className='sport-opt' value={option}>{option.Sport}</option>
         </>
     );
 }

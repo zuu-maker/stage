@@ -8,19 +8,23 @@ import {Link, useHistory, useParams} from 'react-router-dom'
 import {getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
 import Card from "./card";
 import {useLoader} from "../../contexts/loaderContext";
+import {useUser} from "../../contexts/userContext";
+import {useAuth} from "../../contexts/authContext";
+import {realDB} from "../../firebase/firebase";
 
 const EventDetails = () => {
     const [eventData,setEventData] =useState([]);
     const [participants,setParticipants] =useState([]);
     const {loader, setLoader} =useLoader();
-
+    const { hasJoined,setHasJoined} =useUser();
+    const {currentUser} =useAuth();
 
 
     let params = useParams();
     var event = []
     let  childList =[]
 
-    useEffect(()=>{
+    useEffect( ()=>{
         setLoader(true)
         getRealtimeDoc('Events',params.id).then(function(snapshot) {
             const data = snapshot.val();
@@ -43,8 +47,15 @@ const EventDetails = () => {
 
         console.log(participants);
 
+        setHasJoined(false)
+        participants.filter(function (entry) {
+            { entry.userId === currentUser.uid ? setHasJoined(true) : setHasJoined(false) }
+            console.log(entry.userId === currentUser.uid)
+            console.log(entry.userId )
 
-
+            return entry.userId === currentUser.uid;
+        });
+        console.log(hasJoined)
 
     },[])
 

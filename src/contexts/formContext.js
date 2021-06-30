@@ -1,4 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react'
+import {getDoc} from "../helper/helper";
 
 const FormContext = React.createContext()
 
@@ -8,7 +9,7 @@ export function useForm() {
 
 export function FormProvider({ children }) {
   const [formType, setFormType] = useState('')
-  const [options, setOptions] = useState([])
+  const [options, setOptions] = useState(getDoc('SportsEvents', 'Sport','Football'))
 
     const value = {
         formType,

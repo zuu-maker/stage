@@ -10,6 +10,7 @@ import {CreateEventBtn} from '../modal/modal'
 import CardList from '../events/getEvents'
 import MobileNavbar from "../../components/mobileNavbar";
 import {useAuth} from "../../contexts/authContext";
+import {useUser} from "../../contexts/userContext";
 
 
 function Events() {
@@ -19,6 +20,7 @@ function Events() {
         <>
         <div  className='container events body'>
             <Header/>
+
             <div className='lg-view'>
                 <div className=' d-flex align-items-center pt-4'>
                     <h4 className=' text-light'>All Events</h4>

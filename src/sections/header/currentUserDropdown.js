@@ -5,7 +5,7 @@ import './header.css'
 import {db} from "../../firebase/firebase";
 import {useAuth} from "../../contexts/authContext";
 import {Dropdown} from "react-bootstrap";
-import {useHistory} from 'react-router-dom'
+import {Link, useHistory} from 'react-router-dom'
 
 
 
@@ -45,8 +45,8 @@ function CurrentUserDropdown({user}) {
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
-                <Dropdown.Item href="#/action-1">Profile</Dropdown.Item>
-                <Dropdown.Item onClick={handleLogOut} href="#/action-1">Logout</Dropdown.Item>
+                <Dropdown.Item  ><Link to={`/user/${currentUser.uid}`}>Profile</Link></Dropdown.Item>
+                <Dropdown.Item onClick={handleLogOut} >Logout</Dropdown.Item>
             </Dropdown.Menu>
         </Dropdown>
         </>

@@ -4,11 +4,7 @@ import trophy from '../../images/trophy.svg';
 import password from '../../images/password.svg';
 import mail from '../../images/mail.svg';
 import user from '../../images/user.svg';
-import facebook from '../../images/facebook.svg';
-import google from '../../images/google.svg';
-import {db, realDB} from '../../firebase/firebase'
 import {useAuth} from "../../contexts/authContext";
-import {Modal} from "react-bootstrap";
 import {pushData} from "../../helper/helper";
 
 
@@ -18,7 +14,6 @@ function Signup() {
     const passwordRef = useRef();
     const {signup, currentUser} = useAuth()
     const [username, setUsername] = useState("")
-    const [usernameError, setUserNameError] = useState(false)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 

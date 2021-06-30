@@ -1,19 +1,24 @@
 import React, {useEffect} from 'react';
-import edit from "../../images/edit.png";
-import dummy from "../../images/dummy.png";
 import rank from "../../images/rank.svg";
 import follow from "../../images/follow.svg";
 import back_arrow from "../../images/back_arrow.svg";
 import message from "../../images/message_green.svg";
-import {Link, useParams} from "react-router-dom";
+import {Link, useHistory, useParams} from "react-router-dom";
 import arrow from "../../images/arrow right.svg";
 import Graph from "./graph";
-import { getRealtimeDoc} from "../../helper/helper";
+import {getRealtimeDoc, pushFireStoreData} from "../../helper/helper";
 import Card from "../events/card";
 
 
 function OtherUserMenu({user}) {
+    const history = useHistory()
 
+    const handleMessage =  (e) => {
+         // await pushFireStoreData('ChatRooms')
+        const id =1
+        history.push(`/message/${id}`)
+
+    }
     return (
         <div className='d-flex user-menu-container'>
         <div className='d-flex flex-column text-center card-body user-side-bar'>
@@ -73,7 +78,7 @@ function OtherUserMenu({user}) {
             </div>
             <div className='lg-view'>
             <div className='   center other-user-btn'>
-                <button className='btn flex-grow-1 m-2 btn-clear' style={{backgroundImage: `url(${message})`}}>Message</button>
+                <button onClick={handleMessage} className='btn flex-grow-1 m-2 btn-clear' style={{backgroundImage: `url(${message})`}}>Message</button>
                 <button className='btn flex-grow-1 m-2' style={{backgroundImage: `url(${follow})`}}>Follow</button>
             </div>
             </div>

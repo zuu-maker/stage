@@ -113,7 +113,12 @@
 .icon-wrapper{
     border-radius: 100%;
     background-color: #13161A;
-    padding: 5%;
+    /*padding: 5%;*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40pt;
+    height: 40pt;
 
 }
 .menu-options .d-flex.pointer:hover{

@@ -6,7 +6,6 @@ import {useForm} from "../contexts/formContext";
 
 export default function ForgotPassword() {
     const emailRef = useRef()
-    const {formType,setFormType}= useForm()
     const { resetPassword } = useAuth()
     const [error, setError] = useState("")
     const [message, setMessage] = useState("")

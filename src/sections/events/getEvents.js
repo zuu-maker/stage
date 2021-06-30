@@ -4,11 +4,15 @@ import Card from './card'
 import {useEvent} from "../../contexts/eventsContext";
 import {useLoader} from "../../contexts/loaderContext";
 import {getOptions, getRealtimeChild} from "../../helper/helper";
+import {useUser} from "../../contexts/userContext";
 function CardList() {
     const {eventsList,setEventsList} = useEvent()
     const [participantList,setParticipantList] = useState([])
     const {loader, setLoader} =useLoader()
-  useEffect(() => {
+    const {setHasJoined} =useUser()
+
+    useEffect(() => {
+
     const eventsRef = realDB.ref('Events').orderByChild('EventTimestamp').limitToLast(48);
 
     setLoader(true);
@@ -41,7 +45,6 @@ function CardList() {
 
     setEventsList(eventList)
        setLoader(false);
-    console.log(eventsList);
 
 
     });

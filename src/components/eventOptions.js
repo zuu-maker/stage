@@ -11,10 +11,9 @@ function EventOptions({eventOption}) {
     return (
 
 
-        <>
             <>
-                <option  value={eventOption.Sport}>{eventOption.Sport}</option>
-            </>
+                { eventOption && eventOption ? eventOption.map( o => {return(<option  value={o}>{o}</option>)}) : <option  >Null</option>}
+
 
         </>
 

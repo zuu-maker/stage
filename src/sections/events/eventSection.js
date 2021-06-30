@@ -1,4 +1,4 @@
-import React,{useRef} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import basketball from "../../images/basketball.png";
 import schedule from "../../images/created_schedule.png";
 import trophy from "../../images/trophy.png";
@@ -8,17 +8,69 @@ import puma from "../../images/982449831d9206873c5c48552ee07e42.png";
 import adiddas from "../../images/adidas_brand.png";
 import nike from "../../images/nike-squarelogo-1486596898031.png";
 import dummy from "../../images/dummy.png";
-import {timeConverter} from '../../helper/helper'
+import {getRealtimeDoc, pushRealData, timeConverter} from '../../helper/helper'
 import './eventDetails.css'
+import {useUser} from "../../contexts/userContext";
+import {useParams} from "react-router-dom";
+import {useAuth} from "../../contexts/authContext";
+import {Modal} from "react-bootstrap";
+import {realDB} from "../../firebase/firebase";
 
-function EventSection({event},{participantList}) {
+function EventSection({event}) {
     const commisionerId = useRef()
+    const {user, hasJoined,setHasJoined} =useUser();
+    const {currentUser} =useAuth();
+    const [accountBalance ,setAccountBalance] = React.useState()
+    const [modal ,setModal] = useState(false)
     const secondCommissionerId = useRef()
     const participantId = useRef()
-    const startDate = timeConverter(parseInt(event.EventStartDate));
-    const endDate = timeConverter(parseInt(event.EventEndDate));
+    const startDate = timeConverter(parseInt(event.EventStartDate),'D-M-Y');
+    const endDate = timeConverter(parseInt(event.EventEndDate),'D-M-Y');
+    let params = useParams();
+    const eventId = {EventId : params.id};
+    let userId;
+    {currentUser && currentUser.uid ?  userId = {userId : currentUser.uid} :  userId = {userId : null}}
+    const joined = {joined : true};
+
+    useEffect(async () =>{
+        await realDB.ref('Users/'+currentUser.uid).on("value" ,(snapshot) =>  {
+            const data = snapshot.val();
+            setAccountBalance(data.userBalance)
+            console.log(data.userBalance)
+
+        });
+    },[])
+    const  handleJoinEvent = async (e) => {
+
+
+        console.log(accountBalance)
+        if (parseInt(accountBalance) >= parseInt(event.EventEntryFee)) {
+            setModal(false)
+            const userData = Object.assign({}, user, eventId, joined, userId);
+
+            console.log(userData)
+            if (user && user.userEmail) {
+
+                pushRealData('Participants', userData);
+                setHasJoined(true)
+            } else console.log('error joining event')
+
+        } else{
+            setModal(true)
+            alert('Please Deposit funds')
+
+
+        }
+    }
+
     return (
         <>
+            {modal ? <Modal
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+                dialogClassName="modal"
+                className="custom-modal" //Add class name here
+            /> : <></>}
             <div className=' event-detail-container flex-column'>
                 <div className=' mb-4 position-relative overflow-hidden m-0 border-0 grid-item event-card'>
                     <img className='sm-view  back-arrow' src={back_arrow} alt=""/>
@@ -37,7 +89,8 @@ function EventSection({event},{participantList}) {
     <div className='d-flex  align-items-center'>
         <p className='event-detail-title text-light'>{event.EventName}</p>
         <div className='join-btn mr-0 ml-auto'>
-            <button className='   btn  '>Join Event</button>
+            { hasJoined ? <button className='   btn  '>Registered</button> : <button onClick={handleJoinEvent} className='   btn  '>Join Event</button> }
+
 
         </div>
     </div>
@@ -92,7 +145,7 @@ function EventSection({event},{participantList}) {
                                     </div>
                                 </div>
                                 <div className='ml-3'>
-                                    <div className='text-light about-upper-info'>{participantList}/{event.EventMaximumParticipants}</div>
+                                    <div className='text-light about-upper-info'>/{event.EventMaximumParticipants}</div>
                                     <div className='text-light about-low-info'>Joined/Total Participants</div>
                                 </div>
                             </div>
@@ -171,5 +224,6 @@ function EventSection({event},{participantList}) {
         </>
     );
 }
+
 
 export default EventSection;
