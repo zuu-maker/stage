@@ -2,50 +2,29 @@ import React,{useEffect,useState} from 'react';
 import './userProfile.css'
 import axios from 'axios'
 // === include 'setup' then 'config' above ===
-import {Line,Bar} from 'react-chartjs-2'
 import ProgressBar from 'react-bootstrap/ProgressBar'
-const Graph = () => {
-    const [chartData, setChartData] = useState({});
-    const [employeeSalary, setEmployeeSalary] = useState([]);
-    const [employeeAge, setEmployeeAge] = useState([]);
+import {useUser} from "../../contexts/userContext";
+import Bar from "../../components/bar";
+function Graph({props})  {
+    const {user} = useUser();
 
-    const chart = () => {
-        let empSal = [];
-        let empAge = [];
-        axios
-            .get("http://dummy.restapiexample.com/api/v1/employees")
-            .then(res => {
-                console.log(res);
-                for (const dataObj of res.data.data) {
-                    empSal.push(parseInt(dataObj.employee_salary));
-                    empAge.push(parseInt(dataObj.employee_age));
-                }
-                setChartData({
-                    labels: ['SUN','MON','TUE','WEN','THUR','FRI','SAT'],
-                    datasets: [
-                        {
-
-                            data: empSal,
-                            backgroundColor: ["#18FF00"],
-                            borderWidth: 2
-
-                        }
-
-                    ]
-                });
-            })
-            .catch(err => {
-                console.log(err);
-            });
-        console.log(empSal, empAge);
-    };
-
-    useEffect(() => {
-        chart();
-    }, []);
     return (
-        <div className="graph">
-            <ProgressBar now={40}/>
+        <div className="graph p-4">
+            <div className={`d-flex text-light`}>
+                <h4>Winning ratio</h4>
+                <span className={`ml-auto`}>$ {user.balance}</span>
+
+            </div>
+            <div className={` d-flex `}>
+                <Bar value={60} day={'MON'}/>
+                <Bar value={60} day={'TUE'}/>
+                <Bar value={60} day={'WED'}/>
+                <Bar value={60} day={'THUR'}/>
+                <Bar value={60} day={'FRI'}/>
+                <Bar value={60} day={'SAT'}/>
+                <Bar value={60} day={'SUN'}/>
+
+            </div>
 
         </div>
     );

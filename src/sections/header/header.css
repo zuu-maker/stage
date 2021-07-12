@@ -39,9 +39,14 @@
 }
 .nav-item {
     padding: 0 15px;
+    margin-right: 0;
 }
+
 .nav-link {
     color: #ffffff;
+}
+.header-nav{
+    width:59%
 }
 .nav-link:hover, .nav-link:focus {
     color: #18ff00;
@@ -50,6 +55,14 @@
     color: #18ff00;
 }
 
+.navbar-toggler {
+    padding: .25rem .75rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    background-color: transparent;
+    border: 1px solid transparent;
+    width: 60px;
+}
 @media (max-width:1200px) {
     .nav-item {
         padding: 0 12px;

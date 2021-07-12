@@ -26,36 +26,46 @@ const EventDetails = () => {
 
     useEffect( ()=>{
         setLoader(true)
+        setHasJoined(false)
+
+        //Fetch event details
         getRealtimeDoc('Events',params.id).then(function(snapshot) {
             const data = snapshot.val();
             setEventData(data)
         });
         // console.log(eventData)
-        getRealtimeChild('Participants','EventId',params.id).on("child_added", function(snapshot) {
 
+        //Fetch participants of the matched id from the URL parameter
+
+        getRealtimeChild('Participants','EventId',params.id).on("child_added", function(snapshot) {
             setParticipants([])
-            console.log(participants)
             childList.push(snapshot.val())
             setParticipants(childList)
-            // snapshot.forEach(doc =>{
-            //   const data = doc.val()
-            //   childList.push(data)
-            //
-            // })
+            console.log(childList)
         });
-        setLoader(false)
+        childList.find((user)  =>{
+            if (user.userId === currentUser.uid){
+                setHasJoined(true)
+                console.log(hasJoined)
+                return true;
+            }
+
+            else{
+                setHasJoined(false)
+                console.log(hasJoined)
+
+                return false;
+
+            }
+        })
+
+        console.log(hasJoined)
 
         console.log(participants);
 
-        setHasJoined(false)
-        participants.filter(function (entry) {
-            { entry.userId === currentUser.uid ? setHasJoined(true) : setHasJoined(false) }
-            console.log(entry.userId === currentUser.uid)
-            console.log(entry.userId )
+        setLoader(false)
 
-            return entry.userId === currentUser.uid;
-        });
-        console.log(hasJoined)
+
 
     },[])
 
@@ -63,7 +73,7 @@ const EventDetails = () => {
         <>
             <Header/>
             <div className='container event-details '>
-                <EventSection event={eventData} participantList={participants.length}/>
+                <EventSection event={eventData} />
                 <div className='flex-grow-1 user-list-section'>
                     <div className=' pt-3 '>
                         <h5 className='pl-4 text-light'>Participants</h5>

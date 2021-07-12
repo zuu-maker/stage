@@ -12,51 +12,24 @@ import MobileNavbar from "../../components/mobileNavbar";
 import {useAuth} from "../../contexts/authContext";
 import {useParams} from "react-router-dom";
 import OtherUserMenu from "./otherUserMenu";
-import {getDoc, getRealtimeDoc} from "../../helper/helper";
+import {getDoc, getFirestoreDocument, getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
 import {auth, db} from "../../firebase/firebase";
 import {useUser} from "../../contexts/userContext";
+import {useLoader} from "../../contexts/loaderContext";
 
 function UserProfile() {
     const {currentUser,setCurrentUser}  = useAuth()
     let params = useParams();
     const userId = params.id;
-    const {user, setUser} = useUser();
+    const {user, setUser,hasFollowed,setHasFollowed} = useUser();
     const [curUser,setCurUser] = useState();
-
-    useEffect( async () => {
-
-         await getRealtimeDoc('Users', params.id).then(function (snapshot) {
-            const data = snapshot.val();
-            // console.log(data)
-             setUser(data)
-
-        });
-        // await auth.onAuthStateChanged(user => {
-        //     // User is signed in.
-        //      db.collection('Users').where('email', "==", user.email).get()
-        //         .then((snapshot) => {
-        //             snapshot.forEach(doc => {
-        //                 const data = doc.data()
-        //                 setUser(data)
-        //                 console.log(user)
-        //
-        //
-        //             })
-        //
-        //         })
-        //
-        //
-        //
-        //
-        // })
-        //
-        // return unsubscribe
+    const {joinedEvents, setJoinedEvents} = useUser();
+    const {setLoader} = useLoader();
+    let userJoinedEventsList = [];
+    let joinedEventsList = [];
 
 
-        console.log(user)
 
-
-    },[])
 
 
     return (
@@ -64,15 +37,16 @@ function UserProfile() {
 
             <Header/>
 
-                {currentUser && user.userEmail == currentUser.email?
+                {currentUser && currentUser.uid == params.id
+                    ?
                     <div className='container user d-flex'>
-                        <UserMenu user={user} />
+                        <UserMenu  user={user} />
                     </div>
                     :
                     <>
                     <div className='container other-user d-flex'>
 
-                    <OtherUserMenu user={user}/>
+                    <OtherUserMenu />
                     </div>
 
                     </> }

@@ -5,7 +5,8 @@ import password from '../../images/password.svg';
 import mail from '../../images/mail.svg';
 import user from '../../images/user.svg';
 import {useAuth} from "../../contexts/authContext";
-import {pushData} from "../../helper/helper";
+import {pushData, updateDocument} from "../../helper/helper";
+import firebase from "firebase";
 
 
 function Signup() {
@@ -25,19 +26,43 @@ function Signup() {
                 setError('')
                 setLoading(true)
                 console.log('before')
-                 await signup(emailRef.current.value, passwordRef.current.value).then(
-                    () => {
-                        var userInfo = {
-                            username: username,
-                            email: currentUser.email,
-                            userId: currentUser.uid,
-                            emailVerified: currentUser.emailVerified,
-                            providerId: currentUser.providerId,
+                 await signup(emailRef.current.value, passwordRef.current.value).then( userInfo => {
+                        var userObj = {
+                            userName: username,
+                            userWins : 0,
+                            userRank: '',
+                            userProfileImageUrl:'',
+                            userLoses:0,
+                            updateProfileAvatarDeliveredTo:[],
+                            email: userInfo.user.email,
+                            userId: userInfo.user.uid,
+                            // emailVerified: userInfo.user.emailVerified,
+                            // providerId: userInfo.user.providerId,
+                            twitter:'',
+                            pushId:'',
+                            isOnline:true,
+                            footballOption: true,
+                            followedUsersIds: [],
+                            facebook:'',
+                            contact:[],
+                            blockedUsers:[],
+                            basketballOption: false,
+                            balance: 0,
+                            objectId:userInfo.user.uid,
+                            notificationCounts: 0,
+                            loginMethod: 'email'
                         };
-                        console.log('reached')
 
-                        pushData('Users',userInfo)
-                        console.log('Added to db')
+                     var user = firebase.auth().currentUser;
+                     user.updateProfile({displayName : username,photoURL:'https://firebasestorage.googleapis.com/v0/b/fantasysports-7117e.appspot.com/o/default_profile_photo.svg?alt=media&token=d217e767-41e1-4a94-9f71-4a60b99b3403'})
+                         .then(() =>{
+
+                             var updatedInfo = {userProfileImageUrl: user.photoURL}
+                             // //Update user Info
+                             updateDocument('Users',user.uid,updatedInfo)
+                         });
+                          pushData('Users',userObj,userInfo.user.uid)
+                     // firebase.storage.ref('users/profilePhoto').put(defaultProfilePhoto)
                     }
                 )
 
@@ -66,13 +91,16 @@ function Signup() {
 
     return (
         <>
-            <p className="text-danger">{error}</p>
 
             <form className="form" onSubmit={handleSubmit}>
-                <img className="form-image" src={trophy} alt=""/>
-                <p className="form-title pt-4">Fantasy Sport Event</p>
-                <p className='form-text f-18'>Please register your details to continue
-                    with Fantasy Sport Event</p>
+                <div className={`header-content lg-view`}>
+                    <img className="form-image" src={trophy} alt=""/>
+                    <p className="form-title pt-4">Fantasy Sport Event</p>
+                    <p className='form-text f-18'>Please register your details to continue
+                        with Fantasy Sport Event</p>
+                </div>
+                <p className="text-danger">{error}</p>
+
                 <div className="input-group">
                     <input ref={usernameRef} onChange={(e) => setUsername(e.target.value)} name="username"
                            style={{backgroundImage: `url(${user})`}} type="text"

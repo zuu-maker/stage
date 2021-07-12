@@ -2,52 +2,39 @@ import {db,realDB} from "../firebase/firebase";
 import {useEvent} from "../contexts/eventsContext";
 
 
-export const pushData = (path,data) =>{
+export const pushData = async (path,data,id) =>{
 
-  db.collection(path).add(data)
-  realDB.ref(path).push(data)
-  console.log('success')
+  await db.collection(path).doc(id).set(data).catch(e => console.log(e))
+  await realDB.ref(path+'/'+id).set(data).catch(e => console.log(e))
 }
 export const pushFireStoreData = (path,data) =>{
 
-  db.collection(path).add(data)
-  console.log('success')
+  db.collection(path).add(data).then(function(docRef) {
+    console.log("Document written with ID: ", docRef.id);
+  })
+      .catch(function(error) {
+        console.error("Error adding document: ", error);
+      });
 }
 export const pushSubCollection = (collection,doc,subcollection, data) =>{
 
-  db.collection(collection).doc(doc).collection(subcollection).add(data )
-      .then((data) => {
-    console.log("Document has added")
-  }).catch((err) => {
-    console.log(err)
-  })
+  { data &&
+    db.collection(collection).doc(doc).collection(subcollection).add(data)
+        .then(() => {
+          console.log("Document has added")
+        }).catch((err) => {
+      console.log(err)
+    })
+  }
 }
 export const pushRealData = (path,data) => {
-  realDB.ref(path).push(data)
-  console.log('success')
+  return realDB.ref(path).push(data)
 
 
 }
-export const getOptions = async (collection) =>{
+export const getOptions = async (collection,order) =>{
   let collectionList = []
-  await db.collection(collection).get().then(snapshot => {
-
-
-    snapshot.forEach(doc =>{
-      console.log(doc)
-          const data = doc.data()
-      collectionList.push(data)
-
-        })
-    console.log(collectionList)
-
-
-  })
-  return collectionList
-}
-export const getSubCollection = async (collection,doc,subcollection) =>{
-  let collectionList = []
-  await db.collection(collection).doc(doc).collection(subcollection).get().then(snapshot => {
+  await db.collection(collection).orderBy(order).get().then(snapshot => {
 
 
     snapshot.forEach(doc =>{
@@ -55,26 +42,95 @@ export const getSubCollection = async (collection,doc,subcollection) =>{
       collectionList.push(data)
 
         })
-    console.log(collectionList)
 
 
   })
   return collectionList
 }
+export const getSubCollection =  async (collection,doc,subcollection,order) =>{
+  let collectionList = []
+   await db.collection(collection).doc(doc).collection(subcollection).orderBy(order).get().then(snapshot => {
+
+
+      snapshot.forEach(doc =>{
+        const data = doc.data()
+        collectionList.push(data)
+
+      })
+      console.log(collectionList)
+
+
+  })
+  return collectionList
+}
+export const getRealtimeSubCollection = async (collection,doc,subcollection,order) =>{
+  let collectionList = []
+   await db.collection(collection).doc(doc).collection(subcollection).orderBy(order).onSnapshot(snapshot => {
+
+
+      snapshot.forEach(doc =>{
+        const data = doc.data()
+        collectionList.push(data)
+
+      })
+      console.log(collectionList)
+
+
+  })
+  return collectionList
+}
+export const getRealtimeCollection =  (collection) =>{
+  let collectionList = []
+    db.collection(collection).onSnapshot(snapshot => {
+
+
+      snapshot.forEach(doc =>{
+        const data = doc.data()
+        collectionList.push(data)
+
+      })
+      console.log(collectionList)
+
+
+  })
+  return collectionList
+}
+export const updateDocument =  (collection,id,data) =>{
+    db.collection(collection).doc(id).update(data)
+  realDB.ref(collection+'/'+id).update(data)
+
+
+}
+export const updateFirebaseDocument =  (collection,id,data) =>{
+ return  realDB.ref(collection+'/'+id).update(data)
+
+
+}
+export const updateFirestoreDocument =  (collection,id,data) =>{
+    return db.collection(collection).doc(id).update(data)
+
+
+}
+export const updateFirestoreArray =  (collection,id,data) =>{
+    return db.collection(collection).doc(id).update(data)
+
+
+}
+
 export const getRealtimeDoc = (path,id) =>{
-  const eventDetails = realDB.ref(path+'/'+id).once("value")
 
-  return eventDetails
+
+  return realDB.ref(path+'/'+id).once("value")
 }
-export const getRealtimeChild = (path,child,id) =>{
+export const  getRealtimeChild =  (path,child,id) =>{
 
-  const childData = realDB.ref(path).orderByChild(child).equalTo(id)
+  const childData =  realDB.ref(path).orderByChild(child).equalTo(id)
 
   return childData
 }
 export const getDoc = (collection,field,value) =>{
   let collectionList = []
-  db.collection(collection).where(field, "==", value).get()
+  db.collection(collection).where(field, "==", field).get()
       .then((snapshot) => {
     snapshot.forEach(doc =>{
       const data = doc.data()
@@ -91,6 +147,12 @@ export const getDoc = (collection,field,value) =>{
   console.log(collectionList)
 
   return collectionList
+}
+
+//Fetch Firestore Document that returns a promise
+export const  getFirestoreDocument = async (collection,field,value) =>{
+  await db.collection(collection).where(field, "==", value).get()
+
 }
 
 // {id: doc.id, data:doc.data()})
@@ -130,10 +192,11 @@ export const eventFilter = (filterBy,value) =>{
 }
 
 export function timeConverter(UNIX_timestamp,type){
-  var a = new Date(UNIX_timestamp * 1000);
+  var a = new Date(UNIX_timestamp );
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var year = a.getFullYear();
   var month = months[a.getMonth()];
+  var monthNum = a.getUTCMonth();
   var date = a.getDate();
   var hour = a.getHours();
   var min = a.getMinutes();
@@ -146,9 +209,38 @@ export function timeConverter(UNIX_timestamp,type){
         ?
     time = date + ' ' + month + ' ' + year + ' '
     :
+        type === 'D/M/Y'
+            ?
+            time = date + '/' + monthNum + '/' + year
+            :
     time = date + ' ' + month + ' ' + year + ' '
 
   }
 
   return time;
 }
+export function checkDate(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp );
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var year = a.getFullYear();
+  var month = months[a.getMonth()];
+  var date = a.getDate();
+  var time;
+
+    time = date + ' ' + month + ' ' + year + ' '
+
+
+  return time;
+}
+// export function sentToday(UNIX_timestamp){
+//
+//   if(UNIX_timestamp > UNIX_timestamp + 86400)
+//     return true
+//   else
+//     return false
+//
+//
+// }
+
+// Object.assign({ uid: doc.id }, doc.data())
+

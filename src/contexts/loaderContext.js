@@ -16,7 +16,7 @@ export function LoaderProvider({ children }) {
 
     return (
         <LoaderContext.Provider value={value}>
-            { children}
+            {   children}
         </LoaderContext.Provider>
     )
 }

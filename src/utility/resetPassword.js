@@ -29,9 +29,10 @@ export default function ForgotPassword() {
 
     return (
         <>
-            <p className="text-danger">{error}</p>
 
             <form className="form" onSubmit={handleSubmit}>
+                <p className="text-danger">{error}</p>
+
                 <div className="input-group">
                    <input ref={emailRef} name="email" style={{backgroundImage: `url(${mail})`}} type="Email"
                            placeholder="Email"/>

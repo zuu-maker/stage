@@ -37,6 +37,17 @@
 
 }
 
+@media (max-width:991px) {
+    .modal-header, .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 0rem;
+        border: 0px;
+        border-radius: 0px;
+    }
+}
+
 form input ,  select ,.switch-container  {
     background-color: #2B3038;
     border: none;
@@ -213,4 +224,8 @@ form {
 .modal-header .close {
      padding: 2%;
      margin: 0;
+}
+
+.modal {
+    max-width: 90%;
 }

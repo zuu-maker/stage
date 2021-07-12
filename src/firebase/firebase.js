@@ -19,4 +19,5 @@ const app = firebase.initializeApp({
 const db = app.firestore()
 var realDB = app.database()
  const auth =app.auth()
-export {db , auth ,realDB}
+ const storage =app.storage()
+export {db , auth ,realDB,storage}

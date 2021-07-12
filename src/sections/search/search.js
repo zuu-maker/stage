@@ -7,10 +7,9 @@ import '../events/events.css'
 import SearchItem from "./searchItem";
 
 function Search({props}) {
-    const [loading, setLoading] = useState(false)
     const [search, setSearch] = useState([])
     const {setLoader} = useLoader();
-    const {eventsList,setEventsList} = useEvent()
+    const {setEventsList} = useEvent()
     
 
 
@@ -25,17 +24,39 @@ function Search({props}) {
         var endcode= strFrontCode + String.fromCharCode(strEndCode.charCodeAt(0) + 1);
         setLoader(true)
         console.log(startcode,endcode)
-       await realDB.ref('Events').orderByChild('EventName').startAt(startcode).endAt(endcode).get()
-           .then((snapshot) => {
-           snapshot.forEach(doc => {
-               const data = doc.val()
-               console.log(data)
-               searchList.push(data)
+       {!e.target.value
+
+           ?
+           await realDB.ref('Events').get()
+               .then((snapshot) => {
+                   snapshot.forEach(doc => {
+                       const data = doc.val()
+                       console.log(doc.id)
+                       Object.assign(data,{id:doc.key})
+                       console.log(data)
+                       searchList.push(data)
 
 
 
-           })
-       })
+                   })
+               })
+
+       :
+           await realDB.ref('Events').orderByChild('EventName').startAt(startcode).endAt(endcode).get()
+               .then((snapshot) => {
+                   snapshot.forEach(doc => {
+                       const data = doc.val()
+                       Object.assign(data,{id:doc.key})
+
+                       console.log(data)
+                       searchList.push(data)
+
+
+
+                   })
+               })
+       }
+
         // await db.collection('Events')
         //     .where('EventName', '>=', startcode)
         //     .where('EventName', '<', endcode).get()
@@ -65,16 +86,16 @@ function Search({props}) {
                            placeholder="Search"/>
 
                 </form>
-                <div className='search-dropdown'>
-                    { search ? search?.map(event  =>{
-                        return(
-                            <>
-                        <SearchItem  event={event}/>
-                            </>
-                        )
-                    }) : 'p'}
+                {/*<div className='search-dropdown'>*/}
+                {/*    { search ? search?.map(event  =>{*/}
+                {/*        return(*/}
+                {/*            <>*/}
+                {/*        <SearchItem  event={event}/>*/}
+                {/*            </>*/}
+                {/*        )*/}
+                {/*    }) : 'p'}*/}
 
-                </div>
+                {/*</div>*/}
 
         </div>
     );

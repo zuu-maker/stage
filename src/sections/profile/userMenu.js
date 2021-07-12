@@ -14,20 +14,26 @@ import {
     BrowserRouter as Router,
     Switch,
     Route,
-    Link
+    Link, useParams
 } from "react-router-dom";
 import Graph from "./graph";
 import Card from "../events/card";
 import {useAuth} from "../../contexts/authContext";
 import {getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
-import {realDB} from "../../firebase/firebase";
+import {db, realDB} from "../../firebase/firebase";
+import defaultProfilePhoto from '../../images/default_profile_photo.svg';
+import {EditProfileBtn} from "../modal/modal";
+import {useUser} from "../../contexts/userContext";
 
 
 function UserMenu({user}) {
-    const [joinedEvents, setJoinedEvents] = useState([]);
+    const {currentUser} = useAuth();
+    let params = useParams();
+    const userId = params.id;
+    const [curUser,setCurUser] = useState();
+    const {joinedEvents, setJoinedEvents} = useUser();
     let userJoinedEventsList = [];
     let joinedEventsList = [];
-    const {currentUser} = useAuth();
     const routes = [
         {
             path: "/user/:id",
@@ -36,10 +42,10 @@ function UserMenu({user}) {
 
             main: () => <div className='flex-column flex-grow-1'>
                 <div className='lg-view'>
-                    <Graph/>
+                    <Graph />
                 </div>
                 <div className='grid-container'>
-                    {!joinedEvents ? joinedEvents?.map(event => {
+                    {joinedEvents ? joinedEvents?.map(event => {
                         return (
                             <>
 
@@ -60,18 +66,25 @@ function UserMenu({user}) {
             exact: true,
             sidebar: () => <></>,
 
-            main: () => <div className='grid-container'>
-                {!joinedEvents ? joinedEvents?.map(event => {
-                    return (
-                        <>
+            main: () => <div className='flex-column flex-grow-1'>
+                <div className='lg-view '>
+                    <Graph/>
+                </div>
+                <div className='grid-container'>
+                    {joinedEvents ? joinedEvents?.map(event => {
+                        return (
+                            <>
 
-                            <Card event={event}/>
-                        </>
-                    )
-                }) :<>
-                    <Card event={''}/>
-                    <Card event={''}/>
-                </> }
+                                <Card event={event}/>
+                            </>
+                        )
+                    }) :<>
+                        <Card event={''}/>
+                        <Card event={''}/>
+                    </> }
+                </div>
+
+
             </div>
         },
         {
@@ -116,33 +129,14 @@ function UserMenu({user}) {
         }
 
     ];
-    useEffect(async () => {
-        await getRealtimeChild('Participants', 'userId', currentUser.uid).limitToLast(10).on("child_added", function (snapshot) {
 
-            userJoinedEventsList.push(snapshot.val())})
-
-            userJoinedEventsList.forEach((eventJoined) => {
-                getRealtimeDoc('Events', eventJoined.EventId).then((snapshot) => {
-
-                    joinedEventsList.push(snapshot.val())
-                })
-
-            })
-            setJoinedEvents(joinedEventsList)
-
-            console.log(joinedEventsList)
-            console.log(joinedEvents)
-
-
-
-        }, [])
 
 
         return (
             <>
                 <Router>
 
-                    <div className='d-flex flex-column  card-body user-side-bar'>
+                    <div className='d-flex flex-grow-1 flex-column  card-body user-side-bar'>
                         <div className='user-sidebar-header'>
                             <div className='flex-column'>
                                 <h5 className='text-light'>Your Profile</h5>
@@ -150,28 +144,30 @@ function UserMenu({user}) {
                                 <p className=''>Manage Your Account Info</p>
 
                             </div>
-                            <div className=' ml-auto  menu-icon-wrapper text-center '>
-                                <img src={edit} alt=""/>
+                            <div className=' ml-auto pointer menu-icon-wrapper text-center '>
+                                <EditProfileBtn/>
 
                             </div>
 
                         </div>
-                        <div className='text-center card-body user-info-container'>
+                        <div className='text-center  user-info-container'>
 
                             <div className='position-relative'>
                                 <div className='mx-auto d-block user-profile-pic-wrapper'>
-                                    <img src={user.userProfileImageUrl} alt=""/>
+
+                                        <img src={currentUser.photoURL} alt=""/>
+
                                 </div>
                                 <div className='badge-wrapper'>
                                     <img src={rank} alt=""/>
-                                    <span className='ml-2'>235</span>
+                                    <span className='ml-2'>0</span>
                                 </div>
                             </div>
 
 
                             <div className='mt-3 text-light'>
-                                <div className='space-medium f-18'>{user.userName}</div>
-                                <div className="space-light mb-4">@{user.userName}</div>
+                                <div className='space-medium f-18'>{currentUser.displayName}</div>
+                                <div className="space-light mb-4">@{currentUser.displayName}</div>
 
                             </div>
                             <div className='sm-view'>

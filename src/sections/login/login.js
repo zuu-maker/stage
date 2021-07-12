@@ -50,12 +50,15 @@ export default function Login() {
 
     return (
         <>
-            <p className="text-danger">{error}</p>
         <form className="form" onSubmit={handleSubmit}>
-            <img className="form-image" src={trophy} alt=""/>
-            <p className="form-title pt-4">Fantasy Sport Event</p>
-            <p className='form-text f-18'>Please register your details to continue
-                with Fantasy Sport Event</p>
+            <div className={`header-content lg-view`}>
+                <img className="form-image" src={trophy} alt=""/>
+                <p className="form-title pt-4">Fantasy Sport Event</p>
+                <p className='form-text f-18'>Please register your details to continue
+                    with Fantasy Sport Event</p>
+            </div>
+            <p className="text-danger">{error}</p>
+
             <div className="input-group">
         <input ref={emailRef} name="email" style={{backgroundImage: `url(${mail})`}} type="Email"
                        placeholder="Email"/>

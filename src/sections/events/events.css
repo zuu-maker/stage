@@ -32,11 +32,11 @@ form button{
     width: 30%;
     margin: 1%;
     height: fit-content;
-    max-width: 30%;
+    max-width: 46%;
 
 }
 
-.event-detail-container .event-card,.user .event-card ,.other-user .event-card{
+.event-detail-container .event-card{
     max-width: 100%;
 
 }
@@ -194,11 +194,11 @@ button{
     height: fit-content;
     background-color: #2B3038;
     border-radius: 18pt;
-    position: absolute;
-    z-index: 100;
+    /*position: absolute;*/
+    /*z-index: 100;*/
     width: 90%;
-    max-height: 63vh;
-    overflow-y: auto;
+    max-height: 35vh;
+    /*overflow-y: auto;*/
     margin-top: 1%;
 }
 select {
@@ -245,6 +245,9 @@ input[type=date]::-webkit-outer-spin-button /* down */
 }
 
 @media (max-width: 985px) {
+    .user .event-card ,.other-user .event-card{
+        max-width: 100%;
+    }
     .sm-view{
         display: block;
     }
@@ -301,9 +304,9 @@ input[type=date]::-webkit-outer-spin-button /* down */
     .lg-view{
         display: none;
     }
-    .navbar{
-        display: none;
-    }
+    /*.navbar{*/
+    /*    display: none;*/
+    /*}*/
     .event-card {
         border-radius: 20px;
         width: auto;

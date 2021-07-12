@@ -8,17 +8,24 @@ import puma from "../../images/982449831d9206873c5c48552ee07e42.png";
 import adiddas from "../../images/adidas_brand.png";
 import nike from "../../images/nike-squarelogo-1486596898031.png";
 import dummy from "../../images/dummy.png";
-import {getRealtimeDoc, pushRealData, timeConverter} from '../../helper/helper'
+import {
+    getRealtimeDoc,
+    pushRealData,
+    timeConverter,
+    updateFirebaseDocument,
+    updateFirestoreDocument
+} from '../../helper/helper'
 import './eventDetails.css'
 import {useUser} from "../../contexts/userContext";
 import {useParams} from "react-router-dom";
 import {useAuth} from "../../contexts/authContext";
 import {Modal} from "react-bootstrap";
 import {realDB} from "../../firebase/firebase";
+import logo from '../../images/logo.png';
 
 function EventSection({event}) {
     const commisionerId = useRef()
-    const {user, hasJoined,setHasJoined} =useUser();
+    const {user,setHasJoined,hasJoined,joinedEvents, setJoinedEvents} =useUser();
     const {currentUser} =useAuth();
     const [accountBalance ,setAccountBalance] = React.useState()
     const [modal ,setModal] = useState(false)
@@ -33,31 +40,50 @@ function EventSection({event}) {
     const joined = {joined : true};
 
     useEffect(async () =>{
-        await realDB.ref('Users/'+currentUser.uid).on("value" ,(snapshot) =>  {
-            const data = snapshot.val();
-            setAccountBalance(data.userBalance)
-            console.log(data.userBalance)
-
-        });
+        console.log(hasJoined)
+        // await realDB.ref('Users/'+currentUser.uid).on("value" ,(snapshot) =>  {
+        //     const data = snapshot.val();
+        //     setAccountBalance(data.userBalance)
+        //     console.log(data.userBalance)
+        //
+        // });
     },[])
     const  handleJoinEvent = async (e) => {
+        console.log(user)
+        // const userObj = user.find(b=>{ return b})
 
 
-        console.log(accountBalance)
-        if (parseInt(accountBalance) >= parseInt(event.EventEntryFee)) {
-            setModal(false)
+        if (parseInt(user.balance) >= parseInt(event.EventEntryFee)) {
+
             const userData = Object.assign({}, user, eventId, joined, userId);
 
             console.log(userData)
-            if (user && user.userEmail) {
+            if (user && user.userId) {
+                //Remaining balance deducted from the user balance  after Joining event
+                const remainingBalance =  parseInt(user.balance) - parseInt(event.EventEntryFee)
+                updateFirestoreDocument('Users',currentUser.uid,{balance:remainingBalance})
+                    .then(() =>{
+                            updateFirebaseDocument('Users',currentUser.uid,{userBalance:remainingBalance})
+                                .catch(e => console.log(e))
 
-                pushRealData('Participants', userData);
-                setHasJoined(true)
+                        }
+                    )
+                    .catch(e => console.log(e))
+
+
+                pushRealData('Participants', userData)
+                    .then((snapshot) =>{
+                        setHasJoined(true)
+                        {joinedEvents ? setJoinedEvents([...joinedEvents,event]) : setJoinedEvents(event)}
+
+                        console.log('joined')})
+                    .catch(e=>console.log(e))
             } else console.log('error joining event')
 
         } else{
-            setModal(true)
+            console.log(user.balance)
             alert('Please Deposit funds')
+            setHasJoined(false)
 
 
         }
@@ -145,7 +171,7 @@ function EventSection({event}) {
                                     </div>
                                 </div>
                                 <div className='ml-3'>
-                                    <div className='text-light about-upper-info'>/{event.EventMaximumParticipants}</div>
+                                    <div className='text-light about-upper-info'>{event.EventParticipants}/{event.EventMaximumParticipants}</div>
                                     <div className='text-light about-low-info'>Joined/Total Participants</div>
                                 </div>
                             </div>
@@ -187,11 +213,11 @@ function EventSection({event}) {
                                 <div id={event.EventSecondCommissionerId} ref={secondCommissionerId} className='mr-3 align-items-center'>
                                     <div className='commissioner-icon-wrapper'>
                                         <div className='center'>
-                                            <img src={adiddas} alt=""/>
+                                            <img src={logo} alt=""/>
 
                                         </div>
                                     </div>
-                                    <p className='text-light text-center mt-2'>{event.EventSecondCommissioner}</p>
+                                    <p className='text-light text-center mt-2'>Fantasy Sports</p>
 
 
                                 </div>

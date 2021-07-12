@@ -10,6 +10,10 @@ import EventsForm from '../events/eventsForm'
 import ForgotPassword from "../../utility/resetPassword";
 import {useForm} from "../../contexts/formContext";
 import plus from "../../images/plus.svg";
+import edit from "../../images/edit.png";
+import EditProfile from '../../sections/forms/editProfileForm'
+import Icon from "../../components/icon";
+import CreateGroup from "../../components/createGroup";
 
 
 
@@ -62,7 +66,14 @@ function LoginModal(props) {
                             </>
 
                             :formType == 'eventForm' ? <EventsForm/>
-                            : <div>failed</div>}
+                                :formType == 'editProfile' ? <EditProfile/>
+                                    :formType == 'createGroup' ? <CreateGroup/>
+                                      //: formType == 'deposit' ? <>
+                                    //     <h4 className={`text-light`}> Your account has insufficient funds.<br/>Please deposit funds to your account</h4>
+                                    //         <Link to={`/user/${currentUser.us}`}></Link><button className={`btn`}>Deposit</button>
+                                    //     </>
+
+                                        : <div>Please refresh</div>}
 
 
             </Modal.Body>
@@ -141,7 +152,62 @@ function CreateEventBtn() {
     );
 }
 
+function CreateGroupBtn() {
+    const {formType,setFormType}= useForm()
+    const [modalShow, setModalShow] = React.useState(false);
 
 
 
-export  {LoginBtn, CreateEventBtn}
+    const  handleCreateGroup = () =>{
+      setFormType('createGroup')
+
+      setModalShow(true)
+    }
+
+
+    return (
+        <>
+            <button onClick={handleCreateGroup } style={{backgroundImage: `url(${plus})`}} className="btn  btn-lg-screen">Create Group</button>
+            <button onClick={handleCreateGroup } style={{backgroundImage: `url(${plus})`}} className="  btn-mobile"></button>
+
+
+            <LoginModal
+                show={modalShow}
+                onHide={() => setModalShow(false) }
+            />
+        </>
+    );
+}
+
+
+function EditProfileBtn() {
+    const {formType,setFormType}= useForm()
+    const [modalShow, setModalShow] = React.useState(false);
+
+
+
+    const  editProfile = () =>{
+        setFormType('editProfile')
+
+        setModalShow(true)
+    }
+
+
+    return (
+        <>
+            {/*<Icon  props={{backgroundColor:'#13161A' , image:edit}}/>*/}
+            <button onClick={editProfile } style={{backgroundImage: `url(${edit})`}} className=""></button>
+
+
+            <LoginModal
+                show={modalShow}
+                onHide={() => setModalShow(false) }
+            />
+        </>
+    );
+}
+
+
+
+
+export  {LoginBtn, CreateEventBtn, EditProfileBtn,CreateGroupBtn}

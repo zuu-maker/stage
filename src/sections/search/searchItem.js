@@ -1,6 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import basketball from "../../images/basketball.png";
 import dummy from "../../images/dummy.png";
+import {getRealtimeChild} from "../../helper/helper";
+import {useChat} from "../../contexts/messageContext";
 
 function SearchItem({event}) {
     const difficulty ={
@@ -10,9 +12,24 @@ function SearchItem({event}) {
         normal : '#D48600',
 
     }
+    const {participants,setParticipants} = useChat();
+    let participantsList= [];
+
+    const getParticipants = (e) =>{
+        getRealtimeChild('Participants','EventId',event.id).get()
+            .then((snapshot) =>{
+
+                snapshot.forEach((doc) =>{
+                    participantsList.push(doc.val())
+                })
+                setParticipants(participantsList)
+                console.log(participants)
+
+            })
+    }
     return (
 
-<div className='p-3'>
+<div onClick={getParticipants} className='p-3'>
     <div className='d-flex  justify-content-center align-items-center'>
         {/*<div className='cover-img-wrapper'>*/}
         {/*    <img src={basketball} alt=""/>*/}

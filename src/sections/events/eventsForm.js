@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './events.css';
 import '../../helper/helper'
-import {getDoc, getOptions, pushData} from "../../helper/helper";
+import {getDoc, getOptions, pushData, pushRealData, updateDocument, updateFirebaseDocument} from "../../helper/helper";
 import calendar from "../../images/created_schedule.png";
 import dropdown from "../../images/sort.png"
 import {useForm} from "../../contexts/formContext";
@@ -14,6 +14,8 @@ import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
+import {useLoader} from "../../contexts/loaderContext";
+import {useAuth} from "../../contexts/authContext";
 
 function ValueLabelComponent(props) {
     const { children, open, value } = props;
@@ -28,19 +30,48 @@ function ValueLabelComponent(props) {
 export default function EventsForm() {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+    const {setLoader, loader} = useLoader()
+    const { currentUser} = useAuth()
     const [formOptions, setFormOptions] = useState([])
     const [maxParticipants, setMaxParticipants] = useState([])
     const [eventTotalPrizes, setEventTotalPrizes] = useState(0)
     const [slider, setSlider] = useState({'s1':0,'s2':0,'s3':0,'s4':0})
     const {options, setOptions} = useForm([])
-    const [state, setState] = React.useState({checkedA: true, checkedB: true,});
+    const [state, setState] = React.useState({checkedB: false});
+    const [startDate,setStartDate] = useState(0);
+    const [endDate,setEndDate] = useState(0);
     var tota, totb, totc,totd, alltot, altval, getslider;
     var chktot = 100;
     var scrore = 101;
 
+    const handleStartDate = (e) => {
+        console.log(e.target.valueAsNumber)
+        setStartDate(e.target.valueAsNumber)
+    }
+    const handleEndDate =  (e) => {
+        console.log(e.target.valueAsNumber)
+
+         setEndDate(e.target.valueAsNumber)
+        console.log(endDate,'-',startDate)
+        console.log(endDate-startDate)
+            if (e.target.valueAsNumber-startDate < 0) {
+
+                setError('End date cannot be before the start date')
+                setStartDate(0)
+                setEndDate(0)
+                document.getElementById('startDate').value = ''
+                document.getElementById('endDate').value = ''
+
+            }
+        else {
+               setError('')}
+        }
+
+
     const handleChange = (event) => {
         setState({ ...state, [event.target.name]: event.target.checked });
     };
+
 //On Change event
     function adjustSlider(e){
         // Get the sliders Id
@@ -151,7 +182,7 @@ export default function EventsForm() {
         var o = document.getElementById("event-participants");
         var selectedOption = o.options[o.selectedIndex].text;
         console.log(selectedOption)
-        var computation = (parseInt(selectedOption) * e.target.value) - 7.5;
+        var computation = (parseInt(selectedOption) * e.target.value) - 0.75;
         {computation < 0 ? setEventTotalPrizes(0) :setEventTotalPrizes(computation) }
 
     }
@@ -160,25 +191,41 @@ export default function EventsForm() {
         e.preventDefault()
         var startDate = new Date(e.target.EventStartDate.value).valueOf();
         var endDate = new Date(e.target.EventEndDate.value).valueOf();
-        var e = document.getElementById("sport");
-        var selectedOption = e.options[e.selectedIndex].text;
 
         var formData = {
 
 
             EventName: e.target.EventName.value,
-            Eventsport: selectedOption,
+            Eventsport: e.target.Eventsport.value,
             EventDifficulty: e.target.EventDifficulty.value,
             EventStyle: e.target.EventStyle.value,
-            EventStartDate: startDate,
-            EventEndDate: endDate,
+            EventStartDate: e.target.EventStartDate.valueAsNumber,
+            EventEndDate: e.target.EventEndDate.valueAsNumber,
             EventMaximumParticipants: e.target.EventMaximumParticipants.value,
             EventEntryFee: e.target.EventEntryFee.value,
-            EventTimestamp: Date.now()
+            EventTotalPrizes: e.target.EventTotalPrizes.value,
+            EventTimestamp: Date.now(),
+            EventCommissioner: currentUser.displayName,
+            EventCommissionerId : currentUser.uid,
+            EventCommissionerProfile: currentUser.photoURL,
+            EventFirstPlacePercent: '',
+            EventSecondPlacePercent:'',
+            EventThirdPlacePercent:'',
+            EventFourthPlacePercent:'',
+            EventSecondCommissioner:'Fantasy Sports',
+            EventSecondCommissionerId:'',
+            EventSecondCommissionerProfile:'',
+            EventPrizeTier: document.getElementsByClassName('PrivateSwitchBase-input-4').checkedB.checked
 
         }
         try {
-            pushData('Events', formData)
+            setLoader(true)
+            pushRealData('Events', formData).then((docRef) =>{
+                console.log(docRef.key)
+                updateFirebaseDocument('Events',docRef.key,{id: docRef.key})
+            } )
+            setLoader(false)
+
         } catch (e) {
             console.log(e.message)
 
@@ -192,7 +239,7 @@ export default function EventsForm() {
         var e = document.getElementById("event-sport");
         var selectedOption = e.options[e.selectedIndex].text;
 
-        // const docs = await getDoc('SportsEvents', 'Sport', e.target.value)
+        // const docs = await fgetDoc('SportsEvents', 'Sport', e.target.value)
 
 
         await db.collection('SportsEvents').where('Sport', "==", selectedOption).get()
@@ -241,16 +288,17 @@ export default function EventsForm() {
 
     return (
         <>
-            <p className="text-danger">{error}</p>
+            <p className={`text-danger`}>{error}</p>
+
             <form className="form event-form" onSubmit={handleSubmit}>
                 <p className='form-title'>Add New Event</p>
                 <div className="input-group">
 
-                    <input name="EventName"
-                           type="text" placeholder="Event Name"/>
+                    <input name="EventName" required type="text" placeholder="Event Name"/>
 
-                    <select id='event-sport' className="pointer" onChange={handleClickOption}
+                    <select id='event-sport' className="pointer" required onChange={handleClickOption}
                             style={{backgroundImage: `url(${dropdown})`}} name="Eventsport">
+                        <option value="" selected>Choose Event sport</option>
                         {formOptions && formOptions.length > 0 ? formOptions.map(option => {
                                 return (<Option option={option}/>)
                             }) :
@@ -260,7 +308,9 @@ export default function EventsForm() {
 
                         }
                     </select>
-                    <select className="pointer" style={{backgroundImage: `url(${dropdown})`}} name="QuarterLengths">
+                    <select required className="pointer" style={{backgroundImage: `url(${dropdown})`}} name="QuarterLengths">
+                        <option value="" selected>Quarter Length</option>
+
                         {options ? options.map(eventOption => {
                             return (<EventOptions eventOption={eventOption.QuarterLengths}/>)
                         }) : <option>Null</option>}
@@ -268,24 +318,28 @@ export default function EventsForm() {
 
                     </select>
 
-                    <input name="EventStartDate"
+                    <input onChange={handleStartDate} required id='startDate' name="EventStartDate"
                            type="date" placeholder="Registration Start Date"
                     />
 
 
-                    <input name="EventEndDate"
+                    <input  onChange={handleEndDate} id={`endDate`} required name="EventEndDate"
                            type="date" placeholder="Registration End Date"
                     />
 
-                    <select className="pointer" style={{backgroundImage: `url(${dropdown})`}} name="EventDifficulty">
+                    <select required className="pointer" style={{backgroundImage: `url(${dropdown})`}} name="EventDifficulty">
+                        <option value="" selected>Event Difficulty</option>
+
                         {options ? options.map(eventOption => {
                             return (<EventOptions eventOption={eventOption.Difficulty}/>)
                         }) : <option>Null</option>}
 
                     </select>
 
-                    <select id='event-style' onChange={maximumParticipants} className="pointer"
+                    <select required id='event-style' onChange={maximumParticipants} className="pointer"
                             style={{backgroundImage: `url(${dropdown})`}} name="EventStyle">
+                        <option value="" selected>Event Style</option>
+
                         {options ? options.map(eventOption => {
                             return (<EventOptions eventOption={eventOption.Style}/>)
                         }) : <option>Null</option>}
@@ -294,15 +348,17 @@ export default function EventsForm() {
                     </select>
 
 
-                    <select id='event-participants' className="pointer" style={{backgroundImage: `url(${dropdown})`}} name="EventMaximumParticipants">
+                    <select required id='event-participants' className="pointer" style={{backgroundImage: `url(${dropdown})`}} name="EventMaximumParticipants">
+                        <option value="" selected>No. of participants</option>
+
                         {maxParticipants ? <EventOptions eventOption={maxParticipants}/>
                          : <option>Null</option>}
 
 
                     </select>
 
-                    <input name="EventEntryFee" type="number" onChange={totalPrize} placeholder="Entry Fee"/>
-                    <input name="EventTotalPrizes" value={eventTotalPrizes} disabled type="text" placeholder="Projected Total Prize"/>
+                    <input required name="EventEntryFee" type="number" onChange={totalPrize} placeholder="Entry Fee"/>
+                    <input  name="EventTotalPrizes" value={eventTotalPrizes} disabled type="text" placeholder="Projected Total Prize"/>
                     <div className='switch-container d-flex center'>
                         <span>Default Prize Tier</span>
                         <Switch className='mr-0 ml-auto'
@@ -323,14 +379,13 @@ export default function EventsForm() {
                     {/*<Slider onChange={adjustSlider} id='range4' aria-valuenow={slider.s4} ValueLabelComponent={ValueLabelComponent} aria-label="custom thumb label" aria-labelledby='range1' defaultValue={0}/>*/}
 
                 </div>
-                <button disabled={loading} style={{background: loading ? '#ffffff' : ''}} type="submit"><span
+                <button disabled={loading} style={{background: loader ? '#ffffff' : ''}} type="submit"><span
                     className='form-btn'>Create Event</span></button>
-            </form>
-            {/*<input id="range1" className="slider" type="range" min="0" max="100" value='0' />*/}
+
+            {/*<input id="range1" className="slider" type="range" min="0" max="100" value='' />*/}
             {/*<input id="range2" className="slider" type="range" min="0" max="100" value='0' />*/}
             {/*<input id="range3" className="slider" type="range" min="0" max="100" value='0' />*/}
-            {/*<input id="range4" className="slider" type="range" min="0" max="100" value='0' />*/}
-
+            </form>
         </>
     );
 

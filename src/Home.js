@@ -19,8 +19,9 @@ import {EventProvider} from "./contexts/eventsContext";
 import {LoaderProvider} from "./contexts/loaderContext";
 import UserProfile from "./sections/profile/userProfile";
 import OtherUser from "./sections/profile/otherUser";
-import Message from "./sections/message/message";
+import Message from "./sections/message/message.js";
 import {UserProvider} from "./contexts/userContext";
+import {ChatProvider} from "./contexts/messageContext";
 
 
 function Home() {
@@ -28,10 +29,13 @@ function Home() {
     return (
       <Router>
           <AuthProvider>
+              <LoaderProvider>
+
               <UserProvider>
 
-          <LoaderProvider>
-            <EventProvider>
+              <ChatProvider>
+
+              <EventProvider>
           <FormProvider>
 
 
@@ -41,8 +45,8 @@ function Home() {
               <Route path="/events" component={Events} />
               <Route path="/eventDetails/:id" component={EventDetails} />
               <Route path="/user/:id" component={UserProfile} />
-              <Route path="/messages" component={Message} />
-              {/*<Route path="/user/dashboard" component={UserProfile} />*/}
+              <Route exact path="/messages" component={Message} />
+              <Route path="/messages/:id" component={Message} />
               <div className="home">
 
 <>
@@ -59,8 +63,10 @@ function Home() {
           </Switch>
           </FormProvider>
             </EventProvider>
-          </LoaderProvider>
+                  </ChatProvider>
+
                   </UserProvider>
+              </LoaderProvider>
 
           </AuthProvider>
 

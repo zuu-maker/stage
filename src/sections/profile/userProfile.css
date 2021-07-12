@@ -1,9 +1,32 @@
 .graph {
-    width: 100%;
+    /* width: 40vw; */
     background-color: #2B3038;
     border-radius: 15pt;
     margin-bottom: 6%;
-    height: 40vh;
+    max-height: 50vh;
+    min-width: 40vw;
+}
+.graph span{
+    color: #18FF00;
+}
+.bar-container{
+    background-color: #13161A;
+    padding: 3% 0 ;
+
+    height: 28vh;
+    width: 25%;
+    border-radius: 2rem;
+    position: relative;
+}
+
+.vertical-progress-bar {
+    background-color: #18FF00;
+    border-radius: 2rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 100%;
 }
 .user-side-bar {
     margin-right: 4%;
@@ -11,6 +34,7 @@
     background-color: #2B3038;
     border-radius: 15pt;
     height: 80vh;
+    min-width: 25vw;
 }
 .user .user-side-bar{
     height: fit-content;
@@ -159,6 +183,14 @@
 /*    padding: 0px;*/
 /*}*/
 @media (max-width: 985px) {
+    .bar-container {
+        background-color: #13161A;
+        padding: 3% 0;
+        height: 16vh;
+        width: 50%;
+        border-radius: 2rem;
+        position: relative;
+    }
     .other-user{
         flex-direction: column;
     }
@@ -179,6 +211,7 @@
     }
     .graph{
         height: 25%;
+        width: 100%;
     }
     .user-sidebar-header{
         display: flex;

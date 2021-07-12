@@ -63,9 +63,9 @@ export default function Header() {
                                             <Link className="nav-link" href="#">How does it work</Link>
                                         </li>
                                     }
-                                    {currentUser && currentUser.userEmail
+                                    {currentUser && currentUser.email
                                         ? <li className="nav-item">
-                                            <Link className="nav-link" to='/messages/1' href="#">Messages</Link>
+                                            <Link className="nav-link" to='/messages' href="#">Messages</Link>
                                         </li>
 
                                         : <></>
