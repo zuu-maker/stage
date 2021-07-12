@@ -14,6 +14,7 @@ import edit from "../../images/edit.png";
 import EditProfile from '../../sections/forms/editProfileForm'
 import Icon from "../../components/icon";
 import CreateGroup from "../../components/createGroup";
+import deposit from "../../images/deposit_fund.svg";
 
 
 
@@ -196,8 +197,14 @@ function EditProfileBtn() {
     return (
         <>
             {/*<Icon  props={{backgroundColor:'#13161A' , image:edit}}/>*/}
-            <button onClick={editProfile } style={{backgroundImage: `url(${edit})`}} className=""></button>
+            {/*<Icon  props={{backgroundColor: '#2B3038',image: edit , click: {editProfile}} }/>*/}
+            {/*<button onClick={editProfile } style={{backgroundImage: `url(${edit})`}} className=""></button>*/}
+            <div onClick={editProfile } style={{backgroundColor: '#13161A'}} className='icon-wrapper ml-2 pointer'>
+                <div className='center'>
+                    <img src={edit} alt=""/>
 
+                </div>
+            </div>
 
             <LoginModal
                 show={modalShow}

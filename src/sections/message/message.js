@@ -87,7 +87,7 @@ function Message(props) {
     //      routes.push([{
     //          path: `/messages/${chat.chatRoomId}`,
     //          exact: true,
-    //          sidebar: () => <></>,
+    //          dashboard: () => <></>,
     //
     //          main: () =><MessageWindow />
     //      }])

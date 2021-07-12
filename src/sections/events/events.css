@@ -192,13 +192,13 @@ button{
 }
 .search-dropdown {
     height: fit-content;
-    background-color: #2B3038;
+    /*background-color: #2B3038;*/
     border-radius: 18pt;
     /*position: absolute;*/
     /*z-index: 100;*/
     width: 90%;
     max-height: 35vh;
-    /*overflow-y: auto;*/
+    overflow-y: auto;
     margin-top: 1%;
 }
 select {

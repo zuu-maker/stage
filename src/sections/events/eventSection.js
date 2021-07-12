@@ -22,11 +22,13 @@ import {useAuth} from "../../contexts/authContext";
 import {Modal} from "react-bootstrap";
 import {realDB} from "../../firebase/firebase";
 import logo from '../../images/logo.png';
+import {useLoader} from "../../contexts/loaderContext";
 
-function EventSection({event}) {
+function EventSection({event,participantsList}) {
     const commisionerId = useRef()
-    const {user,setHasJoined,hasJoined,joinedEvents, setJoinedEvents} =useUser();
-    const {currentUser} =useAuth();
+    const {setHasJoined,hasJoined,joinedEvents, setJoinedEvents} =useUser();
+    const {currentUser,user} =useAuth();
+    const {loader} =useLoader();
     const [accountBalance ,setAccountBalance] = React.useState()
     const [modal ,setModal] = useState(false)
     const secondCommissionerId = useRef()
@@ -39,8 +41,24 @@ function EventSection({event}) {
     {currentUser && currentUser.uid ?  userId = {userId : currentUser.uid} :  userId = {userId : null}}
     const joined = {joined : true};
 
-    useEffect(async () =>{
+    useEffect( () =>{
         console.log(hasJoined)
+        participantsList?.find((user)  =>{
+            if (user.userId === currentUser.uid){
+                setHasJoined(true)
+                console.log(hasJoined)
+                return true;
+            }
+
+            else{
+                setHasJoined(false)
+                console.log(hasJoined)
+
+                return false;
+
+            }
+        })
+
         // await realDB.ref('Users/'+currentUser.uid).on("value" ,(snapshot) =>  {
         //     const data = snapshot.val();
         //     setAccountBalance(data.userBalance)
@@ -115,7 +133,7 @@ function EventSection({event}) {
     <div className='d-flex  align-items-center'>
         <p className='event-detail-title text-light'>{event.EventName}</p>
         <div className='join-btn mr-0 ml-auto'>
-            { hasJoined ? <button className='   btn  '>Registered</button> : <button onClick={handleJoinEvent} className='   btn  '>Join Event</button> }
+            {!loader &&  hasJoined ? <button className='   btn  '>Registered</button> :!loader &&  !hasJoined ? <button onClick={handleJoinEvent} className='   btn  '>Join Event</button>: <button  className='   btn  '>Loading...</button> }}
 
 
         </div>

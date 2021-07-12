@@ -1,5 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react'
-import {auth} from '../firebase/firebase'
+import {auth, db} from '../firebase/firebase'
+import {useUser} from "./userContext";
+import {getRealtimeChild, getRealtimeDoc} from "../helper/helper";
 
 const AuthContext = React.createContext()
 
@@ -9,7 +11,15 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState()
+    const [user,setUser] = useState([]);
     const [loading, setLoading] = useState(true)
+    const [joinedEvents, setJoinedEvents] = useState([]);
+    const [createdEvents, setCreatedEvents] = useState([]);
+
+
+    let userJoinedEventsList = [];
+    let joinedEventsList = [];
+    let createdEventsList = [];
 
     //Sign up User
     function signup(email, password) {
@@ -44,7 +54,64 @@ export function AuthProvider({ children }) {
          const unsubscribe = await auth.onAuthStateChanged(user => {
                 // User is signed in.
                 setCurrentUser(user)
+             if(user){
+             db.collection('Users').where('objectId', "==", user.uid)
+                 .onSnapshot((snapshot) => {
+                     console.log(snapshot.docs.map(doc => doc.data()))
+                     setUser([])
+                     const userArr  = snapshot.docs.map(doc => doc.data())
+                     setUser(userArr?.find( b=>{ return b}))
 
+                 })
+             console.log(user.toJSON())
+
+
+                 getRealtimeChild('Participants', 'userId', user.uid).on("child_added", function (snapshot) {
+                     userJoinedEventsList.push(snapshot.val())
+
+
+                 })
+                     console.log(userJoinedEventsList)
+                     userJoinedEventsList.forEach((eventJoined) => {
+                         // realDB.ref('Events'+'/'+eventJoined.EventId).on('value',(snapshot) =>{
+                         //     console.log(snapshot)
+                         //     console.log(snapshot.val())
+                         // })
+                         getRealtimeDoc('Events', eventJoined.EventId).then((snapshot) => {
+
+                             joinedEventsList.push(snapshot.val())
+                         })
+
+                     })
+                     console.log(joinedEventsList)
+
+                     setJoinedEvents(joinedEventsList)
+
+                     console.log(joinedEvents)
+
+
+
+
+
+
+                 getRealtimeChild('Events','EventCommissionerId',user.uid).get()
+                     .then((snapshot)=>{
+                         snapshot.forEach((doc) =>{
+                             createdEventsList.push(doc.val())
+                         })
+                         setCreatedEvents(createdEventsList)
+                         console.log(createdEventsList)
+                         console.log(createdEvents)
+                     })
+                     .catch(e => {
+                         console.log(e)})
+
+
+
+
+
+
+         }
 
 
             setLoading(false)
@@ -62,7 +129,10 @@ export function AuthProvider({ children }) {
         logout,
         resetPassword,
         updateEmail,
-        updatePassword
+        updatePassword,
+        joinedEvents, setJoinedEvents,
+        user,
+        createdEvents, setCreatedEvents
     }
 
     return (

@@ -56,23 +56,23 @@ function SearchItem({event}) {
         <p className='m-0 prize text-light'>
             Prize: ${event.EventTotalPrizes}
         </p>
-        {
-            event.EventDifficulty === 'Easy' ?
-                <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.easy   }} value=''>{event.EventDifficulty}</button>
+        {/*{*/}
+        {/*    event.EventDifficulty === 'Easy' ?*/}
+        {/*        <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.easy   }} value=''>{event.EventDifficulty}</button>*/}
 
-                :
+        {/*        :*/}
 
-                event.EventDifficulty === 'Hard' ?
-                    <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.hard   }} value=''>{event.EventDifficulty}</button>
+        {/*        event.EventDifficulty === 'Hard' ?*/}
+        {/*            <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.hard   }} value=''>{event.EventDifficulty}</button>*/}
 
-                    :
-                    event.EventDifficulty === 'Medium' ?
-                        <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.normal   }} value=''>{event.EventDifficulty}</button>
+        {/*            :*/}
+        {/*            event.EventDifficulty === 'Medium' ?*/}
+        {/*                <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.normal   }} value=''>{event.EventDifficulty}</button>*/}
 
-                        :
-                        <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.hard   }} value=''>{event.EventDifficulty}</button>
+        {/*                :*/}
+        {/*                <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.hard   }} value=''>{event.EventDifficulty}</button>*/}
 
-        }
+        {/*}*/}
     </div>
 </div>
 

@@ -22,6 +22,8 @@ function CardList() {
         const eventsRef = realDB.ref('Events').orderByChild('EventTimestamp').limitToFirst(3);
 
         setLoader(true);
+        eventList= []
+        setEventsList([])
 
         eventsRef.on('value', (snapshot) => {
 

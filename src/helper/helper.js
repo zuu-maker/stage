@@ -124,9 +124,9 @@ export const getRealtimeDoc = (path,id) =>{
 }
 export const  getRealtimeChild =  (path,child,id) =>{
 
-  const childData =  realDB.ref(path).orderByChild(child).equalTo(id)
 
-  return childData
+
+  return  realDB.ref(path).orderByChild(child).equalTo(id)
 }
 export const getDoc = (collection,field,value) =>{
   let collectionList = []

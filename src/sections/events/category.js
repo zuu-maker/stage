@@ -24,19 +24,10 @@ function Category(props) {
             eventsRef.on('value',(snapshot) => {
 
                 snapshot.forEach(function(events) {
-                    eventList.push({
+                    eventList.push( events.val()
 
 
-                        EventName: events.val().EventName,
-                        EventEntryFee: events.val().EventEntryFee,
-                        eventGame: events.val().EventGame,
-                        eventCurrentParticipants: events.val().EventCurrentParticipants,
-                        EventMaximumParticipants: events.val().EventMaximumParticipants,
-                        EventTotalPrizes: events.val().EventTotalPrizes,
-                        EventDifficulty: events.val().EventDifficulty
-
-
-                    });
+                    );
                 });
 
 

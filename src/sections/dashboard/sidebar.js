@@ -9,14 +9,12 @@ import create_schedule from "../../images/created_schedule.svg";
 import deposit from "../../images/deposit_fund.svg";
 import withdraw from "../../images/withdraw_fund.svg";
 import arrow from "../../images/arrow right.svg";
-import './userProfile.css'
 import {
     BrowserRouter as Router,
     Switch,
     Route,
     Link, useParams, useHistory
 } from "react-router-dom";
-import Graph from "./graph";
 import Card from "../events/card";
 import {useAuth} from "../../contexts/authContext";
 import {getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
@@ -27,147 +25,85 @@ import {useUser} from "../../contexts/userContext";
 import {useLoader} from "../../contexts/loaderContext";
 
 
-function UserMenu({user}) {
-    const {currentUser,joinedEvents, createdEvents} = useAuth();
+function Sidebar({user}) {
+    const {currentUser} = useAuth();
     let params = useParams();
     const userId = params.id;
-    // const {joinedEvents, createdEvents} = useUser();
+    const {joinedEvents, createdEvents,setJoinedEvents,setCreatedEvents} = useUser();
     const {setLoader} = useLoader();
     let userJoinedEventsList = [];
     let joinedEventsList = [];
+    let createdEventsList = [];
     const history = useHistory()
 
-    const routes = [
-        {
-            path: "/user/:id",
-            exact: true,
-            sidebar: () => <></>,
 
-            main: () => <div className='flex-column flex-grow-1'>
-                <div className='lg-view'>
-                    <Graph />
-                </div>
-                <div className='grid-container'>
-                    {joinedEvents ? joinedEvents?.map(event => {
-                        return (
-                            <>
-
-                                <Card event={event}/>
-                            </>
-                        )
-                    }) :<>
-                        <Card event={''}/>
-                        <Card event={''}/>
-                    </> }
-                </div>
-
-
-            </div>
-        },
-        {
-            path: "/user/:id/joined-events",
-            exact: true,
-            sidebar: () => <></>,
-
-            main: () => <div className='flex-column flex-grow-1'>
-
-                <div className='grid-container'>
-                    {joinedEvents ? joinedEvents?.map(event => {
-                        return (
-                            <>
-
-                                <Card event={event}/>
-                            </>
-                        )
-                    }) :<>
-                        <Card event={''}/>
-                        <Card event={''}/>
-                    </> }
-                </div>
-
-
-            </div>
-        },
-        {
-            exact: true,
-
-            path: "/user/:id/created-events",
-            sidebar: () => <></>,
-            main: () => <div className='grid-container'>
-                {createdEvents ? createdEvents?.map(event => {
-                    return (
-                        <>
-
-                            <Link to={`/eventDetails/${event.id}`}><Card event={event}/></Link>
-                        </>
-                    )
-                }) :<>
-                    <p className={`text-light d-block mx-auto text-center`}>No available created events</p>
-                </> }
-            </div>
-        },
-        {
-            exact: true,
-
-            path: "/user/:id/create-schedule",
-            sidebar: () => <></>,
-            main: () => <div className='grid-container'>
-
-            </div>
-        },
-        {
-            exact: true,
-
-            path: "/user/:id/deposit",
-            sidebar: () => <></>,
-            main: () => <div className='grid-container'>
-
-            </div>
-        },
-        {
-            exact: true,
-
-            path: "/user/:id/withdraw",
-            sidebar: () => <></>,
-            main: () => <div className='grid-container'>
-
-            </div>
-        }
-
-    ];
-
-    // const handleJoinedEvents = () =>{
-    //     setLoader(true)
-    //     getRealtimeChild('Participants', 'userId', currentUser.uid).on("child_added", function (snapshot) {
-    //         userJoinedEventsList.push(snapshot.val())
+    // {joinedEvents ? joinedEvents?.map(event => {
+    //     return (
+    //         <>
     //
-    //
-    //     })
-    //     console.log(userJoinedEventsList)
-    //     userJoinedEventsList.forEach((eventJoined) => {
-    //         // realDB.ref('Events'+'/'+eventJoined.EventId).on('value',(snapshot) =>{
-    //         //     console.log(snapshot)
-    //         //     console.log(snapshot.val())
-    //         // })
-    //         getRealtimeDoc('Events', eventJoined.EventId).then((snapshot) => {
-    //
-    //             joinedEventsList.push(snapshot.val())
-    //         })
-    //
-    //     })
-    //     console.log(joinedEventsList)
-    //     {joinedEvents ? setJoinedEvents([...joinedEvents,joinedEventsList]) : setJoinedEvents(joinedEventsList)}
-    //
-    //     console.log(joinedEvents)
-    //     setLoader(false)
-    //     history.push(`/user/${currentUser.uid}/joined-events`)
-    // }
+    //             <Card event={event}/>
+    //         </>
+    //     )
+    // })
+
+
+    const handleJoinedEvents = () =>{
+        setLoader(true)
+        getRealtimeChild('Participants','userId',currentUser.uid).get()
+            .then((snapshot)=>{
+                snapshot.forEach((doc) =>{
+                    userJoinedEventsList.push(doc.val())
+                })
+            })
+            .catch(e => {
+                console.log(e)})
+        console.log(userJoinedEventsList)
+        // getRealtimeChild('Participants', 'userId', currentUser.uid).on("child_added", function (snapshot) {
+        //     userJoinedEventsList.push(snapshot.val())
+        //
+        //
+        // })
+        userJoinedEventsList.forEach((eventJoined) => {
+            // realDB.ref('Events'+'/'+eventJoined.EventId).on('value',(snapshot) =>{
+            //     console.log(snapshot)
+            //     console.log(snapshot.val())
+            // })
+            getRealtimeDoc('Events', eventJoined.EventId).then((snapshot) => {
+                console.log(snapshot.val())
+                joinedEventsList.push(snapshot.val())
+            })
+
+        })
+
+        console.log(joinedEventsList)
+        setJoinedEvents(joinedEventsList)
+        console.log(joinedEvents)
+        setLoader(false)
+        history.push(`/user/${currentUser.uid}/joined-events`)
+
+    }
+    const handleCreatedEvents = () =>{
+        setLoader(true)
+        getRealtimeChild('Events','EventCommissionerId',currentUser.uid).get()
+            .then((snapshot)=>{
+                snapshot.forEach((doc) =>{
+                    createdEventsList.push(doc.val())
+                })
+                setCreatedEvents(createdEventsList)
+                console.log(createdEventsList)
+                console.log(createdEvents)
+            })
+            .catch(e => {
+                console.log(e)})
+        setLoader(false)
+        history.push(`/user/${currentUser.uid}/created-events`)
+
+    }
 
 
 
         return (
             <>
-                <Router>
 
                     <div className='d-flex flex-grow-1 flex-column  card-body user-side-bar'>
                         <div className='user-sidebar-header'>
@@ -204,14 +140,14 @@ function UserMenu({user}) {
 
                             </div>
                             <div className='sm-view'>
-                                <Graph/>
+                                {/*<Graph/>*/}
 
                             </div>
 
                         </div>
                         <div className='menu-options'>
-                            <Link  to={`/user/${currentUser.uid}/joined-events`}>
-                                <div   className=' m-3 pointer  menu-item'>
+
+                                <div  onClick={handleJoinedEvents} className=' m-3 pointer  menu-item'>
                                     <div className='icon-wrapper'>
                                         <div className='center'>
                                             <img src={join_event} alt=""/>
@@ -225,9 +161,9 @@ function UserMenu({user}) {
                                         <img src={arrow} alt=""/>
                                     </div>
                                 </div>
-                            </Link>
-                            <Link to={`/user/${currentUser.uid}/created-events`}>
-                                <div className='menu-item m-3 pointer '>
+
+
+                                <div onClick={handleCreatedEvents} className='menu-item m-3 pointer '>
                                     <div className='icon-wrapper'>
                                         <div className='center'>
                                             <img src={create_event} alt=""/>
@@ -241,7 +177,7 @@ function UserMenu({user}) {
                                         <img src={arrow} alt=""/>
                                     </div>
                                 </div>
-                            </Link>
+
                             <Link to={`/user/${currentUser.uid}/create-schedule`}>
                                 <div className='menu-item m-3 pointer '>
                                     <div className='icon-wrapper'>
@@ -297,42 +233,11 @@ function UserMenu({user}) {
 
                     </div>
 
-                    <Switch>
-                        {routes.map((route, index) => (
-                            // You can render a <Route> in as many places
-                            // as you want in your app. It will render along
-                            // with any other <Route>s that also match the URL.
-                            // So, a dashboard or breadcrumbs or anything else
-                            // that requires you to render multiple things
-                            // in multiple places at the same URL is nothing
-                            // more than multiple <Route>s.
-                            <Route
-                                key={index}
-                                path={route.path}
-                                exact={route.exact}
-                                children={<route.sidebar/>}
-                            />
-                        ))}
-                    </Switch>
 
-                    <div>
-                        <Switch>
-                            {routes.map((route, index) => (
-                                // Render more <Route>s with the same paths as
-                                // above, but different components this time.
-                                <Route
-                                    key={index}
-                                    path={route.path}
-                                    exact={route.exact}
-                                    children={<route.main/>}
-                                />
-                            ))}
-                        </Switch>
-                    </div>
-                </Router>
+
             </>
 
         );
     }
 
-    export default UserMenu;
+    export default Sidebar;

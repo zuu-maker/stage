@@ -43,21 +43,6 @@ const EventDetails = () => {
             setParticipants(childList)
             console.log(childList)
         });
-        childList.find((user)  =>{
-            if (user.userId === currentUser.uid){
-                setHasJoined(true)
-                console.log(hasJoined)
-                return true;
-            }
-
-            else{
-                setHasJoined(false)
-                console.log(hasJoined)
-
-                return false;
-
-            }
-        })
 
         console.log(hasJoined)
 
@@ -72,16 +57,16 @@ const EventDetails = () => {
     return (
         <>
             <Header/>
-            <div className='container event-details '>
-                <EventSection event={eventData} />
+            {!loader && participants.length > 0 && <div className='container event-details '>
+                <EventSection event={eventData} participantsList={participants}/>
                 <div className='flex-grow-1 user-list-section'>
                     <div className=' pt-3 '>
                         <h5 className='pl-4 text-light'>Participants</h5>
                         <div className='user-list'>
-                            { participants ? participants?.map(user  =>{
-                                return(<>
+                            {participants ? participants?.map(user => {
+                                return (<>
 
-                                            <UserList  user={user} key={user.userId} />
+                                        <UserList user={user} key={user.userId}/>
 
 
                                     </>
@@ -94,7 +79,7 @@ const EventDetails = () => {
                     </div>
                 </div>
 
-            </div>
+            </div>}
         </>
 
     );

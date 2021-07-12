@@ -5,8 +5,9 @@ import axios from 'axios'
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import {useUser} from "../../contexts/userContext";
 import Bar from "../../components/bar";
+import {useAuth} from "../../contexts/authContext";
 function Graph({props})  {
-    const {user} = useUser();
+    const {user} = useAuth();
 
     return (
         <div className="graph p-4">

@@ -1,7 +1,15 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './events.css';
 import '../../helper/helper'
-import {getDoc, getOptions, pushData, pushRealData, updateDocument, updateFirebaseDocument} from "../../helper/helper";
+import {
+    getDoc,
+    getOptions,
+    pushData,
+    pushRealData,
+    updateDocument,
+    updateFirebaseDocument,
+    updateFirestoreDocument
+} from "../../helper/helper";
 import calendar from "../../images/created_schedule.png";
 import dropdown from "../../images/sort.png"
 import {useForm} from "../../contexts/formContext";
@@ -29,9 +37,10 @@ function ValueLabelComponent(props) {
 
 export default function EventsForm() {
     const [error, setError] = useState("")
+    const [success, setSuccess] = useState("")
     const [loading, setLoading] = useState(false)
     const {setLoader, loader} = useLoader()
-    const { currentUser} = useAuth()
+    const { currentUser,user} = useAuth()
     const [formOptions, setFormOptions] = useState([])
     const [maxParticipants, setMaxParticipants] = useState([])
     const [eventTotalPrizes, setEventTotalPrizes] = useState(0)
@@ -219,14 +228,59 @@ export default function EventsForm() {
 
         }
         try {
-            setLoader(true)
-            pushRealData('Events', formData).then((docRef) =>{
-                console.log(docRef.key)
-                updateFirebaseDocument('Events',docRef.key,{id: docRef.key})
-            } )
-            setLoader(false)
+            if (parseInt(user.balance) >= parseInt(formData.EventEntryFee)) {
+                setError('')
+                //Set loading state
+                setLoader(true)
 
-        } catch (e) {
+                    //Remaining balance deducted from the user balance  after Joining event
+                    const remainingBalance =  parseInt(user.balance) - parseInt(formData.EventEntryFee)
+                    updateFirestoreDocument('Users',currentUser.uid,{balance:remainingBalance})
+                        .then(() =>{
+                            //Update userBalance in  firebase
+                                updateFirebaseDocument('Users',currentUser.uid,{userBalance:remainingBalance})
+                                    .catch(e => console.log(e))
+
+                            //Create event
+                            pushRealData('Events', formData).then((docRef) =>{
+                                console.log(docRef.key)
+                                //Update event document with an Id field that matches its reference id
+                                //key property returns the documents reference Id
+                                updateFirebaseDocument('Events',docRef.key,{id: docRef.key})
+
+                                //Remove user balance property from user object from the auth context
+                                var newUserObj = user
+                                delete newUserObj['balance']
+
+                                //Add the creator of the event as a participant to firebase participant's collection
+                                pushRealData('Participants',Object.assign({},newUserObj , {EventId : docRef.key}))
+
+                            } )
+                            setLoader(false)
+                            setSuccess('Event created successfully')
+                            }
+                        )
+                        .catch(e => {
+                            setSuccess('')
+                            setLoader(false)
+                            setError(e)
+
+                            console.log(e)
+                        })
+
+
+            } else{
+                setSuccess('')
+
+                console.log(user.balance)
+                setError('Please deposit enough funds to create this event. ')
+
+            }
+        }
+
+
+         catch (e) {
+            setError(e)
             console.log(e.message)
 
         }
@@ -289,6 +343,7 @@ export default function EventsForm() {
     return (
         <>
             <p className={`text-danger`}>{error}</p>
+            <p className={`text-success`}>{success}</p>
 
             <form className="form event-form" onSubmit={handleSubmit}>
                 <p className='form-title'>Add New Event</p>
@@ -379,7 +434,7 @@ export default function EventsForm() {
                     {/*<Slider onChange={adjustSlider} id='range4' aria-valuenow={slider.s4} ValueLabelComponent={ValueLabelComponent} aria-label="custom thumb label" aria-labelledby='range1' defaultValue={0}/>*/}
 
                 </div>
-                <button disabled={loading} style={{background: loader ? '#ffffff' : ''}} type="submit"><span
+                <button disabled={loader} style={{background: loader ? '#ffffff' : ''}} type="submit"><span
                     className='form-btn'>Create Event</span></button>
 
             {/*<input id="range1" className="slider" type="range" min="0" max="100" value='' />*/}

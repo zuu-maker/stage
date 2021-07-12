@@ -4,6 +4,7 @@ import dummy from '../../images/dummy.png'
 import mail from "../../images/mail.svg";
 import {Link, useHistory} from 'react-router-dom'
 import {getRealtimeDoc} from "../../helper/helper";
+import {useLoader} from "../../contexts/loaderContext";
 
 const difficulty ={
     easy : '#18FF00',
@@ -18,9 +19,12 @@ function Card({ event }) {
     const history = useHistory()
     const idRef = useRef()
     const eventLevel = event.EventDifficulty
+    const {setLoader} = useLoader()
     function handleClick(){
+        setLoader(true)
         getRealtimeDoc('Events',idRef.current.id)
-        history.push(`eventDetails/${idRef.current.id}`)
+        history.push(`/eventDetails/${idRef.current.id}`)
+        setLoader(false)
 
 
     }
