@@ -51,6 +51,7 @@ export default function EditProfile() {
 
         }
         try {
+            //Check if there is an existing file
             {
                 file && file.size
                     ?

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Search from "../search/search";
 import Header from "../header/header";
 import './events.css'
@@ -11,16 +11,56 @@ import CardList from '../events/getEvents'
 import MobileNavbar from "../../components/mobileNavbar";
 import {useAuth} from "../../contexts/authContext";
 import {useUser} from "../../contexts/userContext";
+import {realDB} from "../../firebase/firebase";
+import {useEvent} from "../../contexts/eventsContext";
+import {useLoader} from "../../contexts/loaderContext";
 
 
 function Events() {
-    const {currentUser} =useAuth()
+    const {eventsList, setEventsList} = useEvent()
+    const [participantList, setParticipantList] = useState([])
+    const {loader, setLoader} = useLoader()
+    const {setHasJoined} = useUser()
+    const {currentUser} = useAuth()
+    let eventList = []
+    let participants = []
+
+    useEffect(() => {
+        setLoader(true);
+
+        //Fetch events ordered by timestamp
+        const eventsRef = realDB.ref('Events').orderByChild('EventTimestamp').limitToLast(20);
+
+        eventList= []
+
+        eventsRef.on('value', (snapshot) => {
+
+            snapshot.forEach(function (events) {eventList.push(Object.assign(events.val(),{id: events.key}));
+
+                //Set event list state and reverse the array order to display latest event
+                setEventsList([])
+                setEventsList(eventList.reverse())
+
+
+            });
+            setLoader(false);
+
+            return () =>{
+                console.log('Event unmounted')
+
+            }
+
+
+        });
+
+    }, [])
+
 
     return (
         <>
         <div  className='container events body'>
-            <Header/>
 
+<Header/>
             <div className='lg-view'>
                 <div className=' d-flex align-items-center pt-4'>
                     <h4 className=' text-light'>All Events</h4>
@@ -59,7 +99,18 @@ function Events() {
             </div>
             <Category/>
             <div className='grid-container'>
-              <CardList  />
+                <>
+
+                    {!loader && eventsList  ? eventsList?.map(event => {
+                        return (
+                            <>
+
+                                <Card event={event}  key={event.id}/>
+                            </>
+                        )
+                    }) : 'p'}
+
+                </>
 
             </div>
 
@@ -69,4 +120,4 @@ function Events() {
     );
 }
 
-export default Events;
+export default Events ;

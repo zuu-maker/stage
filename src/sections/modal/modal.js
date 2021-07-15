@@ -168,11 +168,12 @@ function CreateGroupBtn() {
 
     return (
         <>
-            <button onClick={handleCreateGroup } style={{backgroundImage: `url(${plus})`}} className="btn  btn-lg-screen">Create Group</button>
+            <button onClick={handleCreateGroup } style={{backgroundImage: `url(${plus})`}} className="btn lg-view add-btn"></button>
             <button onClick={handleCreateGroup } style={{backgroundImage: `url(${plus})`}} className="  btn-mobile"></button>
 
 
             <LoginModal
+                size="lg"
                 show={modalShow}
                 onHide={() => setModalShow(false) }
             />

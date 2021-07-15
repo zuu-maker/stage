@@ -11,9 +11,10 @@ import {useLoader} from "../../contexts/loaderContext";
 import {useUser} from "../../contexts/userContext";
 import {useAuth} from "../../contexts/authContext";
 import {realDB} from "../../firebase/firebase";
+import MobileNavbar from "../../components/mobileNavbar";
 
 const EventDetails = () => {
-    const [eventData,setEventData] =useState([]);
+    const [eventData,setEventData] =useState();
     const [participants,setParticipants] =useState([]);
     const {loader, setLoader} =useLoader();
     const { hasJoined,setHasJoined} =useUser();
@@ -29,9 +30,9 @@ const EventDetails = () => {
         setHasJoined(false)
 
         //Fetch event details
-        getRealtimeDoc('Events',params.id).then(function(snapshot) {
+        getRealtimeDoc('Events',params.id).then( async function(snapshot) {
             const data = snapshot.val();
-            setEventData(data)
+           await setEventData(data)
         });
         // console.log(eventData)
 
@@ -57,7 +58,7 @@ const EventDetails = () => {
     return (
         <>
             <Header/>
-            {!loader && participants.length > 0 && <div className='container event-details '>
+            {!loader && participants.length > 0 && eventData &&<div className='container event-details '>
                 <EventSection event={eventData} participantsList={participants}/>
                 <div className='flex-grow-1 user-list-section'>
                     <div className=' pt-3 '>
@@ -80,6 +81,7 @@ const EventDetails = () => {
                 </div>
 
             </div>}
+            <MobileNavbar/>
         </>
 
     );

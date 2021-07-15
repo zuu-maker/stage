@@ -15,6 +15,7 @@ export function ChatProvider({ children }) {
     const [chatRoom,setChatRoom] = useState('');
     const [recent,setRecent] = useState();
     const [chatList, setChatList] = useState([]);
+    const [totalNotificationCount,setTotalNotificationCount] = useState(0)
 
     const [counter,setCounter] = useState(0);
     const [show,setShow] = useState(false);
@@ -36,7 +37,8 @@ export function ChatProvider({ children }) {
         counter,setCounter,
         show,setShow,
         participants,setParticipants,
-        chatList, setChatList
+        chatList, setChatList,
+        totalNotificationCount,setTotalNotificationCount
 
     }
 

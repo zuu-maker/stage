@@ -3,7 +3,7 @@ import {realDB} from '../../firebase/firebase'
 import Card from './card'
 import {useEvent} from "../../contexts/eventsContext";
 import {useLoader} from "../../contexts/loaderContext";
-import {getOptions, getRealtimeChild} from "../../helper/helper";
+import {getDoc, getOptions, getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
 import {useUser} from "../../contexts/userContext";
 import {useAuth} from "../../contexts/authContext";
 
@@ -57,16 +57,23 @@ function CardList() {
                 // })
 
 
+                setEventsList(eventList)
 
 
             });
 
-            setEventsList(eventList)
-            setLoader(false);
-            console.log(eventList)
+            return () =>{
+                setEventsList(eventList)
+
+            }
 
 
         });
+
+
+        setLoader(false);
+        // console.log(eventList)
+        console.log(participantList)
 
     }, [])
 
@@ -74,11 +81,11 @@ function CardList() {
     return (
         <>
 
-            {eventsList ? eventsList?.map(event => {
+            {!loader && eventsList  ? eventsList?.map(event => {
                 return (
                     <>
 
-                        <Card event={event} key={event.id}/>
+                        <Card event={event}  key={event.id}/>
                     </>
                 )
             }) : 'p'}

@@ -63,49 +63,48 @@ export function AuthProvider({ children }) {
                      setUser(userArr?.find( b=>{ return b}))
 
                  })
-             console.log(user.toJSON())
 
 
-                 getRealtimeChild('Participants', 'userId', user.uid).on("child_added", function (snapshot) {
-                     userJoinedEventsList.push(snapshot.val())
-
-
-                 })
-                     console.log(userJoinedEventsList)
-                     userJoinedEventsList.forEach((eventJoined) => {
-                         // realDB.ref('Events'+'/'+eventJoined.EventId).on('value',(snapshot) =>{
-                         //     console.log(snapshot)
-                         //     console.log(snapshot.val())
-                         // })
-                         getRealtimeDoc('Events', eventJoined.EventId).then((snapshot) => {
-
-                             joinedEventsList.push(snapshot.val())
-                         })
-
-                     })
-                     console.log(joinedEventsList)
-
-                     setJoinedEvents(joinedEventsList)
-
-                     console.log(joinedEvents)
-
-
-
-
-
-
-                 getRealtimeChild('Events','EventCommissionerId',user.uid).get()
-                     .then((snapshot)=>{
-                         snapshot.forEach((doc) =>{
-                             createdEventsList.push(doc.val())
-                         })
-                         setCreatedEvents(createdEventsList)
-                         console.log(createdEventsList)
-                         console.log(createdEvents)
-                     })
-                     .catch(e => {
-                         console.log(e)})
-
+                 // getRealtimeChild('Participants', 'userId', user.uid).on("child_added", function (snapshot) {
+                 //     userJoinedEventsList.push(snapshot.val())
+                 //
+                 //
+                 // })
+                 //     console.log(userJoinedEventsList)
+                 //     userJoinedEventsList.forEach((eventJoined) => {
+                 //         // realDB.ref('Events'+'/'+eventJoined.EventId).on('value',(snapshot) =>{
+                 //         //     console.log(snapshot)
+                 //         //     console.log(snapshot.val())
+                 //         // })
+                 //         getRealtimeDoc('Events', eventJoined.EventId).then((snapshot) => {
+                 //
+                 //             joinedEventsList.push(snapshot.val())
+                 //         })
+                 //
+                 //     })
+                 //     console.log(joinedEventsList)
+                 //
+                 //     setJoinedEvents(joinedEventsList)
+                 //
+                 //     console.log(joinedEvents)
+                 //
+                 //
+                 //
+                 //
+                 //
+                 //
+                 // getRealtimeChild('Events','EventCommissionerId',user.uid).get()
+                 //     .then((snapshot)=>{
+                 //         snapshot.forEach((doc) =>{
+                 //             createdEventsList.push(doc.val())
+                 //         })
+                 //         setCreatedEvents(createdEventsList)
+                 //         console.log(createdEventsList)
+                 //         console.log(createdEvents)
+                 //     })
+                 //     .catch(e => {
+                 //         console.log(e)})
+                 //
 
 
 
@@ -118,7 +117,10 @@ export function AuthProvider({ children }) {
 
         })
           
-        return unsubscribe
+        return () =>{
+             unsubscribe()
+            console.log('auth unmounted')
+         }
     }, [])
 
     const value = {

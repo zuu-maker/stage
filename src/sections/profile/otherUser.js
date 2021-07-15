@@ -11,17 +11,20 @@ function OtherUser() {
     const {otherUser, setOtherUser} = useUser();
     let params = useParams();
 
-    useEffect(async ()=>{
-        await getDoc('Users','userId',params.id).then(function(snapshot) {
-            const data = snapshot.val();
-            setOtherUser(data)
-            console.log(data)
-        });
+    useEffect( ()=>{
+
+        const unsubscribe  = async () => {
+            await getDoc('Users', 'userId', params.id).then(function (snapshot) {
+                const data = snapshot.val();
+                setOtherUser(data)
+                console.log(data)
+            });
+        }
         console.log(otherUser)
 
 
 
-
+return unsubscribe
     },[])
     return (
         <>

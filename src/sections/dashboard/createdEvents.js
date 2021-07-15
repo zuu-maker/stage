@@ -46,7 +46,7 @@ function CreatedEvents(props) {
                                 return (
                                     <>
 
-                                        <Card event={event}/>
+                                        <Card event={event} key={event.id}/>
                                     </>
                                 )
                             }) :<>

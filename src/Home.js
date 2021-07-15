@@ -14,7 +14,7 @@ import Login from "./sections/login/login";
 import {AuthProvider, useAuth} from "./contexts/authContext";
 import {FormProvider} from "./contexts/formContext";
 
-import {BrowserRouter as Router ,Switch, Route} from 'react-router-dom'
+import {BrowserRouter as Router ,Switch, Route,useLocation} from 'react-router-dom'
 import {EventProvider} from "./contexts/eventsContext";
 import {LoaderProvider} from "./contexts/loaderContext";
 import UserProfile from "./sections/profile/userProfile";
@@ -27,12 +27,16 @@ import CreatedEvents from "./sections/dashboard/createdEvents";
 import CreateSchedule from "./sections/dashboard/createSchedule";
 import Withdraw from "./sections/dashboard/withdraw";
 import Deposit from "./sections/dashboard/deposit";
+import SlideRoutes from 'react-slide-routes';
+import {TransactionProvider} from "./contexts/transactionContext";
 
 
 function Home() {
+    // const location = useLocation();
 
     return (
-      <Router>
+
+        <Router>
           <AuthProvider>
               <LoaderProvider>
 
@@ -40,15 +44,21 @@ function Home() {
 
               <ChatProvider>
 
-              <EventProvider>
-          <FormProvider>
+
+
+                  <FormProvider>
 
 
 
           <Switch>
+              {/*<SlideRoutes location={location}>*/}
+
               <Route path="/signup" component={Signup} />
-              <Route path="/events" component={Events} />
-              <Route path="/eventDetails/:id" component={EventDetails} />
+              <EventProvider>
+                  <TransactionProvider>
+                  <Route path="/events" component={Events} />
+                  <Route path="/eventDetails/:id" component={EventDetails} />
+
               <Route exact path="/user/:id" component={UserProfile} />
               <Route exact path="/user/:id/joined-events" component={JoinedEvents} />
               <Route exact path="/user/:id/created-events" component={CreatedEvents} />
@@ -57,6 +67,11 @@ function Home() {
               <Route exact path="/user/:id/withdraw" component={Withdraw} />
               <Route exact path="/messages" component={Message} />
               <Route path="/messages/:id" component={Message} />
+              {/*</SlideRoutes>*/}
+                      </TransactionProvider>
+
+              </EventProvider>
+
               <div className="home">
 
 <>
@@ -72,7 +87,6 @@ function Home() {
               </div>
           </Switch>
           </FormProvider>
-            </EventProvider>
                   </ChatProvider>
 
                   </UserProvider>
@@ -81,7 +95,6 @@ function Home() {
           </AuthProvider>
 
       </Router>
-
   );
 }
 

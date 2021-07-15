@@ -120,19 +120,29 @@ label{
     order: 1;
 }
 
-.counter{
+.message-card-notification {
     background-color: #18FF00;
-    padding: 2%;
+    padding: 0;
     border-radius: 50%;
-    width: 1.8rem;
-    height: 1.8rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    /* margin-right: auto; */
+    display: inline-flex;
 }
 
 .dots-dropdown {
     font-size: 24px;
     color: white;
 }
-
+.add-btn{
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-size: contain;
+    padding: 0;
+}
 .message .dropdown button{
     background: none;
     padding: 0;

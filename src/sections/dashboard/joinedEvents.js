@@ -9,49 +9,48 @@ import {useUser} from "../../contexts/userContext";
 
 function JoinedEvents(props) {
     const {joinedEvents, setJoinedEvents} = useUser();
-    const {setLoader} = useLoader();
+    const [loading,setLoading] = useState(false)
+    const {setLoader,loader} = useLoader();
     const {currentUser} = useAuth();
     let userJoinedEventsList = [];
     let joinedEventsList = [];
     let createdEventsList = [];
 
 
-    useEffect(async ()=>{
+    useEffect( ()=>{
         setLoader(true)
-        getRealtimeChild('Participants','userId',currentUser.uid).get()
-            .then((snapshot)=>{
-                snapshot.forEach((doc) =>{
+        //Get an array of participants that match the current user Is
+        getRealtimeChild('Participants', 'userId', currentUser.uid).get()
+            .then((snapshot) => {
+                snapshot.forEach((doc) => {
                     userJoinedEventsList.push(doc.val())
                 })
+
+                //Get an array of Events in the participants array
+                userJoinedEventsList?.map((eventJoined) => {
+                    getRealtimeDoc('Events', eventJoined.EventId)
+                        .then((snapshot) => {
+                            joinedEventsList.push(snapshot.val())
+                            setJoinedEvents(joinedEventsList)
+
+                        })
+
+
+                        .catch(e => {
+                            console.log(e)
+                        })
+
+                })
+
             })
             .catch(e => {
-                console.log(e)})
-
-    },[])
-    useEffect(async ()=>{
-        // getRealtimeChild('Participants', 'userId', currentUser.uid).on("child_added", function (snapshot) {
-        //     userJoinedEventsList.push(snapshot.val())
-        //
-        //
-        // })
-        userJoinedEventsList?.forEach((eventJoined) => {
-            // realDB.ref('Events'+'/'+eventJoined.EventId).on('value',(snapshot) =>{
-            //     console.log(snapshot)
-            //     console.log(snapshot.val())
-            // })
-            getRealtimeDoc('Events', eventJoined.EventId).then((snapshot) => {
-
-                joinedEventsList.push(snapshot.val())
+                console.log(e)
             })
-
-        })
-        console.log(joinedEventsList)
-
-        setJoinedEvents(joinedEventsList)
-
-        console.log(joinedEvents)
-
-setLoader(false)
+        //Filter out events created by the current user
+        // joinedEventsList.filter((eachEvent) => {
+        //     if (eachEvent.EventCommissionerId != currentUser.uid)
+        //         return eachEvent})
+        setLoader(false)
     },[])
 
     return (
@@ -63,11 +62,11 @@ setLoader(false)
                     <div className='flex-column flex-grow-1'>
 
                         <div className='grid-container'>
-                            {joinedEvents ? joinedEvents?.map(event => {
+                            {!loader && joinedEvents ? joinedEvents?.map(event => {
                                 return (
                                     <>
 
-                                        <Card event={event}/>
+                                        <Card event={event} key={event.id}/>
                                     </>
                                 )
                             }) :<>

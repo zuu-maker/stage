@@ -19,11 +19,13 @@ import CreateGroup from "../../components/createGroup";
 
 function Message(props) {
     const {currentUser} = useAuth();
+    const [loading,setLoading] = useState(false);
     const {chatRoom,show,setShow,chatList, setChatList} = useChat();
     const recentChats = [];
+    const modifiedList =[]
 
 
-    const {setLoader} = useLoader();
+    const {setLoader,loader} = useLoader();
     let params = useParams();
     var messageId = params.id;
     const userObj = {
@@ -40,13 +42,34 @@ function Message(props) {
             setShow(false)
         }
         // {messageId ? setOpenedChat(true): setOpenedChat(false)}
-        setLoader(true)
+        setLoading(true)
 
          await db.collection("Recent").where("members", "array-contains", currentUser.uid).orderBy('date','desc')
-            .onSnapshot(snapshot => {
-                setChatList([])
-                setChatList(snapshot.docs.map(doc =>doc.data() ))
-                console.log(chatList)
+            .onSnapshot(
+                (snapshot) => {
+                    setChatList([])
+
+                    setChatList(snapshot.docs.map(doc =>doc.data() ))
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            console.log("New : ", change.doc.data());
+
+                        }
+                        if (change.type === "modified") {
+                            console.log("Modified : ", change.doc.data());
+                            modifiedList.push(change.doc.data())
+                            console.log(modifiedList)
+                        }
+                        if (change.type === "removed") {
+                            console.log("Removed : ", change.doc.data());
+                        }
+                    })
+                })
+
+                // snapshot => {
+                // setChatList([])
+                // setChatList(snapshot.docs.map(doc =>doc.data() ))
+                // console.log(chatList)
 
                 // snapshot.docChanges().forEach(change => {
                 //     if (change.type === "added") {
@@ -62,7 +85,7 @@ function Message(props) {
                 //         recentChats.push(change.doc.data())
                 //     }
                 // } )
-            })
+            // })
 
 
 
@@ -78,7 +101,7 @@ function Message(props) {
 
         // setChatList(await getRealtimeCollection('ChatRooms'))
         // setChatList(x)
-        setLoader(false)
+        setLoading(false)
 
     }, [])
     // const routes =[]
@@ -99,105 +122,110 @@ function Message(props) {
 
 
             <Header/>
-            <div className='container'>
+    { chatList && <div className='container'>
 
 
-                <div className='message '>
-                    <div className='row'>
-                        <div className='col-md-4 col-lg-4 col-sm-12 lg-view'>
-                            <div className=' pt-3 user-list-section'>
-                                <div className='lg-view'>
-                                    <h5 className='text-light ml-5 mb-5`'>Messages</h5>
-                                    <Search props={'#13161A'}/>
-                                    <CreateGroupBtn/>
+        <div className='message '>
+            <div className='row'>
+                <div className='col-md-4 col-lg-4 col-sm-12 lg-view'>
+                    <div className=' pt-3 user-list-section'>
+                        <div className='lg-view'>
+                            <h5 className='text-light ml-5 mb-5`'>Messages</h5>
+                            <div className={`d-flex align-items-center`}>
+                                <Search props={'#13161A'}/>
+                                <CreateGroupBtn/>
+                            </div>
 
+                        </div>
+                        <div className='user-list'>
+                            {chatList ? chatList.map(chats => {
+                                return (<>
+
+                                        <MessageCard chats={chats} key={chats.chatRoomID}/>
+
+
+                                    </>
+                                )
+                            }) : 'No Chats Available'}
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+                {
+                    !show ? <>
+                            <div className='sm-view mx-auto  '>
+                                <div className='  d-flex justify-content-center align-items-center pt-4'>
+                                    <div className='flex-grow-1'>
+                                        <h4 className='text-light'>Messages</h4>
+                                        <p>Talk with your friends</p>
+
+
+                                    </div>
+
+                                    <div className="search-container flex-grow-1 ">
+                                        <div className='search d-flex float-right'>
+                                            <CreateGroupBtn/>
+                                        </div>
+
+
+                                    </div>
 
                                 </div>
-                                <div className='user-list'>
-                                    {chatList ? chatList.map(chats => {
-                                        return (<>
-
-                                                <MessageCard chats={chats} key={chats.chatRoomId}/>
+                                <Search/>
 
 
-                                            </>
-                                        )
-                                    }) : 'No Chats Available'}
+                            </div>
+
+                            <div className='col-md-4 col-lg-4 col-sm-12 sm-view'>
+                                <div className=' pt-3 user-list-section'>
+                                    <div className='lg-view'>
+                                        <h5 className='text-light ml-5 mb-5`'>Messages</h5>
+                                        <div className={`d-flex align-items-center`}>
+                                            <Search props={'#13161A'}/>
+                                            <CreateGroupBtn/>
+                                        </div>
+
+
+                                    </div>
+                                    <div className='user-list'>
+                                        {chatList ? chatList.map(chats => {
+                                            return (<>
+
+                                                    <MessageCard chats={chats} key={chats.chatRoomID}/>
+
+
+                                                </>
+                                            )
+                                        }) : 'No Chats Available'}
+
+                                    </div>
+
 
                                 </div>
 
 
                             </div>
 
+                        </>
+                        :
+                        <>
+                            <div className='col-md-8 col-lg-8 col-sm-12'>
+                                {
+                                    messageId && <MessageWindow/>
 
-                        </div>
-                        {
-                            !show ? <>
-                                    <div className='sm-view mx-auto  '>
-                                        <div className='  d-flex justify-content-center align-items-center pt-4'>
-                                            <div className='flex-grow-1'>
-                                                <h4 className='text-light'>Messages</h4>
-                                                <p>Talk with your friends</p>
+                                }
 
+                            </div>
 
-                                            </div>
-
-                                            <div className="search-container flex-grow-1 ">
-                                                <div className='search d-flex float-right'>
-                                                    <CreateEventBtn/>
-                                                </div>
-
-
-                                            </div>
-
-                                        </div>
-                                        <Search/>
-
-
-                                    </div>
-
-                                <div className='col-md-4 col-lg-4 col-sm-12 sm-view'>
-                                    <div className=' pt-3 user-list-section'>
-                                        <div className='lg-view'>
-                                            <h5 className='text-light ml-5 mb-5`'>Messages</h5>
-                                            <Search props={'#13161A'}/>
-
-                                        </div>
-                                        <div className='user-list'>
-                                            {chatList ? chatList.map(chats => {
-                                                return (<>
-
-                                                        <MessageCard chats={chats} key={chats.chatRoomId}/>
-
-
-                                                    </>
-                                                )
-                                            }) : 'No Chats Available'}
-
-                                        </div>
-
-
-                                    </div>
-
-
-                                </div>
-
-                            </>
-                                :
-                                <>
-                                    <div className='col-md-8 col-lg-8 col-sm-12'>
-                                        {
-                                            messageId && <MessageWindow />
-
-                                        }
-
-                                    </div>
-
-                                </>
-                        }
-                    </div>
-                </div>
+                        </>
+                }
             </div>
+        </div>
+    </div>}
             <MobileNavbar/>
 </>
 

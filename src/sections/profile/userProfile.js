@@ -12,106 +12,163 @@ import MobileNavbar from "../../components/mobileNavbar";
 import {useAuth} from "../../contexts/authContext";
 import {useParams} from "react-router-dom";
 import OtherUserMenu from "./otherUserMenu";
-import {getDoc, getFirestoreDocument, getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
-import {auth, db} from "../../firebase/firebase";
+import {
+    getDoc,
+    getFirestoreDocument,
+    getRealtimeChild,
+    getRealtimeCollection,
+    getRealtimeDoc
+} from "../../helper/helper";
+import {auth, db, realDB} from "../../firebase/firebase";
 import {useUser} from "../../contexts/userContext";
 import {useLoader} from "../../contexts/loaderContext";
 import Sidebar from "../dashboard/sidebar";
 
 function UserProfile() {
-    const {currentUser, setCurrentUser, user} = useAuth()
+    const {currentUser, user} = useAuth()
     let params = useParams();
-    const userId = params.id;
-    const {otherUser, setOtherUser, setUser, hasFollowed, setHasFollowed} = useUser();
-    const [curUser, setCurUser] = useState();
+    const {otherUser, setOtherUser, setHasFollowed} = useUser();
     const [joinedEvents, setJoinedEvents] = useState([]);
+    const [loading, setLoading] = useState(false);
     const {setLoader, loader} = useLoader();
     let userJoinedEventsList = [];
     let joinedEventsList = [];
 
 
     useEffect(() => {
-        {
-            currentUser && currentUser.uid !== params.id &&
 
+        //Get other user object from firestore User collection
+            if(currentUser && currentUser.uid !== params.id ){
             setLoader(true)
 
             db.collection('Users').where('objectId', "==", params.id)
+                // .get()
                 .onSnapshot((snapshot) => {
                     console.log(snapshot.docs.map(doc => doc.data()))
-                    setOtherUser([])
-                    const userArr = snapshot.docs.map(doc => doc.data())
-                    setOtherUser(userArr?.find(b => {
-                        return b
-                    }))
 
-                    user.followedUsersIds?.find((follower) => {
-                        if (otherUser.userId === follower) {
-                            setHasFollowed(true)
+                    setOtherUser(snapshot.docs.map(doc => doc.data()).find(b => {return b}))
 
-                            return true;
-                        } else {
-                            setHasFollowed(false)
-                            return false;
-
-                        }
-                    })
+                    // user.followedUsersIds?.find((follower) => {
+                    //     if (otherUser.userId === follower) {
+                    //         setHasFollowed(true)
+                    //
+                    //         return true;
+                    //     } else {
+                    //         setHasFollowed(false)
+                    //         return false;
+                    //
+                    //     }
+                    // })
 
                 });
+                setLoader(false)
+
+            return () =>{
+                console.log('other user unmounted')
+            }
+            }
+
+            else{
+                setLoading(true)
+                //Get an array of participants that match the current user Is
+                getRealtimeChild('Participants', 'userId', currentUser.uid).get()
+                    .then((snapshot) => {
+                        snapshot.forEach((doc) => {
+                            userJoinedEventsList.push(doc.val())
+                        })
+
+                        //Get an array of Events in the participants array
+                        userJoinedEventsList?.map((eventJoined) => {
+                            getRealtimeDoc('Events', eventJoined.EventId)
+                                .then((snapshot) => {
+                                    joinedEventsList.push(snapshot.val())
+                                    setJoinedEvents(joinedEventsList)
+                                    setLoading(false)
+
+                                })
 
 
-            getRealtimeChild('Participants', 'userId', params.id).on("child_added", function (snapshot) {
+                                .catch(e => {
+                                    console.log(e)
+                                    setLoading(false)
+                                })
 
-                userJoinedEventsList?.push(snapshot.val())
-            })
+                        })
 
-            userJoinedEventsList.forEach((eventJoined) => {
-                getRealtimeDoc('Events', eventJoined.EventId).then((snapshot) => {
+                    })
+                    .catch(e => {
+                        console.log(e)
+                        setLoading(false)
+                    })
+                //Filter out events created by the current user
+                // joinedEventsList.filter((eachEvent) => {
+                //     if (eachEvent.EventCommissionerId != currentUser.uid)
+                //         return eachEvent})
 
-                    joinedEventsList?.push(snapshot.val())
-                })
-
-            })
-            setJoinedEvents(joinedEventsList)
-
-            console.log(joinedEventsList)
-            console.log(joinedEvents)
-
-            setLoader(false)
-
+                // //Get future events based on current time compared to the EventStartDate field
+                // realDB.ref('Events').orderByChild('EventStartDate').startAt(parseInt( Date.now())).get()
+                //     .then(snapshot =>{
+                //             snapshot.forEach(doc =>{
+                //                 console.log(doc.val())
+                //             })
+                //         })
         }
-
     }, [])
+
+
 
     return (
         <>
 
             <Header/>
+<>
 
-            {currentUser && currentUser.uid == params.id &&
+    { !loader && <>
+        {currentUser && currentUser.uid == params.id ?
 
             <div className='container user d-flex'>
                 {/*<UserMenu  user={user} />*/}
                 <Sidebar/>
-                <Graph/>
+                <div className={`lg-view flex-column`}>
+                    <Graph/>
+                    <div className='grid-container w-100'>
+                        <div className={`flex-column`}>
+
+
+                        <h4 className={`text-light`}>Joined Events</h4>
+                        {!loading &&  joinedEvents ? joinedEvents?.map(event => {
+                            return (
+                                <>
+
+                                    <Card event={event} key={event.id}/>
+                                </>
+                            )
+                        }) :<>
+                            <p className={`mx-auto text-center justify-content-center align-items-center text-light`}>{!loading &&'No recent activity'}</p></> }
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
-            }
+            :
             <>
                 <div className='container other-user d-flex'>
                     <>
-                        {!loader && otherUser.userId && joinedEvents  && <OtherUserMenu otherUserObj={otherUser} joinedEventsArray={joinedEvents}/>}
+                        {!loader && otherUser.userId && <OtherUserMenu otherUserObj={otherUser}/>}
 
                     </>
 
                 </div>
 
-            </>
-            }
+            </>}
+    </>}
             <MobileNavbar/>
 
-
+</>}
         </>
     );
 }
+
 
 export default UserProfile;

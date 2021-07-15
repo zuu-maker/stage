@@ -28,6 +28,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
     const {setChatRoom} =useChat();
     const {hasFollowed,setHasFollowed,otherUser,setOtherUser} =useUser();
     const [followers,setFollowers] = useState();
+    const [loading,setLoading] = useState();
     let params = useParams();
 
     const {currentUser,user} =useAuth();
@@ -39,19 +40,23 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
 
 
     useEffect(   () => {
-        user.followedUsersIds?.find((follower)  =>{
-            if (otherUserObj.userId===follower  ){
-                setHasFollowed(true)
+        setHasFollowed(false)
+        setLoader(true)
 
-                return true;
-            }
+        otherUserObj.FollowersIds?.find((follower) => {
+                console.log('reached')
 
-            else{
-                setHasFollowed(false)
-                return false;
+                if (currentUser && currentUser.uid === follower) {
+                    setHasFollowed(true)
 
-            }
-        })
+                    return true;
+                } else {
+                    setHasFollowed(false)
+                    return false;
+
+                }
+            })
+
 
 
     },[])
@@ -59,34 +64,54 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
 
 
 
+        setLoading(true)
+        console.log(otherUserObj)
+        console.log(otherUser)
+        {  otherUserObj.userId &&      //Get an array of participants that match the other user Id
+            getRealtimeChild('Participants', 'userId',   otherUserObj.userId).get()
+                .then((snapshot) => {
+                    snapshot.forEach((doc) => {
+                        userJoinedEventsList.push(doc.val())
+                    })
+
+                    //Get an array of Events in the participants array
+                    userJoinedEventsList?.map((eventJoined) => {
+                        getRealtimeDoc('Events', eventJoined.EventId)
+                            .then((snapshot) => {
+                                joinedEventsList.push(snapshot.val())
+                                setJoinedEvents(joinedEventsList)
+
+                            })
 
 
-        getRealtimeChild('Participants', 'userId', params.id).on("child_added", function (snapshot) {
+                            .catch(e => {
+                                console.log(e)
+                            })
 
-            userJoinedEventsList?.push(snapshot.val())})
+                    })
 
-        userJoinedEventsList.forEach((eventJoined) => {
-            getRealtimeDoc('Events', eventJoined.EventId).then((snapshot) => {
+                })
+                .catch(e => {
+                    console.log(e.message)
+                })
+            //Filter out events created by the current user
+            // joinedEventsList.filter((eachEvent) => {
+            //     if (eachEvent.EventCommissionerId != currentUser.uid)
+            //         return eachEvent})
+            setLoading(false)
+        }
 
-                joinedEventsList?.push(snapshot.val())
-            })
-
-        })
-        setJoinedEvents(joinedEventsList)
-
-        console.log(joinedEventsList)
-        console.log(joinedEvents)
-
-setLoader(false)
+        setLoader(false)
 
     },[])
 
+    //Send a message
     const handleMessage = async (e) => {
         //Chatroom Data
         var data = {
             dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-            groupChatName: otherUser.userName,
-            groupImageUrl: otherUser.userProfileImageUrl,
+            groupChatName: '',
+            groupImageUrl: '',
             isGroupChat: false,
             participants: [{objId : currentUser.uid,userName: currentUser.displayName,email: currentUser.email,userProfileImage:currentUser.photoURL},{objId : otherUser.userId,userName: otherUser.userName,email: otherUser.email,userProfileImage: otherUser.userProfileImageUrl}]
         }
@@ -116,33 +141,47 @@ setLoader(false)
     }
     //Follow a user
     const  handleFollow =async (e) => {
+        setLoading(true)
+
         try{
 
             await updateFirestoreDocument('Users',currentUser.uid,{followedUsersIds:firebase.firestore.FieldValue.arrayUnion(otherUser.objectId)})
-               .then( () => {
+               .then( () => {setHasFollowed(true)
                    // otherUser.FollowersIds.length += 1;
 
                    updateFirestoreDocument('Users', otherUser.objectId, {FollowersIds: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)})
-                       .then(() =>{setHasFollowed(true)})
+                       .then(() =>{
+                           setLoading(false)
+
+                       })
                        .catch(error => {
                            console.log(error);
                            setHasFollowed(false)
+                           setLoading(false)
+
                        })
                })
+
                .catch(e =>{
                    console.log(e)
                    setHasFollowed(false)
+                   setLoading(false)
+
                })
 
         }catch (e) {
             console.log(e)
             setHasFollowed(false)
+            setLoading(false)
+
         }
+        setLoading(false)
 
     }
 
     //Unfollow a user
     const  handleUnfollow =async (e) => {
+        setLoading(true)
         try{
 
             await updateFirestoreDocument('Users',currentUser.uid,{followedUsersIds:firebase.firestore.FieldValue.arrayRemove(otherUser.objectId)})
@@ -151,19 +190,23 @@ setLoader(false)
                     updateFirestoreDocument('Users', otherUser.objectId, {FollowersIds: firebase.firestore.FieldValue.arrayRemove(currentUser.uid)})
                         .then(
 
-                            () =>{setHasFollowed(false)}
+                            () =>{setHasFollowed(false)
+                            setLoading(false)
+                            }
 
                         )
                         .catch(error => {
                             console.log(error);
                             setHasFollowed(true)
+                            setLoading(false)
                         })
                 })
 
         }catch (e) {
             console.log(e)
+            setLoading(false)
         }
-
+setLoading(false)
     }
 
     return (
@@ -220,9 +263,7 @@ setLoader(false)
                             <div className="space-light ">@{otherUser.userName}</div>
 
                         </div>
-                        <div className='sm-view'>
-                            <Graph/>
-                        </div>
+
 
 
                     </div>
@@ -245,20 +286,22 @@ setLoader(false)
 
                                 <>
                                     {
-                                        !loader && hasFollowed
+                                        !loading && hasFollowed
                                             ?
                                             <button disabled={loader} onClick={handleUnfollow}
                                                     className='btn flex-grow-1 m-2'
                                                     style={{backgroundImage: `url(${follow})`}}>Unfollow</button>
 
-                                            :!loader && !hasFollowed ?
+                                            :!loading && !hasFollowed ?
                                             <button disabled={loader} onClick={handleFollow}
                                                     className='btn flex-grow-1 m-2'
                                                     style={{backgroundImage: `url(${follow})`}}>Follow</button>
 
                                             :
-                                            <button disabled={loader} className='btn flex-grow-1 m-2'
-                                            >Loading...</button>
+                                            <>
+                                                { loading && <button disabled={loading} className='btn flex-grow-1 m-2'>Loading...</button>}
+
+                                            </>
                                     }
 
                                 </>
@@ -274,15 +317,15 @@ setLoader(false)
 
 
                     <div className='grid-container'>
-                        {joinedEvents ? joinedEvents?.map(event => {
+                        {!loading &&  joinedEvents ? joinedEvents?.map(event => {
                             return (
                                 <>
 
-                                    <Card event={event}/>
+                                    <Card event={event} key={event.id}/>
                                 </>
                             )
                         }) :<>
-                            <p>No recent activity</p>
+                            <p className={`mx-auto text-center justify-content-center align-items-center text-light`}>{!loading &&'No recent activity'}</p>
 
                         </> }
                     </div>

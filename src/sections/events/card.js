@@ -1,9 +1,9 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import basketball from '../../images/basketball.png'
 import dummy from '../../images/dummy.png'
 import mail from "../../images/mail.svg";
 import {Link, useHistory} from 'react-router-dom'
-import {getRealtimeDoc} from "../../helper/helper";
+import {getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
 import {useLoader} from "../../contexts/loaderContext";
 
 const difficulty ={
@@ -20,11 +20,37 @@ function Card({ event }) {
     const idRef = useRef()
     const eventLevel = event.EventDifficulty
     const {setLoader} = useLoader()
+    const [participants,setParticipants] = useState([]);
+    const [loading,setLoading] = useState(false);
+    let participantsList =[]
+
+
+//     useEffect(() =>{
+//         setLoading(true)
+//         //Get participants object
+//         //Display participants Image on the event card
+// try {
+//     getRealtimeChild('Participants','EventId',event.id).get()
+//         .then(snapshot =>{
+//             snapshot.forEach( (doc) =>
+//             { participantsList.push(doc.val())})
+//             setParticipants(participantsList)
+//
+//             console.log(participants)
+//         })
+//         .catch(e => console.log(e.message))
+//
+// }
+// catch (e) {
+//     console.log(e)
+// }
+//         setLoading(false)
+//     },[])
     function handleClick(){
-        setLoader(true)
-        getRealtimeDoc('Events',idRef.current.id)
+        // setLoader(true)
+        // getRealtimeDoc('Events',idRef.current.id)
         history.push(`/eventDetails/${idRef.current.id}`)
-        setLoader(false)
+        // setLoader(false)
 
 
     }
@@ -45,14 +71,22 @@ function Card({ event }) {
                     {event.Eventsport}
                 </p>
                 <div className='d-flex flex-grow-1'>
-                    <div className='thumbnail-list d-flex flex-row'>
-                        <li className='thumbnail-wrapper'><img src={dummy} alt=""/></li>
-                        <li className='thumbnail-wrapper'><img src={dummy} alt=""/></li>
-                        <li className='thumbnail-wrapper'><img src={dummy} alt=""/></li>
 
-                        <li className='thumbnail-wrapper'><img src={dummy} alt=""/></li>
-                    </div>
-                    <p className='spots'> +{!event.EventCurrentParticipants ? 0 : event.EventCurrentParticipants} going ({event.EventMaximumParticipants} spots left)</p>
+                    <div className='thumbnail-list d-flex flex-row'>
+                        <>
+                            {
+                               !loading && participants.userProfileImageUrl &&   participants?.map((image) =>{return(
+
+
+                                    <>
+                                        <li className='thumbnail-wrapper'><img src={image.userProfileImageUrl} alt=""/></li>
+
+                                    </>)
+                                })
+                            }
+                        </>
+             </div>
+                    <p className='spots'> +{parseInt(event.EventCurrentParticipants) > 0 ? event.EventCurrentParticipants : 0} going ({parseInt(event.EventMaximumParticipants)-parseInt(event.EventCurrentParticipants)} spots left)</p>
 
                 </div>
 

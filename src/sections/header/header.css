@@ -41,7 +41,9 @@
     padding: 0 15px;
     margin-right: 0;
 }
-
+.header .message-card-notification{
+    right: 0;
+}
 .nav-link {
     color: #ffffff;
 }

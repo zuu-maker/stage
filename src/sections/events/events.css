@@ -245,6 +245,16 @@ input[type=date]::-webkit-outer-spin-button /* down */
 }
 
 @media (max-width: 985px) {
+    .event-details.container{
+        padding: 0;
+        margin: 0;
+    }
+    .home .header{
+        display: block;
+    }
+    .header{
+        display: none;
+    }
     .user .event-card ,.other-user .event-card{
         max-width: 100%;
     }
@@ -262,7 +272,7 @@ input[type=date]::-webkit-outer-spin-button /* down */
         background-color: #2B3038;
         max-height: 10%;
         display: flex;
-        position: fixed;
+        position: sticky;
         bottom: 0;
         width: 100%;
         z-index: 20;

@@ -170,7 +170,7 @@
 
     margin: auto;
 }
-.other-user-btn button {
+.other-user-btn button, .icon-btn {
     width: 100%;
     font-family: "SpaceGrotesk-Light";
     text-align: center;
@@ -266,6 +266,10 @@
     }
     .other-user .back-arrow , .other-user .back-arrow{
         position: relative;
+    }
+    .user-side-bar{
+        max-width: 100%;
+        min-width: 90%;
     }
 
 }

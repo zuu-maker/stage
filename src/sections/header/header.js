@@ -2,7 +2,7 @@ import logo from '../../images/logo.png';
 import './header.css';
 import  {LoginBtn} from "../modal/modal";
 import LoginLink from "../login/loginMobile";
-import {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Login from "../login/login";
 import {useAuth} from "../../contexts/authContext";
 import CurrentUserDropdown from "./currentUserDropdown";
@@ -10,16 +10,28 @@ import {Link} from 'react-router-dom'
 import {FormProvider} from "../../contexts/formContext";
 import {useLoader} from "../../contexts/loaderContext";
 import {useUser} from "../../contexts/userContext";
+import {useChat} from "../../contexts/messageContext";
 
 
 
 export default function Header() {
     const [showForm,setShowForm] = useState(false)
+    const [showNotification,setShowNotification] = useState(false)
+    const {totalNotificationCount,setTotalNotificationCount}= useChat()
     const {loader} =useLoader()
 
     const { currentUser,loading } = useAuth()
     const { user } = useUser()
 
+
+    useEffect(() =>{
+        {
+            totalNotificationCount > 0 ?
+                setShowNotification(true)
+                :
+                setShowNotification(false)
+        }
+    },[])
     return (
 
         <header className="header">
@@ -64,8 +76,19 @@ export default function Header() {
                                         </li>
                                     }
                                     {currentUser && currentUser.email
-                                        ? <li className="nav-item">
+                                        ? <li className="nav-item d-flex position-relative">
                                             <Link className="nav-link" to='/messages' href="#">Messages</Link>
+                                            <>
+                                                {
+                                                    totalNotificationCount > 0 &&
+                                                    <span style={{display: setShowNotification ? 'inline-flex' : 'none'}}
+                                                          className={`message-card-notification text-light mt-1 position-absolute right-0`}>
+                    <span
+                        className={`mx-auto mt-auto mb-auto`}>{totalNotificationCount}</span>
+                </span>
+
+                                                }
+                                            </>
                                         </li>
 
                                         : <></>

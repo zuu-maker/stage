@@ -17,12 +17,13 @@ import {
 } from '../../helper/helper'
 import './eventDetails.css'
 import {useUser} from "../../contexts/userContext";
-import {useParams} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import {useAuth} from "../../contexts/authContext";
 import {Modal} from "react-bootstrap";
 import {realDB} from "../../firebase/firebase";
 import logo from '../../images/logo.png';
 import {useLoader} from "../../contexts/loaderContext";
+import BackButton from "../../components/backButton";
 
 function EventSection({event,participantsList}) {
     const commisionerId = useRef()
@@ -36,13 +37,16 @@ function EventSection({event,participantsList}) {
     const startDate = timeConverter(parseInt(event.EventStartDate),'D-M-Y');
     const endDate = timeConverter(parseInt(event.EventEndDate),'D-M-Y');
     let params = useParams();
+    const history = useHistory()
+
     const eventId = {EventId : params.id};
-    let userId;
-    {currentUser && currentUser.uid ?  userId = {userId : currentUser.uid} :  userId = {userId : null}}
     const joined = {joined : true};
 
     useEffect( () =>{
         console.log(hasJoined)
+
+        //Check if current user is in the participants list
+        //If true then setHasJoined to true and show joined button
         participantsList?.find((user)  =>{
             if (user.userId === currentUser.uid){
                 setHasJoined(true)
@@ -59,44 +63,48 @@ function EventSection({event,participantsList}) {
             }
         })
 
-        // await realDB.ref('Users/'+currentUser.uid).on("value" ,(snapshot) =>  {
-        //     const data = snapshot.val();
-        //     setAccountBalance(data.userBalance)
-        //     console.log(data.userBalance)
-        //
-        // });
+
     },[])
+
+    //This function handles joining an event
     const  handleJoinEvent = async (e) => {
-        console.log(user)
-        // const userObj = user.find(b=>{ return b})
 
-
+        //Check if current user balance is more than the event entry fee
         if (parseInt(user.balance) >= parseInt(event.EventEntryFee)) {
-
-            const userData = Object.assign({}, user, eventId, joined, userId);
+            //Combine user object and eventId
+            const userData = Object.assign({}, user, eventId, joined, {userId : currentUser.uid});
 
             console.log(userData)
             if (user && user.userId) {
                 //Remaining balance deducted from the user balance  after Joining event
-                const remainingBalance =  parseInt(user.balance) - parseInt(event.EventEntryFee)
-                updateFirestoreDocument('Users',currentUser.uid,{balance:remainingBalance})
-                    .then(() =>{
-                            updateFirebaseDocument('Users',currentUser.uid,{userBalance:remainingBalance})
-                                .catch(e => console.log(e))
+                const remainingBalance = parseInt(user.balance) - parseInt(event.EventEntryFee)
 
+                //Update user balance in firestore User document
+                updateFirestoreDocument('Users', currentUser.uid, {balance: remainingBalance})
+                    .then(() => {
+
+                        //Update user balance in firebase User document
+                        updateFirebaseDocument('Users', currentUser.uid, {userBalance: remainingBalance})
+                            .catch(e => console.log(e))
+
+                    })
+                    .catch(e => console.log(e))
+
+                //Add current user to the firebase participants collection
+                pushRealData('Participants', userData)
+                    .then((snapshot) => {
+                        setHasJoined(true)
+                        {
+                            joinedEvents ? setJoinedEvents([...joinedEvents, event]) : setJoinedEvents(event)
                         }
-                    )
+
+                        //Update EventCurrentParticipants field in the Events document
+                        updateFirebaseDocument('Events', event.id, {EventCurrentParticipants: parseInt(event.EventCurrentParticipants) + 1})
+                    })
                     .catch(e => console.log(e))
 
 
-                pushRealData('Participants', userData)
-                    .then((snapshot) =>{
-                        setHasJoined(true)
-                        {joinedEvents ? setJoinedEvents([...joinedEvents,event]) : setJoinedEvents(event)}
-
-                        console.log('joined')})
-                    .catch(e=>console.log(e))
-            } else console.log('error joining event')
+            }else {console.log('error joining event')}
 
         } else{
             console.log(user.balance)
@@ -117,7 +125,10 @@ function EventSection({event,participantsList}) {
             /> : <></>}
             <div className=' event-detail-container flex-column'>
                 <div className=' mb-4 position-relative overflow-hidden m-0 border-0 grid-item event-card'>
-                    <img className='sm-view  back-arrow' src={back_arrow} alt=""/>
+                    {/*<img className='sm-view  back-arrow' src={back_arrow} alt=""/>*/}
+                    <div className={`sm-view  back-arrow`}>
+                        <BackButton/>
+                    </div>
 
                     <div className='cover-img-wrapper'>
                         <img src={basketball} alt=""/>
@@ -133,7 +144,17 @@ function EventSection({event,participantsList}) {
     <div className='d-flex  align-items-center'>
         <p className='event-detail-title text-light'>{event.EventName}</p>
         <div className='join-btn mr-0 ml-auto'>
-            {!loader &&  hasJoined ? <button className='   btn  '>Registered</button> :!loader &&  !hasJoined ? <button onClick={handleJoinEvent} className='   btn  '>Join Event</button>: <button  className='   btn  '>Loading...</button> }}
+            <>
+                {!loader && participantsList.length >= parseInt(event.EventMaximumParticipants) ?<button  className='   btn  '>Event Full</button> :
+                    <>
+
+                {!loader &&  hasJoined ? <button className='   btn  '>Registered</button> :!loader &&  !hasJoined ? <button onClick={handleJoinEvent} className='   btn  '>Join Event</button>:  <button  className='   btn  '>Loading...</button> }
+
+                    </>
+                        }
+
+
+            </>
 
 
         </div>
@@ -151,10 +172,6 @@ function EventSection({event,participantsList}) {
                             <p className='cost  ml-auto mr-0 text-right'>${event.EventEntryFee}</p>
 
 
-                            <div className='join-btn'>
-                                <button className='   btn  '>Join Event</button>
-
-                            </div>
                         </div>
                         <p className=''>{event.Eventsport}</p>
 
@@ -165,6 +182,11 @@ function EventSection({event,participantsList}) {
                         <p className=' text-light event-description'>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem distinctio pariatur
                             voluptates. Delectus, eum, tenetur? Consequatur esse, ipsam modi nam nemo numquam
                             perspiciatis quis unde vero! Ab eaque perferendis quod!</p>
+                        <div className='d-sm-block d-md-block mt-2 mb-4 d-lg-none w-100'>
+                            {!loader &&  hasJoined ? <button className='  w-100 btn  '>Registered</button> :!loader &&  !hasJoined ? <button onClick={handleJoinEvent} className='  w-100 btn  '>Join Event</button>:  <button  className=' w-100  btn  '>Loading...</button> }
+
+                        </div>
+
                     </div>
                     <div className='mb-3 about-section'>
                         <h5 className='text-light mt-4 mb-4'>About</h5>
@@ -189,7 +211,7 @@ function EventSection({event,participantsList}) {
                                     </div>
                                 </div>
                                 <div className='ml-3'>
-                                    <div className='text-light about-upper-info'>{event.EventParticipants}/{event.EventMaximumParticipants}</div>
+                                    <div className='text-light about-upper-info'>{participantsList.length}/{event.EventMaximumParticipants}</div>
                                     <div className='text-light about-low-info'>Joined/Total Participants</div>
                                 </div>
                             </div>
@@ -215,9 +237,9 @@ function EventSection({event,participantsList}) {
                             <div className='d-flex flex-grow-1'>
                                 { event.EventCommissionerId && event.EventCommissionerId != 'None'?<>
                                         <div id={event.EventCommissionerId} ref={commisionerId} className='mr-3 align-items-center'>
-                                            <div className='commissioner-icon-wrapper'>
+                                            <div onClick={() =>{history.push(`/user/${event.EventCommissionerId}`)}} className='commissioner-icon-wrapper'>
                                                 <div className='center'>
-                                                    <img src={nike} alt=""/>
+                                                    <img src={event.EventCommissionerProfile} alt=""/>
 
                                                 </div>
                                             </div>

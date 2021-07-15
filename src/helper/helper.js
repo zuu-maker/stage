@@ -79,6 +79,10 @@ export const getRealtimeSubCollection = async (collection,doc,subcollection,orde
   })
   return collectionList
 }
+export const updateFirestoreSubCollection = async (collection,doc,subcollection,subId,data) =>{
+
+  return await db.collection(collection).doc(doc).collection(subcollection).doc(subId).update(data)
+}
 export const getRealtimeCollection =  (collection) =>{
   let collectionList = []
     db.collection(collection).onSnapshot(snapshot => {
@@ -95,6 +99,7 @@ export const getRealtimeCollection =  (collection) =>{
   })
   return collectionList
 }
+
 export const updateDocument =  (collection,id,data) =>{
     db.collection(collection).doc(id).update(data)
   realDB.ref(collection+'/'+id).update(data)

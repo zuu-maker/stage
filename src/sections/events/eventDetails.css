@@ -78,7 +78,7 @@
     border-radius: 15pt;
     height: 85vh;
     margin-left: 4%;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .event-details .user-list-thumb-wrapper,.message .user-list-thumb-wrapper{
     overflow: hidden;

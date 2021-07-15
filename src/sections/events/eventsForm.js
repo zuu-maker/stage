@@ -24,6 +24,7 @@ import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
 import {useLoader} from "../../contexts/loaderContext";
 import {useAuth} from "../../contexts/authContext";
+import {useHistory} from "react-router-dom";
 
 function ValueLabelComponent(props) {
     const { children, open, value } = props;
@@ -36,6 +37,7 @@ function ValueLabelComponent(props) {
 }
 
 export default function EventsForm() {
+    const history =useHistory()
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
     const [loading, setLoading] = useState(false)
@@ -210,6 +212,7 @@ export default function EventsForm() {
             EventStyle: e.target.EventStyle.value,
             EventStartDate: e.target.EventStartDate.valueAsNumber,
             EventEndDate: e.target.EventEndDate.valueAsNumber,
+            EventCurrentParticipants: 1,
             EventMaximumParticipants: e.target.EventMaximumParticipants.value,
             EventEntryFee: e.target.EventEntryFee.value,
             EventTotalPrizes: e.target.EventTotalPrizes.value,
@@ -258,6 +261,7 @@ export default function EventsForm() {
                             } )
                             setLoader(false)
                             setSuccess('Event created successfully')
+                            history.push('/events')
                             }
                         )
                         .catch(e => {

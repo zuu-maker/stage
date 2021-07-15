@@ -24,10 +24,7 @@ function Category(props) {
             eventsRef.on('value',(snapshot) => {
 
                 snapshot.forEach(function(events) {
-                    eventList.push( events.val()
-
-
-                    );
+                    eventList.push( events.val());
                 });
 
 
