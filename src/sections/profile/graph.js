@@ -6,14 +6,19 @@ import ProgressBar from 'react-bootstrap/ProgressBar'
 import {useUser} from "../../contexts/userContext";
 import Bar from "../../components/bar";
 import {useAuth} from "../../contexts/authContext";
+import {useParams} from "react-router-dom";
 function Graph({props})  {
-    const {user} = useAuth();
+    const {user,currentUser} = useAuth();
+    let params = useParams();
+
 
     return (
         <div className="graph p-4">
             <div className={`d-flex text-light`}>
-                <h4>Winning ratio</h4>
-                <span className={`ml-auto`}>$ {user.balance}</span>
+                <h4>Winning ratio</h4>{
+                params.id === currentUser.uid &&   <span className={`ml-auto`}>$ {user.balance}</span>
+
+            }
 
             </div>
             <div className={` d-flex `}>

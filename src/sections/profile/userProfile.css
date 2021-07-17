@@ -271,5 +271,14 @@
         max-width: 100%;
         min-width: 90%;
     }
+    .bar-container {
+        width: 25%;
+    }
+    .menu-options .m-3{
+        margin: 1rem 0;
+    }
+    .user .user-side-bar.card-body{
+        padding: 1.25rem 0;
+    }
 
 }

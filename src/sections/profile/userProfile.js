@@ -70,7 +70,7 @@ function UserProfile() {
 
             else{
                 setLoading(true)
-                //Get an array of participants that match the current user Is
+                //Get an array of participants that match the current user Id
                 getRealtimeChild('Participants', 'userId', currentUser.uid).get()
                     .then((snapshot) => {
                         snapshot.forEach((doc) => {

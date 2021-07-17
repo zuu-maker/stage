@@ -8,6 +8,7 @@ import Paypal from "../../components/paypal";
 import {getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
 import {useTransaction} from "../../contexts/transactionContext";
 import TransactionCard from "../../components/transactionCard";
+import BackButton from "../../components/backButton";
 
 function Deposit(props) {
     const {currentUser, user} = useAuth()
@@ -40,10 +41,15 @@ function Deposit(props) {
             <Header/>
             <div className={` user container`}>
                 <div className={`d-flex`}>
-                    <Sidebar/>
-                    <div
-                        className='text-light flex-column d-flex flex-grow-1 align-items-center justify-content-center'>
+                    <div className={`lg-view`}>
 
+                        <Sidebar/>
+                    </div>
+
+                    <div className='text-light flex-column d-flex flex-grow-1 align-items-center justify-content-center'>
+                        <div className={`mt-4 mr-auto`}>
+                            <BackButton/>
+                        </div>
                         <div className={`icon-wrapper`}>
                             <img src={wallet} alt=""/>
 

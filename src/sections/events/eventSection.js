@@ -126,7 +126,7 @@ function EventSection({event,participantsList}) {
             <div className=' event-detail-container flex-column'>
                 <div className=' mb-4 position-relative overflow-hidden m-0 border-0 grid-item event-card'>
                     {/*<img className='sm-view  back-arrow' src={back_arrow} alt=""/>*/}
-                    <div className={`sm-view  back-arrow`}>
+                    <div className={`sm-view position-absolute back-arrow`}>
                         <BackButton/>
                     </div>
 

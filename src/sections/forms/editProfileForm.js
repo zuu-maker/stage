@@ -9,6 +9,7 @@ import {useLoader} from "../../contexts/loaderContext";
 import {storage} from "../../firebase/firebase";
 import {useAuth} from "../../contexts/authContext";
 import {useUser} from "../../contexts/userContext";
+import BackButton from "../../components/backButton";
 
 
 export default function EditProfile() {
@@ -108,7 +109,7 @@ export default function EditProfile() {
 
 
     return (
-        <>
+        <><BackButton/>
             <form className="form" onSubmit={handleSubmit}>
                 <p className="text-danger"></p>
 

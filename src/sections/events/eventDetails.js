@@ -50,7 +50,9 @@ const EventDetails = () => {
         console.log(participants);
 
         setLoader(false)
-
+        return ()=>{
+            console.log('unmounted')
+        }
 
 
     },[])

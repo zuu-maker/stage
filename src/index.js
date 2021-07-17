@@ -4,15 +4,16 @@ import ReactDOM from 'react-dom';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/style.css';
+import {BrowserRouter as Router ,Switch, Route,useLocation} from 'react-router-dom'
 
-import Home from './Home';
 import reportWebVitals from './reportWebVitals';
+import App from "./App";
 
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Home />
-  </React.StrictMode>,
+  <Router>
+    <App />
+  </Router>,
   document.getElementById('root')
 );
 

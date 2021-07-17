@@ -21,6 +21,7 @@ import {useChat} from "../../contexts/messageContext";
 import {useAuth} from "../../contexts/authContext";
 import {useLoader} from "../../contexts/loaderContext";
 import {useUser} from "../../contexts/userContext";
+import BackButton from "../../components/backButton";
 
 
 function OtherUserMenu({otherUserObj,joinedEventsArray}) {
@@ -215,15 +216,15 @@ setLoading(false)
 
             {  otherUser.userId && <div className='d-flex user-menu-container'>
                 <div className='d-flex flex-column text-center card-body user-side-bar'>
-                    <div className='sm-view text-left w-100 back-arrow'>
-                        <img src={back_arrow} alt=""/>
+                    <div className='text-left w-100 '>
+                    <BackButton />
                     </div>
                     <div className='text-center  user-info-container'>
 
                         <div className='position-relative d-flex align-items-center '>
                             <div className='sm-view'>
                                 <div className=' other-user-btn'>
-                                    <button className='btn flex-grow-1 m-2 btn-clear'
+                                    <button onClick={handleMessage} className='btn flex-grow-1 m-2 btn-clear'
                                             style={{backgroundImage: `url(${message})`}}></button>
 
                                 </div>
@@ -248,8 +249,29 @@ setLoading(false)
                             </div>
                             <div className='sm-view'>
                                 <div className=' other-user-btn'>
-                                    <button onClick={handleFollow} className='btn flex-grow-1 m-2'
-                                            style={{backgroundImage: `url(${follow})`}}></button>
+
+                                    <>
+                                        {
+                                            !loading && hasFollowed
+                                                ?
+                                                <button disabled={loader} onClick={handleUnfollow}
+                                                        className='btn flex-grow-1 m-2'
+                                                        style={{backgroundImage: `url(${follow})`}}></button>
+
+                                                :!loading && !hasFollowed ?
+                                                <button disabled={loader} onClick={handleFollow}
+                                                        className='btn flex-grow-1 m-2'
+                                                        style={{backgroundImage: `url(${follow})`}}></button>
+
+                                                :
+                                                <>
+                                                    { loading && <button disabled={loading} className='btn flex-grow-1 m-2'>...</button>}
+
+                                                </>
+                                        }
+
+                                    </>
+
 
                                 </div>
                             </div>
@@ -262,9 +284,12 @@ setLoading(false)
                             <div className='space-medium f-18'>{otherUser.userName}</div>
                             <div className="space-light ">@{otherUser.userName}</div>
 
+
                         </div>
 
-
+                        <div className={`sm-view`}>
+<Graph/>
+                        </div>
 
                     </div>
                     <div className='p-3  center  followers-container text-light mb-4'>

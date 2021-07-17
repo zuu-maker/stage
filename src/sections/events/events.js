@@ -108,7 +108,7 @@ function Events() {
                                 <Card event={event}  key={event.id}/>
                             </>
                         )
-                    }) : 'p'}
+                    }) : <></>}
 
                 </>
 

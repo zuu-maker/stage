@@ -6,6 +6,9 @@
     font-family: "SpaceGrotesk-Light";
     src: url(SpaceGrotesk-Light.ttf);
 }
+body.modal-open{
+    overflow:hidden;
+}
 @media (min-width: 768px) {
 
     .modal-content {

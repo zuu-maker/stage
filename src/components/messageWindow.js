@@ -20,6 +20,7 @@ import firebase from "firebase";
 import {db} from "../firebase/firebase";
 import {Dropdown} from "react-bootstrap";
 import arrow from "../images/arrow.svg";
+import BackButton from "./backButton";
 
 const MessageWindow = ({}) => {
     const {chat,setChat ,recent,setOpenedChat,openedChat,setRecent,chatRoom} = useChat();
@@ -239,12 +240,13 @@ const MessageWindow = ({}) => {
         <>
 
                     <>
+                        <BackButton/>
                         <div className='d-flex center mb-2'>
                             <div className='user-list-thumb-wrapper'>
-                                <img src={chatRoom.groupImageUrl} alt=""/>
+                                <img src={chatRoom.groupImageUrl } alt=""/>
                             </div>
                             <div className='ml-3 text-light'>
-                                <div className='space-medium'>{chatRoom.groupChatName}</div>
+                                <div className='space-medium'>{chatRoom.groupChatName || chatRoom.withUserName}</div>
 
                             </div>
 

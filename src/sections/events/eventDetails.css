@@ -101,7 +101,7 @@
     position: absolute;
     bottom: 8%;
     left: 5%;
-    width: fit-content;
+    width: auto;
     border-radius: 45pt;
     padding: 2%;
 }
@@ -203,9 +203,8 @@
         color: #18ff00;
     }
     .back-arrow{
-        position: absolute;
+        /*position: absolute;*/
         width: 30pt;
-        left: 5%;
         top: 5%;
 
 

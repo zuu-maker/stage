@@ -91,6 +91,14 @@ function Sidebar() {
 
     }
 
+    const handleCreateSchedule = () => {
+        setLoader(true)
+
+        setLoader(false)
+        history.push(`/user/${currentUser.uid}/create-schedule`)
+
+    }
+
     //Fetch current user transactions from Transaction collection in firebase
     const handleDeposit = () => {
 
@@ -212,7 +220,7 @@ function Sidebar() {
                                 </div>
                             </div>
                             <div className='ml-3'>
-                                <div className='text-light space-light'>Create Schedule</div>
+                                <div  onClick={handleCreateSchedule} className='text-light space-light'>Create Schedule</div>
                             </div>
                             <div className='mr-0 ml-auto'>
                                 <img src={arrow} alt=""/>

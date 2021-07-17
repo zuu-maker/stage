@@ -6,6 +6,7 @@ import {useAuth} from "../../contexts/authContext";
 import {useLoader} from "../../contexts/loaderContext";
 import Header from "../header/header";
 import {useUser} from "../../contexts/userContext";
+import BackButton from "../../components/backButton";
 
 function JoinedEvents(props) {
     const {joinedEvents, setJoinedEvents} = useUser();
@@ -58,8 +59,14 @@ function JoinedEvents(props) {
             <Header/>
             <div className={` user container`}>
                 <div className={`d-flex`}>
-                    <Sidebar/>
+                    <div className={`lg-view`}>
+
+                        <Sidebar/>
+                    </div>
                     <div className='flex-column flex-grow-1'>
+                        <div className={`mt-4 sm-view`}>
+                            <BackButton/>
+                        </div>
 
                         <div className='grid-container'>
                             {!loader && joinedEvents ? joinedEvents?.map(event => {
@@ -81,8 +88,6 @@ function JoinedEvents(props) {
             </div>
 
         </>
-
-
     );
 }
 

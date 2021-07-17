@@ -5,7 +5,7 @@ import { useHistory } from "react-router-dom";
 function BackButton(props) {
     let history = useHistory();
     return (
-        <img onClick={() => history.goBack()} className='sm-view  back-arrow' src={back_arrow} alt=""/>
+        <img onClick={() => history.goBack()} className='sm-view  pointer back-arrow' src={back_arrow} alt=""/>
     );
 }
 

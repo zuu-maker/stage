@@ -25,6 +25,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import {useLoader} from "../../contexts/loaderContext";
 import {useAuth} from "../../contexts/authContext";
 import {useHistory} from "react-router-dom";
+import BackButton from "../../components/backButton";
 
 function ValueLabelComponent(props) {
     const { children, open, value } = props;
@@ -348,7 +349,7 @@ export default function EventsForm() {
         <>
             <p className={`text-danger`}>{error}</p>
             <p className={`text-success`}>{success}</p>
-
+<BackButton/>
             <form className="form event-form" onSubmit={handleSubmit}>
                 <p className='form-title'>Add New Event</p>
                 <div className="input-group">

@@ -23,7 +23,10 @@ import deposit from "../../images/deposit_fund.svg";
 function LoginModal(props) {
     const [showForm, setShowForm] = useState({login: true, signup: false, forgotPassword: false, eventForm : false})
     const {formType,setFormType}= useForm()
-
+    document.documentElement.style.overflow = 'hidden';
+    document.body.scroll = "no";
+    document.documentElement.style.overflow = 'auto';
+    document.body.scroll = "yes";
     return (
         <Modal
             {...props}

@@ -268,11 +268,11 @@ input[type=date]::-webkit-outer-spin-button /* down */
     .events .cover-img-wrapper,.user .cover-img-wrapper ,.other-user .cover-img-wrapper{
         display: none;
     }
-    .mobile-navbar{
+    .mobile-navbar {
         background-color: #2B3038;
         max-height: 10%;
         display: flex;
-        position: sticky;
+        position: fixed;
         bottom: 0;
         width: 100%;
         z-index: 20;

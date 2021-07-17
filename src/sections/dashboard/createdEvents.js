@@ -7,6 +7,7 @@ import Header from "../header/header";
 import Sidebar from "./sidebar";
 import Card from "../events/card";
 import {Link} from "react-router-dom";
+import BackButton from "../../components/backButton";
 
 function CreatedEvents(props) {
     const {createdEvents,setCreatedEvents} = useUser();
@@ -38,8 +39,14 @@ function CreatedEvents(props) {
             <Header/>
             <div className={` user container`}>
                 <div className={`d-flex`}>
-                    <Sidebar/>
+                    <div className={`lg-view`}>
+
+                        <Sidebar/>
+                    </div>
                     <div className='flex-column flex-grow-1'>
+                        <div className={`mt-4 sm-view`}>
+                            <BackButton/>
+                        </div>
 
                         <div className='grid-container'>
                             {createdEvents ? createdEvents?.map(event => {
