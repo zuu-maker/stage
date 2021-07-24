@@ -18,12 +18,13 @@ const difficulty ={
 function Card({ event }) {
     const history = useHistory()
     const idRef = useRef()
-    const eventLevel = event.EventDifficulty
+    const eventLevel = event?.EventDifficulty
     const {setLoader} = useLoader()
     const [participants,setParticipants] = useState([]);
     const [loading,setLoading] = useState(false);
     let participantsList =[]
-
+    
+    console.log(event);
 
 //     useEffect(() =>{
 //         setLoading(true)
@@ -56,7 +57,7 @@ function Card({ event }) {
     }
 
     return (
-        <card onClick={handleClick} ref={idRef} id={event.id} className='card pointer overflow-hidden border-0 grid-item event-card'>
+        <card onClick={handleClick} ref={idRef} id={event?.id} className='card pointer overflow-hidden border-0 grid-item event-card'>
 
                 <div className='cover-img-wrapper'>
                     <img src={basketball} alt=""/>
@@ -64,11 +65,11 @@ function Card({ event }) {
             <card className='card-body
             '>
                 <div className='d-flex  align-items-center'>
-                    <p className='card-title'>{event.EventName}</p>
-                <p className='cost flex-grow-1 text-right '>${event.EventEntryFee}</p>
+                    <p className='card-title'>{event?.EventName}</p>
+                <p className='cost flex-grow-1 text-right '>${event?.EventEntryFee}</p>
                 </div>
                 <p className='card-category'>
-                    {event.Eventsport}
+                    {event?.Eventsport}
                 </p>
                 <div className='d-flex flex-grow-1'>
 
@@ -86,29 +87,29 @@ function Card({ event }) {
                             }
                         </>
              </div>
-                    <p className='spots'> +{parseInt(event.EventCurrentParticipants) > 0 ? event.EventCurrentParticipants : 0} going ({parseInt(event.EventMaximumParticipants)-parseInt(event.EventCurrentParticipants)} spots left)</p>
+                    <p className='spots'> +{parseInt(event?.EventCurrentParticipants) > 0 ? event?.EventCurrentParticipants : 0} going ({parseInt(event?.EventMaximumParticipants)-parseInt(event?.EventCurrentParticipants)} spots left)</p>
 
                 </div>
 
                 <div className=' w-100 card-footer d-flex justify-content-center flex-grow-1'>
                     <p className='m-0 prize text-light'>
-                        Prize: ${event.EventTotalPrizes}
+                        Prize: ${event?.EventTotalPrizes}
                     </p>
                     {
-                        event.EventDifficulty === 'Easy' ?
-                            <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.easy   }} value=''>{event.EventDifficulty}</button>
+                        event?.EventDifficulty === 'Easy' ?
+                            <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.easy   }} value=''>{event?.EventDifficulty}</button>
 
                     :
 
-                            event.EventDifficulty === 'Hard' ?
-                                <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.hard   }} value=''>{event.EventDifficulty}</button>
+                            event?.EventDifficulty === 'Hard' ?
+                                <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.hard   }} value=''>{event?.EventDifficulty}</button>
 
                     :
-                                event.EventDifficulty === 'Medium' ?
-                                    <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.normal   }} value=''>{event.EventDifficulty}</button>
+                                event?.EventDifficulty === 'Medium' ?
+                                    <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.normal   }} value=''>{event?.EventDifficulty}</button>
 
                     :
-                                        <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.hard   }} value=''>{event.EventDifficulty}</button>
+                                        <button className='ml-auto mr-0  text-light btn-danger difficulty-btn ' style={{  backgroundColor: difficulty.hard   }} value=''>{event?.EventDifficulty}</button>
 
                     }
                 </div>

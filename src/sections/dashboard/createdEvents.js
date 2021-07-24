@@ -8,11 +8,14 @@ import Sidebar from "./sidebar";
 import Card from "../events/card";
 import {Link} from "react-router-dom";
 import BackButton from "../../components/backButton";
+import { useStateValue } from '../../contexts/StateProvider';
 
 function CreatedEvents(props) {
-    const {createdEvents,setCreatedEvents} = useUser();
+    const [{user,createdEvents}, dispatch] = useStateValue()
+    // const {createdEvents,setCreatedEvents} = useUser();
     const {setLoader} = useLoader();
-    const {currentUser} = useAuth();
+    // const {user} = useAuth();
+    console.log(user);
 
     let createdEventsList = [];
 
@@ -20,19 +23,25 @@ function CreatedEvents(props) {
     useEffect(()=>{
         console.log('joined link')
         setLoader(true)
-        getRealtimeChild('Events','EventCommissionerId',currentUser.uid).get()
+        if(user.uid){
+            getRealtimeChild('Events','EventCommissionerId',user?.uid).get()
             .then((snapshot)=>{
                 snapshot.forEach((doc) =>{
                     createdEventsList.push(doc.val())
                 })
-                setCreatedEvents(createdEventsList)
+                dispatch({
+                    type:"SET_CREATED_EVENTS",
+                    createdEvents:createdEventsList
+                })
+                // setCreatedEvents(createdEventsList)
                 console.log(createdEventsList)
                 console.log(createdEvents)
             })
             .catch(e => {
                 console.log(e)})
+        }
         setLoader(false)
-    },[])
+    },[user])
 
     return (
         <>
@@ -49,7 +58,7 @@ function CreatedEvents(props) {
                         </div>
 
                         <div className='grid-container'>
-                            {createdEvents ? createdEvents?.map(event => {
+                            {createdEvents ? createdEvents[0]?.map(event => {
                                 return (
                                     <>
 

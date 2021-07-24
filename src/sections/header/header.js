@@ -11,6 +11,7 @@ import {FormProvider} from "../../contexts/formContext";
 import {useLoader} from "../../contexts/loaderContext";
 import {useUser} from "../../contexts/userContext";
 import {useChat} from "../../contexts/messageContext";
+import { useStateValue } from '../../contexts/StateProvider';
 
 
 
@@ -20,8 +21,9 @@ export default function Header() {
     const {totalNotificationCount,setTotalNotificationCount}= useChat()
     const {loader} =useLoader()
 
-    const { currentUser,loading } = useAuth()
-    const { user } = useUser()
+    // const { currentUser,loading } = useAuth()
+    // const { user } = useUser()
+    const [{user}] = useStateValue()
 
 
     useEffect(() =>{
@@ -35,7 +37,8 @@ export default function Header() {
     return (
 
         <header className="header">
-            {loader || loading ? <>
+            
+            {loader ? <>
                 <div className="loader">
                     <div className="bar">
 
@@ -67,7 +70,7 @@ export default function Header() {
                                     <li className="nav-item active">
                                         <Link className="nav-link" to='/events'>Home</Link>
                                     </li>
-                                    { currentUser && currentUser.email
+                                    { user 
                                         ? <li className="nav-item">
                                             <Link to='/events' className="nav-link" href="#">Events</Link>
                                         </li>
@@ -75,7 +78,7 @@ export default function Header() {
                                             <Link className="nav-link" href="#">How does it work</Link>
                                         </li>
                                     }
-                                    {currentUser && currentUser.email
+                                    {user 
                                         ? <li className="nav-item d-flex position-relative">
                                             <Link className="nav-link" to='/messages' href="#">Messages</Link>
                                             <>
@@ -111,9 +114,9 @@ export default function Header() {
                     </div>
                     <div className="col col-md-3 d-none d-lg-flex header_btn_wrapper">
                         <Link href="#" className="btn btn-clear">Contact Us</Link>
-                        { currentUser && currentUser.email
-                            ? <CurrentUserDropdown user={''}/>
-                            : <LoginBtn/>
+                        { user?.uid
+                            ? <CurrentUserDropdown />
+                            :<LoginBtn/>
                         }
 
 

@@ -24,11 +24,13 @@ import {realDB} from "../../firebase/firebase";
 import logo from '../../images/logo.png';
 import {useLoader} from "../../contexts/loaderContext";
 import BackButton from "../../components/backButton";
+import { useStateValue } from '../../contexts/StateProvider';
 
 function EventSection({event,participantsList}) {
+    const [{user,hasJoined,joinedEvents},dispatch] = useStateValue()
     const commisionerId = useRef()
-    const {setHasJoined,hasJoined,joinedEvents, setJoinedEvents} =useUser();
-    const {currentUser,user} =useAuth();
+    // const {setHasJoined,hasJoined,joinedEvents, setJoinedEvents} =useUser();
+    // const {currentUser,user} =useAuth();
     const {loader} =useLoader();
     const [accountBalance ,setAccountBalance] = React.useState()
     const [modal ,setModal] = useState(false)
@@ -47,15 +49,21 @@ function EventSection({event,participantsList}) {
 
         //Check if current user is in the participants list
         //If true then setHasJoined to true and show joined button
-        participantsList?.find((user)  =>{
-            if (user.userId === currentUser.uid){
-                setHasJoined(true)
+        participantsList?.find((participant)  =>{
+            if (participant.userId === user.uid){
+                dispatch({
+                    type:"SET_HAS_JOINED",
+                    hasJoined:true,
+                })
                 console.log(hasJoined)
                 return true;
             }
 
             else{
-                setHasJoined(false)
+                dispatch({
+                    type:"SET_HAS_JOINED",
+                    hasJoined:false,
+                })
                 console.log(hasJoined)
 
                 return false;
@@ -72,7 +80,7 @@ function EventSection({event,participantsList}) {
         //Check if current user balance is more than the event entry fee
         if (parseInt(user.balance) >= parseInt(event.EventEntryFee)) {
             //Combine user object and eventId
-            const userData = Object.assign({}, user, eventId, joined, {userId : currentUser.uid});
+            const userData = Object.assign({}, user, eventId, joined, {userId : user.uid});
 
             console.log(userData)
             if (user && user.userId) {
@@ -80,11 +88,11 @@ function EventSection({event,participantsList}) {
                 const remainingBalance = parseInt(user.balance) - parseInt(event.EventEntryFee)
 
                 //Update user balance in firestore User document
-                updateFirestoreDocument('Users', currentUser.uid, {balance: remainingBalance})
+                updateFirestoreDocument('Users', user.uid, {balance: remainingBalance})
                     .then(() => {
 
                         //Update user balance in firebase User document
-                        updateFirebaseDocument('Users', currentUser.uid, {userBalance: remainingBalance})
+                        updateFirebaseDocument('Users', user.uid, {userBalance: remainingBalance})
                             .catch(e => console.log(e))
 
                     })
@@ -93,10 +101,17 @@ function EventSection({event,participantsList}) {
                 //Add current user to the firebase participants collection
                 pushRealData('Participants', userData)
                     .then((snapshot) => {
-                        setHasJoined(true)
-                        {
-                            joinedEvents ? setJoinedEvents([...joinedEvents, event]) : setJoinedEvents(event)
-                        }
+                        dispatch({
+                            type:"SET_HAS_JOINED",
+                            hasJoined:true
+                        })
+                        
+                        dispatch({
+                            type:"SET_JOINED_EVENTS",
+                            joinedEvents:event
+                        })
+                            // joinedEvents ? setJoinedEvents([...joinedEvents, event]) : setJoinedEvents(event)
+                        
 
                         //Update EventCurrentParticipants field in the Events document
                         updateFirebaseDocument('Events', event.id, {EventCurrentParticipants: parseInt(event.EventCurrentParticipants) + 1})
@@ -109,7 +124,11 @@ function EventSection({event,participantsList}) {
         } else{
             console.log(user.balance)
             alert('Please Deposit funds')
-            setHasJoined(false)
+            dispatch({
+                type:"SET_HAS_JOINED",
+                hasJoined:false
+            })
+            // setHasJoined(false)
 
 
         }
@@ -124,6 +143,7 @@ function EventSection({event,participantsList}) {
                 className="custom-modal" //Add class name here
             /> : <></>}
             <div className=' event-detail-container flex-column'>
+                <button onClick={console.log(user.uid)}>click me</button>
                 <div className=' mb-4 position-relative overflow-hidden m-0 border-0 grid-item event-card'>
                     {/*<img className='sm-view  back-arrow' src={back_arrow} alt=""/>*/}
                     <div className={`sm-view position-absolute back-arrow`}>

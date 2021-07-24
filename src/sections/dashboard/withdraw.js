@@ -11,9 +11,11 @@ import Paypal from "../../components/paypal";
 import TransactionCard from "../../components/transactionCard";
 import {useAuth} from "../../contexts/authContext";
 import BackButton from "../../components/backButton";
+import { useStateValue } from '../../contexts/StateProvider';
 
 function Withdraw(props) {
-    const {currentUser, user} = useAuth()
+    // const {user, userData} = useAuth()
+    const [{user, userData}] = useStateValue()
 
     const [clickedWithdraw, setClickedWithdraw] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -24,7 +26,7 @@ function Withdraw(props) {
     const transactionList = []
     const handleWithdrawal = (e) => {
         setLoading(true)
-        if (amount && amount > user.balance) {
+        if (amount && amount > userData.balance) {
             setError('Withdrawal amount exceeds your balance')
             setLoading(false)
         }
@@ -73,9 +75,9 @@ function Withdraw(props) {
                                     "value": amount,
                                     "currency": "USD"
                                 },
-                                "receiver": currentUser.email,
+                                "receiver": user.email,
                                 "note": "Withdrawal",
-                                "sender_item_id": `i-${currentUser.uid}`
+                                "sender_item_id": `i-${user.uid}`
                             }
                         ]
                     }
@@ -108,19 +110,19 @@ function Withdraw(props) {
                                         transactionAmount: payout.payout_item.amount.value,
                                         transactionId: response.data.batch_header.payout_batch_id,
                                         transactionType: "Withdrawal",
-                                        userEmailId: payout.payout_item.receiver,
-                                        userId: currentUser.uid,
-                                        userMobileNumber: '',
+                                        userDataEmailId: payout.payout_item.receiver,
+                                        userDataId: user.uid,
+                                        userDataMobileNumber: '',
 
                                     }
                                     pushRealData('Transaction', withdrawData)
                                         .then((snapshot) => {
-                                            //Update user balance in firestore User document
-                                            updateFirestoreDocument('Users', currentUser.uid, {balance: parseInt(user.balance) - amount})
+                                            //Update userData balance in firestore userData document
+                                            updateFirestoreDocument('userDatas', user.uid, {balance: parseInt(userData.balance) - amount})
                                                 .then(() => {
 
-                                                    //Update user balance in firebase User document
-                                                    updateFirebaseDocument('Users', currentUser.uid, {balance: parseInt(user.balance) - amount})
+                                                    //Update userData balance in firebase userData document
+                                                    updateFirebaseDocument('userDatas', user.uid, {balance: parseInt(userData.balance) - amount})
                                                         .catch(e => console.log(e))
                                                     setSuccess('Withdrawal successful')
 
@@ -170,8 +172,8 @@ function Withdraw(props) {
         setLoading(true)
         setError('')
         setSuccess('')
-        //Get an array of participants that match the current user Is
-        getRealtimeChild('Transaction', 'userId', currentUser.uid).on('value', async (snapshot) => {
+        //Get an array of participants that match the current userData Is
+        getRealtimeChild('Transaction', 'userDataId', user.uid).on('value', async (snapshot) => {
             snapshot.forEach((doc) => {
                 transactionList.push(doc.val())
             })
@@ -185,7 +187,7 @@ function Withdraw(props) {
     return (
         <>
             <Header/>
-            <div className={` user container`}>
+            <div className={` userData container`}>
                 <div className={`d-flex`}>
                     <div className={`lg-view`}>
 
@@ -200,7 +202,7 @@ function Withdraw(props) {
                             <img src={wallet} alt=""/>
 
                         </div>
-                        <h3>$ {user.balance}</h3>
+                        <h3>$ {userData.balance}</h3>
                         <h5 className={``}>Total balance</h5>
                         <p className={`text-danger`}>{error}</p>
                         <p className={`text-success`}>{success}</p>

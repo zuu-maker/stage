@@ -12,13 +12,16 @@ import {useUser} from "../../contexts/userContext";
 import {useAuth} from "../../contexts/authContext";
 import {realDB} from "../../firebase/firebase";
 import MobileNavbar from "../../components/mobileNavbar";
+import { useStateValue } from '../../contexts/StateProvider';
 
 const EventDetails = () => {
+
+    const [{ hasJoined, user}] = useStateValue()   
     const [eventData,setEventData] =useState();
     const [participants,setParticipants] =useState([]);
     const {loader, setLoader} =useLoader();
-    const { hasJoined,setHasJoined} =useUser();
-    const {currentUser} =useAuth();
+    // const { hasJoined,setHasJoined} =useUser();
+    // const {currentUser} =useAuth();
 
 
     let params = useParams();
@@ -27,7 +30,7 @@ const EventDetails = () => {
 
     useEffect( ()=>{
         setLoader(true)
-        setHasJoined(false)
+        // setHasJoined(false)
 
         //Fetch event details
         getRealtimeDoc('Events',params.id).then( async function(snapshot) {

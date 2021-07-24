@@ -8,18 +8,18 @@ import ContactUs from './sections/contactUs/contactUs';
 import Footer from './sections/footer/footer';
 import {useAuth} from "./contexts/authContext";
 import {useLocation} from "react-router-dom";
+import { useStateValue } from './contexts/StateProvider';
 
 
 
 function Home() {
-    const {currentUser} = useAuth()
+    const [{user}] = useStateValue()
     const location = useLocation();
 
 
     return (
         <>
 
-        { !currentUser &&
         <div className="home">
             <Hero/>
             <Features/>
@@ -30,8 +30,6 @@ function Home() {
             <Footer/>
         </div>
 
-
- }
         </>
 
   );

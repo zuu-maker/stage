@@ -18,6 +18,7 @@ const app = firebase.initializeApp({
 // firebase.analytics();
 const db = app.firestore()
 var realDB = app.database()
- const auth =app.auth()
- const storage =app.storage()
-export {db , auth ,realDB,storage}
+const auth =app.auth()
+const storage =app.storage()
+//use this auth
+ export {db , auth ,realDB,storage}
