@@ -8,7 +8,7 @@ import MessageWindow from "../../components/messageWindow";
 import '../message/message.css'
 import {getDoc, getOptions, getRealtimeCollection, getSubCollection} from "../../helper/helper";
 import UserList from "../events/userList";
-import {db} from "../../firebase/firebase";
+import {auth, db} from "../../firebase/firebase";
 import {ChatProvider, useChat} from "../../contexts/messageContext";
 import {useLoader} from "../../contexts/loaderContext";
 import Graph from "../profile/graph";
@@ -16,26 +16,42 @@ import Card from "../events/card";
 import {Link, useParams} from "react-router-dom";
 import {useAuth} from "../../contexts/authContext";
 import CreateGroup from "../../components/createGroup";
+import { useStateValue } from '../../contexts/StateProvider';
+import {useAuthState} from "react-firebase-hooks/auth"
+import {useCollection} from "react-firebase-hooks/firestore"
 
-function Message(props) {
-    const {currentUser} = useAuth();
+function Message() {
+
+    //new lines
+    const [currentUser] = useAuthState(auth)
+
+    // const userChatRef = db.collection("Recent").where('members',"array-contains",currentUser?.uid)
+
+    const chatRef = db.collection("Recent").where('members',"array-contains","YbDgZU6l83YmhwsBY9iIwEOqB4f2").orderBy('date','asc')
+  
+     const [{user}] = useStateValue()
+    // const {currentUser} = useAuth();
     const [loading,setLoading] = useState(false);
     const {chatRoom,show,setShow,chatList, setChatList} = useChat();
     const recentChats = [];
     const modifiedList =[]
-
+    // setChatList([])
+    const [chats,setChats] = useState([])
+    // console.log(chatsSnap?.docs);
 
     const {setLoader,loader} = useLoader();
     let params = useParams();
-    var messageId = params.id;
+    const messageId = params.id;
     const userObj = {
-        email: currentUser.email,
-        objId: currentUser.uid,
+        email: user?.email,
+        objId: user?.uid,
 
-        userName: currentUser.displayName
+        userName: user?.displayName
     };
+    const [chatsSnap] = useCollection(chatRef)
+    console.log(chatsSnap);
 
-
+    
     useEffect(async () => {
         { params.id ? setShow(true)
             :
@@ -47,9 +63,8 @@ function Message(props) {
          await db.collection("Recent").where("members", "array-contains", currentUser.uid).orderBy('date','desc')
             .onSnapshot(
                 (snapshot) => {
-                    setChatList([])
 
-                    setChatList(snapshot.docs.map(doc =>doc.data() ))
+                    setChats(snapshot.docs.map(doc =>doc.data() ))
                     snapshot.docChanges().forEach((change) => {
                         if (change.type === "added") {
                             console.log("New : ", change.doc.data());
@@ -65,6 +80,75 @@ function Message(props) {
                         }
                     })
                 })
+
+                // snapshot => {
+                // setChatList([])
+                // setChatList(snapshot.docs.map(doc =>doc.data() ))
+                // console.log(chatList)
+
+                // snapshot.docChanges().forEach(change => {
+                //     if (change.type === "added") {
+                //
+                //
+                //         console.log(change.doc.data())
+                //     }
+                //     if (change.type === "modified") {
+                //         recentChats.push(change.doc.data())
+                //         console.log(change.doc.data())
+                //     }
+                //     if (change.type === "removed") {
+                //         recentChats.push(change.doc.data())
+                //     }
+                // } )
+            // })
+
+
+
+
+        // db.collection('ChatRooms').orderBy('dateLastUpdated','desc').onSnapshot(snapshot => {
+        //
+        //
+        //     setChatList(snapshot.docs.map(doc =>doc.data()))
+        //
+        //
+        // })
+
+
+        // setChatList(await getRealtimeCollection('ChatRooms'))
+        // setChatList(x)
+        setLoading(false)
+
+    }, [])
+
+    useEffect(async () => {
+        { params.id ? setShow(true)
+            :
+            setShow(false)
+        }
+        // {messageId ? setOpenedChat(true): setOpenedChat(false)}
+        setLoading(true)
+
+        //  db.collection("Recent").where("members", "array-contains", user?.uid).orderBy('date','desc')
+        //     .onSnapshot(
+        //         (snapshot) => {
+        //             setChatList([])
+
+        //             setChatList(snapshot.docs.map(doc =>doc.data() ))
+        //             snapshot.docChanges().forEach((change) => {
+        //                 if (change.type === "added") {
+        //                     console.log("New : ", change.doc.data());
+
+        //                 }
+        //                 if (change.type === "modified") {
+        //                     console.log("Modified : ", change.doc.data());
+        //                     modifiedList.push(change.doc.data())
+        //                     console.log(modifiedList)
+        //                 }
+        //                 if (change.type === "removed") {
+        //                     console.log("Removed : ", change.doc.data());
+        //                 }
+        //             })
+        //         })
 
                 // snapshot => {
                 // setChatList([])
@@ -122,7 +206,7 @@ function Message(props) {
 
 
             <Header/>
-    { chatList && <div className='container'>
+    { chats && <div className='container'>
 
 
         <div className='message '>
@@ -138,10 +222,12 @@ function Message(props) {
 
                         </div>
                         <div className='user-list'>
-                            {chatList ? chatList.map(chats => {
+                            { chats ? chats?.map(chat => {
+                                // console.log(chat.data());
+                                 console.warn(chat.members) 
                                 return (<>
 
-                                        <MessageCard chats={chats} key={chats.chatRoomID}/>
+                                       {(chat.chatRoomID && chat.members) && <MessageCard uid={currentUser.uid} key={chat.chatRoomID} id={chat.chatRoomID} data={chat}/> } 
 
 
                                     </>
@@ -192,10 +278,10 @@ function Message(props) {
 
                                     </div>
                                     <div className='user-list'>
-                                        {chatList ? chatList.map(chats => {
+                                        {chats ? chats.map(chats => {
                                             return (<>
 
-                                                    <MessageCard chats={chats} key={chats.chatRoomID}/>
+                                                    <MessageCard data={chats} id={chats.id} key={chats.chatRoomID} />
 
 
                                                 </>
@@ -215,7 +301,7 @@ function Message(props) {
                         <>
                             <div className='col-md-8 col-lg-8 col-sm-12'>
                                 {
-                                    messageId && <MessageWindow/>
+                                    messageId && currentUser.email && <MessageWindow />
 
                                 }
 
@@ -233,3 +319,6 @@ function Message(props) {
 }
 
 export default Message;
+
+
+ 

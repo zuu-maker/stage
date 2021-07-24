@@ -8,12 +8,16 @@ import {BrowserRouter as Router ,Switch, Route,useLocation} from 'react-router-d
 
 import reportWebVitals from './reportWebVitals';
 import App from "./App";
+import { StateProvider } from './contexts/StateProvider';
+import reducer, { initialState } from './contexts/reducer';
 
 
 ReactDOM.render(
+  <StateProvider initialState={initialState} reducer ={reducer}>
   <Router>
     <App />
-  </Router>,
+  </Router>
+  </StateProvider>,
   document.getElementById('root')
 );
 

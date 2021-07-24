@@ -17,11 +17,13 @@ import {useLoader} from "../../contexts/loaderContext";
 import Graph from "../profile/graph";
 import {useTransaction} from "../../contexts/transactionContext";
 import axios from "axios";
+import { useStateValue } from '../../contexts/StateProvider';
 
 function Sidebar() {
-    const {currentUser} = useAuth();
+    const[{user,joinedEvents,createdEvents}, dispatch] = useStateValue()
+    // const {currentUser} = useAuth();
     let params = useParams();
-    const {joinedEvents, createdEvents, setJoinedEvents, setCreatedEvents} = useUser();
+    // const {joinedEvents, createdEvents, setJoinedEvents, setCreatedEvents} = useUser();
     const {setLoader} = useLoader();
     let userJoinedEventsList = [];
     let joinedEventsList = [];
@@ -36,7 +38,7 @@ function Sidebar() {
     const handleJoinedEvents = () => {
         setLoader(true)
         //Get an array of participants that match the current user Is
-        getRealtimeChild('Participants', 'userId', currentUser.uid).get()
+        getRealtimeChild('Participants', 'userId', user.uid).get()
             .then((snapshot) => {
                 snapshot.forEach((doc) => {
                     userJoinedEventsList.push(doc.val())
@@ -47,8 +49,12 @@ function Sidebar() {
                     getRealtimeDoc('Events', eventJoined.EventId)
                         .then((snapshot) => {
                             joinedEventsList.push(snapshot.val())
-                            setJoinedEvents(joinedEventsList)
-
+                            dispatch({
+                                type:"SET_JOINED_EVENTS",
+                                joinedEvents:joinedEventsList
+                            })
+                            // setJoinedEvents(joinedEventsList)
+                            
                         })
 
 
@@ -68,26 +74,30 @@ function Sidebar() {
         //         return eachEvent})
         console.log(joinedEvents)
         setLoader(false)
-        history.push(`/user/${currentUser.uid}/joined-events`)
+        history.push(`/user/${user.uid}/joined-events`)
 
     }
 
     //Fetch created events on click
     const handleCreatedEvents = () => {
         setLoader(true)
-        getRealtimeChild('Events', 'EventCommissionerId', currentUser.uid).get()
+        getRealtimeChild('Events', 'EventCommissionerId', user.uid).get()
             .then((snapshot) => {
                 snapshot.forEach((doc) => {
                     createdEventsList.push(doc.val())
                 })
-                setCreatedEvents(createdEventsList)
+                dispatch({
+                    type:"SET_CREATED_EVENTS",
+                    createdEvents:createdEventsList
+                })
+                // setCreatedEvents(createdEventsList)
                 console.log(createdEvents)
             })
             .catch(e => {
                 console.log(e)
             })
         setLoader(false)
-        history.push(`/user/${currentUser.uid}/created-events`)
+        history.push(`/user/${user.uid}/created-events`)
 
     }
 
@@ -95,7 +105,7 @@ function Sidebar() {
         setLoader(true)
 
         setLoader(false)
-        history.push(`/user/${currentUser.uid}/create-schedule`)
+        history.push(`/user/${user.uid}/create-schedule`)
 
     }
 
@@ -104,7 +114,7 @@ function Sidebar() {
 
         setLoader(true)
         //Get an array of participants that match the current user Is
-        getRealtimeChild('Transaction', 'userId', currentUser.uid).on('value', (snapshot) => {
+        getRealtimeChild('Transaction', 'userId', user.uid).on('value', (snapshot) => {
             snapshot.forEach((doc) => {
                 transactionList.push(doc.val())
             })
@@ -112,7 +122,7 @@ function Sidebar() {
             setTransactions(transactionList)
         })
         setLoader(false)
-        history.push(`/user/${currentUser.uid}/deposit`)
+        history.push(`/user/${user.uid}/deposit`)
 
     }
 
@@ -121,7 +131,7 @@ function Sidebar() {
 
         setLoader(true)
         //Get an array of participants that match the current user Is
-        getRealtimeChild('Transaction', 'userId', currentUser.uid).on('value', (snapshot) => {
+        getRealtimeChild('Transaction', 'userId', user.uid).on('value', (snapshot) => {
             snapshot.forEach((doc) => {
                 transactionList.push(doc.val())
             })
@@ -129,7 +139,7 @@ function Sidebar() {
             setTransactions(transactionList)
         })
         setLoader(false)
-        history.push(`/user/${currentUser.uid}/withdraw`)
+        history.push(`/user/${user.uid}/withdraw`)
 
     }
 
@@ -155,7 +165,7 @@ function Sidebar() {
                     <div className='position-relative'>
                         <div className='mx-auto d-block user-profile-pic-wrapper'>
 
-                            <img src={currentUser && currentUser.photoURL} alt=""/>
+                            <img src={user && user.photoURL} alt=""/>
 
                         </div>
                         <div className='badge-wrapper'>
@@ -166,12 +176,12 @@ function Sidebar() {
 
 
                     <div className='mt-3 text-light'>
-                        <div className='space-medium f-18'>{currentUser.displayName}</div>
-                        <div className="space-light mb-4">@{currentUser.displayName}</div>
+                        <div className='space-medium f-18'>{user.displayName}</div>
+                        <div className="space-light mb-4">@{user.displayName}</div>
 
                     </div>
                     <div className='sm-view'>
-                        {/*<Graph/>*/}
+                        <Graph/>
 
                     </div>
 

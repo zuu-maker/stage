@@ -1,6 +1,12 @@
 import {db,realDB} from "../firebase/firebase";
 import {useEvent} from "../contexts/eventsContext";
 
+export const getReceiverUid = (members, currentUser) => (
+  members?.filter(filteredUser => filteredUser !== currentUser?.uid)[0]
+)
+export const getReceiverEmail = (users, currentUser) => (
+     users?.filter(filteredUser => filteredUser !== currentUser?.email)[0]
+)
 
 export const pushData = async (path,data,id) =>{
 
@@ -127,12 +133,14 @@ export const getRealtimeDoc = (path,id) =>{
 
   return realDB.ref(path+'/'+id).once("value")
 }
-export const  getRealtimeChild =  (path,child,id) =>{
 
+export const  getRealtimeChild =  (path,child,id) =>{
+console.log(id);
 
 
   return  realDB.ref(path).orderByChild(child).equalTo(id)
 }
+
 export const getDoc = (collection,field,value) =>{
   let collectionList = []
   db.collection(collection).where(field, "==", field).get()
@@ -149,7 +157,7 @@ export const getDoc = (collection,field,value) =>{
       .catch((error) => {
         console.log("Error getting documents: ", error);
       });
-  console.log(collectionList)
+  // console.log(collectionList)
 
   return collectionList
 }
@@ -224,6 +232,7 @@ export function timeConverter(UNIX_timestamp,type){
 
   return time;
 }
+
 export function checkDate(UNIX_timestamp){
   var a = new Date(UNIX_timestamp );
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];

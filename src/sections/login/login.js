@@ -11,25 +11,36 @@ import {useAuth} from "../../contexts/authContext";
 import Signup from "../signup/form";
 import {useHistory} from 'react-router-dom'
 import {Modal} from "react-bootstrap";
+import { auth } from '../../firebase/firebase';
+import { useStateValue } from '../../contexts/StateProvider';
 
 
 
+//update login here
 export default function Login() {
     const history = useHistory()
+    const [{user}, dispatch] = useStateValue()
+    
     const emailRef = useRef()
     const passwordRef = useRef()
-    const { login,currentUser  } = useAuth()
+    // const { login,currentUser  } = useAuth()
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
-    async function handleSubmit(e) {
+    const handleSubmit = (e) => {
         e.preventDefault()
         try {
             setError('')
             setLoading(true)
-            await login(emailRef.current.value, passwordRef.current.value).then((user) => {history.push(`/user/${user.user.uid}`);
-                console.log(currentUser)})
-
+            //logging user in
+            auth.signInWithEmailAndPassword(emailRef.current.value,passwordRef.current.value)
+            .then((user) => {
+                dispatch({
+                    type: "SET_USER",
+                    user
+                })
+                history.push(`/user/${user.user.uid}`)
+            })
 
         } catch (err) {
             switch (err.code) {

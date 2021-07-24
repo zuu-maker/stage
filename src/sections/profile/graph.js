@@ -7,8 +7,11 @@ import {useUser} from "../../contexts/userContext";
 import Bar from "../../components/bar";
 import {useAuth} from "../../contexts/authContext";
 import {useParams} from "react-router-dom";
+import { useStateValue } from '../../contexts/StateProvider';
+
 function Graph({props})  {
-    const {user,currentUser} = useAuth();
+    const [{user,userData}] = useStateValue()
+    // const {user,currentUser} = useAuth();
     let params = useParams();
 
 
@@ -16,7 +19,7 @@ function Graph({props})  {
         <div className="graph p-4">
             <div className={`d-flex text-light`}>
                 <h4>Winning ratio</h4>{
-                params.id === currentUser.uid &&   <span className={`ml-auto`}>$ {user.balance}</span>
+                params.id === user?.uid &&   <span className={`ml-auto`}>$ {userData.balance}</span>
 
             }
 

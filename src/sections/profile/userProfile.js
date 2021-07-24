@@ -23,11 +23,15 @@ import {auth, db, realDB} from "../../firebase/firebase";
 import {useUser} from "../../contexts/userContext";
 import {useLoader} from "../../contexts/loaderContext";
 import Sidebar from "../dashboard/sidebar";
+import { useStateValue } from '../../contexts/StateProvider';
+import {useAuthState} from "react-firebase-hooks/auth"
 
 function UserProfile() {
-    const {currentUser, user} = useAuth()
+    const [currentUser] = useAuthState(auth)
+    const [{user,userData,otherUser},dispatch] = useStateValue();
+    // const {currentUser, user} = useAuth()
     let params = useParams();
-    const {otherUser, setOtherUser, setHasFollowed} = useUser();
+    // const {otherUser, setOtherUser, setHasFollowed} = useUser();
     const [joinedEvents, setJoinedEvents] = useState([]);
     const [loading, setLoading] = useState(false);
     const {setLoader, loader} = useLoader();
@@ -38,15 +42,19 @@ function UserProfile() {
     useEffect(() => {
 
         //Get other user object from firestore User collection
-            if(currentUser && currentUser.uid !== params.id ){
+            if(userData && user.uid !== params.id ){
             setLoader(true)
 
             db.collection('Users').where('objectId', "==", params.id)
                 // .get()
                 .onSnapshot((snapshot) => {
                     console.log(snapshot.docs.map(doc => doc.data()))
-
-                    setOtherUser(snapshot.docs.map(doc => doc.data()).find(b => {return b}))
+                    const otherUser =  snapshot.docs.map(doc => doc.data()).find(b => {return b})
+                    dispatch({
+                        type:"SET_OTHER_USER",
+                        otherUser,
+                    })
+                    // setOtherUser(snapshot.docs.map(doc => doc.data()).find(b => {return b}))
 
                     // user.followedUsersIds?.find((follower) => {
                     //     if (otherUser.userId === follower) {
@@ -71,7 +79,9 @@ function UserProfile() {
             else{
                 setLoading(true)
                 //Get an array of participants that match the current user Id
-                getRealtimeChild('Participants', 'userId', currentUser.uid).get()
+                console.log(user);
+                
+                    getRealtimeChild('Participants', 'userId', user?.uid).get()
                     .then((snapshot) => {
                         snapshot.forEach((doc) => {
                             userJoinedEventsList.push(doc.val())
@@ -100,18 +110,18 @@ function UserProfile() {
                         console.log(e)
                         setLoading(false)
                     })
-                //Filter out events created by the current user
-                // joinedEventsList.filter((eachEvent) => {
-                //     if (eachEvent.EventCommissionerId != currentUser.uid)
-                //         return eachEvent})
+                // Filter out events created by the current user
+                joinedEventsList.filter((eachEvent) => {
+                    if (eachEvent.EventCommissionerId != currentUser.uid)
+                        return eachEvent})
 
-                // //Get future events based on current time compared to the EventStartDate field
-                // realDB.ref('Events').orderByChild('EventStartDate').startAt(parseInt( Date.now())).get()
-                //     .then(snapshot =>{
-                //             snapshot.forEach(doc =>{
-                //                 console.log(doc.val())
-                //             })
-                //         })
+                //Get future events based on current time compared to the EventStartDate field
+                realDB.ref('Events').orderByChild('EventStartDate').startAt(parseInt( Date.now())).get()
+                    .then(snapshot =>{
+                            snapshot.forEach(doc =>{
+                                console.log(doc.val())
+                            })
+                        })
         }
     }, [])
 
@@ -124,10 +134,10 @@ function UserProfile() {
 <>
 
     { !loader && <>
-        {currentUser && currentUser.uid == params.id ?
+        {user && user.uid == params.id ?
 
             <div className='container user d-flex'>
-                {/*<UserMenu  user={user} />*/}
+                {/* <UserMenu  user={user} /> */}
                 <Sidebar/>
                 <div className={`lg-view flex-column`}>
                     <Graph/>
@@ -140,7 +150,7 @@ function UserProfile() {
                             return (
                                 <>
 
-                                    <Card event={event} key={event.id}/>
+                                    <Card event={event} key={event?.id}/>
                                 </>
                             )
                         }) :<>
@@ -155,7 +165,7 @@ function UserProfile() {
             <>
                 <div className='container other-user d-flex'>
                     <>
-                        {!loader && otherUser.userId && <OtherUserMenu otherUserObj={otherUser}/>}
+                        {!loader && user.uid && otherUser?.userId && <OtherUserMenu otherUserObj={otherUser}/>}
 
                     </>
 
@@ -165,7 +175,7 @@ function UserProfile() {
     </>}
             <MobileNavbar/>
 
-</>}
+</>
         </>
     );
 }

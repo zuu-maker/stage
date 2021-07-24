@@ -9,9 +9,11 @@ import {getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
 import {useTransaction} from "../../contexts/transactionContext";
 import TransactionCard from "../../components/transactionCard";
 import BackButton from "../../components/backButton";
+import { useStateValue } from '../../contexts/StateProvider';
 
 function Deposit(props) {
-    const {currentUser, user} = useAuth()
+    const [{user,userData}] = useStateValue()
+    // const {user, userData} = useAuth()
     const [clickedDeposit, setClickedDeposit] = useState(false)
     const [loading, setLoading] = useState(false)
     const {transactions, setTransactions} = useTransaction()
@@ -22,8 +24,8 @@ function Deposit(props) {
 
     useEffect(() => {
         setLoading(true)
-        //Get an array of participants that match the current user Is
-        getRealtimeChild('Transaction', 'userId', currentUser.uid).on('value', async (snapshot) => {
+        //Get an array of participants that match the current userDataData Is
+        getRealtimeChild('Transaction', 'userDataDataId', user.uid).on('value', async (snapshot) => {
             snapshot.forEach((doc) => {
                 transactionList.push(doc.val())
             })
@@ -39,7 +41,7 @@ function Deposit(props) {
     return (
         <>
             <Header/>
-            <div className={` user container`}>
+            <div className={` userData container`}>
                 <div className={`d-flex`}>
                     <div className={`lg-view`}>
 
@@ -54,7 +56,7 @@ function Deposit(props) {
                             <img src={wallet} alt=""/>
 
                         </div>
-                        <h3>$ {user.balance}</h3>
+                        <h3>$ {userData.balance}</h3>
                         <h5 className={``}>Total balance</h5>
                         <p className={`text-success`}>{depositSuccess}</p>
                         <p className={`text-danger`}>{depositError}</p>
@@ -79,8 +81,8 @@ function Deposit(props) {
                         }
                         {
                             clickedDeposit  && amount && depositError === ""?
-                                <Paypal currentBalance={user.balance} amount={amount} userId={currentUser.uid}
-                                        email={currentUser.email}/>
+                                <Paypal currentBalance={userData.balance} amount={amount} userDataId={user.uid}
+                                        email={user.email}/>
                                 :
                                 <></>
                         }

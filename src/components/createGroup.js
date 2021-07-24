@@ -10,13 +10,16 @@ import group from "../images/group.png";
 import password from "../images/password.svg";
 import {useLoader} from "../contexts/loaderContext";
 import {useHistory} from "react-router-dom";
+import { useStateValue } from '../contexts/StateProvider';
 
 function CreateGroup(props) {
-    const {currentUser} = useAuth();
+    const [{user}] = useStateValue() 
+    // const {currentUser} = useAuth();
     const [createdEvents,setCreatedEvents] = useState([]);
     const {participants,setParticipants} = useChat();
     let eventsList = [];
     let invitationList = [];
+    let usersList = []
     const [file, setFile] = useState('');
     const hiddenFileInput = React.useRef(null);
     const {setLoader,loader} = useLoader();
@@ -42,10 +45,13 @@ function CreateGroup(props) {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        invitationList=[]
-
+        // alert("hey!!!")
+        // invitationList=[]
+        // usersList = []
         participants.map((p) =>{
             document.querySelectorAll(`[name=${p.userName}]:checked`).forEach((node) =>{
+                console.log(node);
+                usersList.push(node.getAttribute('email'))
                 invitationList.push(node.getAttribute('userId') )
             })
         })
@@ -57,7 +63,26 @@ function CreateGroup(props) {
             dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
             groupChatName: e.target.groupName.value,
             isGroupChat: true,
-            participants: invitationList
+            participants: invitationList,
+            users:usersList
+        }
+
+        const otherFormData = {
+          
+                counter: 0,
+                date: Date.now(),
+                groupChatName: e.target.groupName.value,
+                lastMessage: " ",
+                membersToPush:invitationList,
+                members:invitationList,
+                type:'group'
+
+                // fromUserId: currentUser.uid,
+                // fromUserName: currentUser.displayName,
+                // fromUserProfileimageUrl: currentUser.photoURL,
+                // date: Date.now(),
+              
+                // chatRoomID: params.id,
         }
         //Show Loader
         setLoader(true)
@@ -71,95 +96,116 @@ function CreateGroup(props) {
             membersToPush: invitationList,
             members: invitationList,
             type: 'group',
-            userId: currentUser.uid,
+            userId: user.uid,
             withUserName: e.target.groupName.value,
             withUserUserID: '',
             // dateTime : firebase.firestore.FieldValue.serverTimestamp()
         }
 
-
-
-
-        //Create a chatroom once user clicks on message
-        await db.collection('ChatRooms').add(formData).then(function (docRef) {
-
-            setChatRoom(Object.assign(formData,{chatRoomId: docRef.id}))
-
-            // Update Id field in the chatroom document using the document reference id
-            docRef.update({chatRoomId: docRef.id})
-             db.collection('Recent').add(recentData)
-                .then(async function (doc) {
-                await doc.update({recentId: doc.id,chatRoomID: docRef.id})
-                    doc.get().then( (recentSnapshot) =>{
-                        console.log(recentSnapshot.data())
-                        try {
-                            {
-                                // Check if there is a file with a certain file size
-                                file && file.size
-                                    ?
-
-                                    // Push File to the firebase storage
-                                    storage.ref(`chatRoom/${docRef.id}/groupPhoto`).put(file)
-                                        .then(snapshot => {
-
-                                            //Fetch the file url
-                                            snapshot.ref.getDownloadURL().then((url) => {
-
-                                                // Update Chatroom groupImageUrl field
-                                                var updatedInfo = { groupImageUrl: url}
-                                                updateFirestoreDocument('ChatRooms', docRef.id, updatedInfo)
-                                                updateFirestoreDocument('Recent', doc.id, {userProfileImageUrl:url})
-                                                var latestRecentObj = Object.assign(recentSnapshot.data(),{userProfileImageUrl:url})
-
-                                                console.log([...chatList, latestRecentObj])
-                                                setChatList([...chatList, latestRecentObj])
-                                                // setChatList(latestRecentObj)
-
-                                            })
-                                            setFile('')
-
-
-                                        })
-                                        .catch(error => {
-                                            setLoader(false)
-                                        })
-
-
-                                    :
-                                    alert('Error updating')
-
-
-
-                            }
-
-                        } catch (e) {
-                            setLoader(false)
-                            console.log(e.message)
-                            console.log('error')
-
-                        }
-                        }
-                    )
-
-
+        
+        db.collection("chats").add(formData)
+        .then(docRef => {
+            console.log(invitationList);
+            setLoader(false)
+            
+            db.collection('Recent').add(
+                otherFormData,
+            ).then(function (doc) {
+                doc.update({chatRoomID: docRef.id})
+                doc.update({recentId: doc.id})
+                alert("added to recent")
+            }).catch(() => {
+                alert("error here")
             })
 
-
-            // Hide Loader
-            setLoader(false)
-
-            // Redirect to the newly created chatRoom  endpoint
+            docRef.update({chatRoomId: docRef.id})
             history.push(`/messages/${docRef.id}`)
+        }).catch(function (error) {
+            setLoader(false)
+            console.error("Error adding document: ", error);
+        });
 
-        })
-            .catch(function (error) {
-                setLoader(false)
-                console.error("Error adding document: ", error);
-            });
+        //Create a chatroom once user clicks on message
+        // await db.collection('ChatRooms').add(formData).then(function (docRef) {
+
+        //     setChatRoom(Object.assign(formData,{chatRoomId: docRef.id}))
+
+        //     // Update Id field in the chatroom document using the document reference id
+        //     docRef.update({chatRoomId: docRef.id})
+        //      db.collection('Recent').add(recentData)
+        //         .then(async function (doc) {
+        //         await doc.update({recentId: doc.id,chatRoomID: docRef.id})
+        //             doc.get().then( (recentSnapshot) =>{
+        //                 console.log(recentSnapshot.data())
+        //                 try {
+        //                     {
+        //                         // Check if there is a file with a certain file size
+        //                         file && file.size
+        //                             ?
+
+        //                             // Push File to the firebase storage
+        //                             storage.ref(`chatRoom/${docRef.id}/groupPhoto`).put(file)
+        //                                 .then(snapshot => {
+
+        //                                     //Fetch the file url
+        //                                     snapshot.ref.getDownloadURL().then((url) => {
+
+        //                                         // Update Chatroom groupImageUrl field
+        //                                         var updatedInfo = { groupImageUrl: url}
+        //                                         updateFirestoreDocument('ChatRooms', docRef.id, updatedInfo)
+        //                                         updateFirestoreDocument('Recent', doc.id, {userProfileImageUrl:url})
+        //                                         var latestRecentObj = Object.assign(recentSnapshot.data(),{userProfileImageUrl:url})
+
+        //                                         console.log([...chatList, latestRecentObj])
+        //                                         setChatList([...chatList, latestRecentObj])
+        //                                         // setChatList(latestRecentObj)
+
+        //                                     })
+        //                                     setFile('')
+
+
+        //                                 })
+        //                                 .catch(error => {
+        //                                     setLoader(false)
+        //                                 })
+
+
+        //                             :
+        //                             alert('Error updating')
+
+
+
+        //                     }
+
+        //                 } catch (e) {
+        //                     setLoader(false)
+        //                     console.log(e.message)
+        //                     console.log('error')
+
+        //                 }
+        //                 }
+        //             )
+
+
+            // })
+
+
+        //     // Hide Loader
+        //     setLoader(false)
+
+        //     // Redirect to the newly created chatRoom  endpoint
+        //     history.push(`/messages/${docRef.id}`)
+
+        // })
+        //     .catch(function (error) {
+        //         setLoader(false)
+        //         console.error("Error adding document: ", error);
+        //     });
     }
+
     useEffect(() =>{
         setParticipants([])
-        getRealtimeChild('Events','EventCommissionerId',currentUser.uid).get()
+        getRealtimeChild('Events','EventCommissionerId',user.uid).get()
             .then((snapshot) =>{
 
                 snapshot.forEach((doc) =>{

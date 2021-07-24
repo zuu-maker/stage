@@ -6,18 +6,22 @@ import mail from "../../images/mail.svg";
 import user from "../../images/user.svg";
 import password from "../../images/password.svg";
 import {useLoader} from "../../contexts/loaderContext";
-import {storage} from "../../firebase/firebase";
+import {auth, storage} from "../../firebase/firebase";
 import {useAuth} from "../../contexts/authContext";
 import {useUser} from "../../contexts/userContext";
 import BackButton from "../../components/backButton";
-
+import {useAuthState} from "react-firebase-hooks/auth"
+import { useStateValue } from '../../contexts/StateProvider';
 
 export default function EditProfile() {
+
     const {setLoader,loader} = useLoader();
-    const {currentUser} = useAuth();
+    // const {currentUser} = useAuth();
+    const [currentUser] = useAuthState(auth)
     const hiddenFileInput = React.useRef(null);
     const [file, setFile] = useState('');
-    const {user, setUser} = useUser();
+    const [{userData}] = useStateValue()
+    // const {user, setUser} = useUser();
 
 
 

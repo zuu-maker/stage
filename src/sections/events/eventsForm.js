@@ -13,7 +13,7 @@ import {
 import calendar from "../../images/created_schedule.png";
 import dropdown from "../../images/sort.png"
 import {useForm} from "../../contexts/formContext";
-import {db, realDB} from "../../firebase/firebase";
+import {auth, db, realDB} from "../../firebase/firebase";
 import Option from "../../components/option";
 import EventOptions from "../../components/eventOptions";
 import Switch from '@material-ui/core/Switch';
@@ -26,6 +26,8 @@ import {useLoader} from "../../contexts/loaderContext";
 import {useAuth} from "../../contexts/authContext";
 import {useHistory} from "react-router-dom";
 import BackButton from "../../components/backButton";
+import { useStateValue } from '../../contexts/StateProvider';
+import {useAuthState} from "react-firebase-hooks/auth"
 
 function ValueLabelComponent(props) {
     const { children, open, value } = props;
@@ -38,12 +40,14 @@ function ValueLabelComponent(props) {
 }
 
 export default function EventsForm() {
+    const [currentUser] = useAuthState(auth)
+    const[{userData}] = useStateValue()
     const history =useHistory()
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
     const [loading, setLoading] = useState(false)
     const {setLoader, loader} = useLoader()
-    const { currentUser,user} = useAuth()
+    // const { currentUser,user} = useAuth()
     const [formOptions, setFormOptions] = useState([])
     const [maxParticipants, setMaxParticipants] = useState([])
     const [eventTotalPrizes, setEventTotalPrizes] = useState(0)
@@ -232,13 +236,13 @@ export default function EventsForm() {
 
         }
         try {
-            if (parseInt(user.balance) >= parseInt(formData.EventEntryFee)) {
+            if (parseInt(userData.balance) >= parseInt(formData.EventEntryFee)) {
                 setError('')
                 //Set loading state
                 setLoader(true)
 
                     //Remaining balance deducted from the user balance  after Joining event
-                    const remainingBalance =  parseInt(user.balance) - parseInt(formData.EventEntryFee)
+                    const remainingBalance =  parseInt(userData.balance) - parseInt(formData.EventEntryFee)
                     updateFirestoreDocument('Users',currentUser.uid,{balance:remainingBalance})
                         .then(() =>{
                             //Update userBalance in  firebase
@@ -253,7 +257,7 @@ export default function EventsForm() {
                                 updateFirebaseDocument('Events',docRef.key,{id: docRef.key})
 
                                 //Remove user balance property from user object from the auth context
-                                var newUserObj = user
+                                var newUserObj = userData
                                 delete newUserObj['balance']
 
                                 //Add the creator of the event as a participant to firebase participant's collection
@@ -277,7 +281,7 @@ export default function EventsForm() {
             } else{
                 setSuccess('')
 
-                console.log(user.balance)
+                console.log(userData.balance)
                 setError('Please deposit enough funds to create this event. ')
 
             }
