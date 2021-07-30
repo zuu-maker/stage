@@ -39,9 +39,10 @@ const MessageWindow = ({}) => {
     const scrollView = useRef();
     const {setLoader} = useLoader();
     const [textId ,setTextId] =useState()
+    const [showSendButton ,setShowSendButton] =useState(false)
     // const [receiver ,setReceiver] =useState()
     const [sender,setSender] = useState('')
-    const [loading,setLoading] = useState(false)
+    // const [loading,setLoading] = useState(false)
     //  let params = useParams();
     var messageId = params.id;
     const [input,setInput] = useState('');
@@ -51,12 +52,15 @@ const MessageWindow = ({}) => {
     var recentData;
 
     // const [chatSnap] = useCollection(db.collection("chats").doc(params.id))
-    const [messagesSnap] = useCollection(db.collection("chats").doc(params.id).collection("messages").orderBy("timestamp","asc"));
+    const [messagesSnap,loading ,error] = useCollection(db.collection("chats").doc(params.id).collection("messages").orderBy("timestamp","asc"));
     // console.log(params.id);
     const [senderSnap] = useCollection(db.collection("chats").where("chatRoomId","==",params.id));
     //  console.log(params.id);
 
+useEffect(()=>{
+    scrollView.current.scrollIntoView({behavior: 'smooth'})
 
+},[])
 
     // senderSnap?.docs?.[0]?.data()
 
@@ -65,7 +69,6 @@ const MessageWindow = ({}) => {
 
 
 
-    console.log(receiverEmail)
 
     // console.log(currentUser);
 
@@ -79,6 +82,7 @@ const MessageWindow = ({}) => {
                 <ChatContent
                     key={message.id}
                     sender={message.data().user}
+                    loading={loading}
                     message={{
                         ...message.data(),
                         timestamp: message.data().timestamp?.toDate().getTime()
@@ -135,9 +139,9 @@ const MessageWindow = ({}) => {
     //Send chat message
     const handleSendText = (e) => {
         e.preventDefault()
+        setShowSendButton(false)
 
         const members = groupData?.participants?.map((participant) => (participant.objectId))
-        console.log(members)
 
         // var data = {
         //     text: e.target.message.value,
@@ -231,7 +235,7 @@ const MessageWindow = ({}) => {
 
         setInput('')
         scrollView.current.scrollIntoView({behavior: 'smooth'})
-        setLoading(false)
+        // setLoading(false)
 
     }
 
@@ -385,14 +389,15 @@ const MessageWindow = ({}) => {
 
             <>
 
-                <div className='d-flex center mb-2'>
+                <div className='d-flex center chat-header mb-2'>
                     <BackButton/>
                     {receiverEmail &&
+                        <div className={`lg-view-flex d-md-none`}>
                     <DisplayPicture
                         chatRoom={chatRoom}
                         receiver={receiverEmail}
-                    />}
-                    <div className='ml-3 text-light'>
+                    /></div>}
+                    <div className='ml-3 text-light guest-name'>
                         {receiverEmail && <DisplayName groupName={groupData?.groupChatName} receiver={receiverEmail}/>}
 
 
@@ -401,8 +406,7 @@ const MessageWindow = ({}) => {
 
                     <div className=' chat-icon-group mr-0 ml-auto d-flex'>
                         <div className={` lg-view-flex`}>
-                            <Icon props={{backgroundColor: '#2B3038',image: ''} }/>
-                            <Icon props={{backgroundColor: '#2B3038',image: ''} }/>
+
                         </div>
 
                         <Dropdown className={`ml-2`}>
@@ -452,9 +456,9 @@ const MessageWindow = ({}) => {
                     {/*/>*/}
                     {/*{preview && <img height={30} src={preview}/>}*/}
 
-                    <input value={input} onChange={(e) => setInput(e.target.value)} name='message'
+                    <input value={input} onChange={(e) => {setInput(e.target.value);setShowSendButton(true)}} name='message'
                            placeholder='Enter Message' type="text" />
-                    <button type={`submit`} className={`btn m-2 w-25`}>Send</button>
+                    <>{showSendButton && input !== "" ? <button type={`submit`} className={`btn m-2 w-25`}>Send</button> : <><div className={' icon-wrapper   pointer text-center'}></div><div className={' icon-wrapper   pointer text-center'}></div></> }</>
                 </form>
                 <br/>
                 <br/>

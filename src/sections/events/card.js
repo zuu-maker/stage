@@ -52,7 +52,7 @@ function Card({ event }) {
                     <div className='thumbnail-list d-flex flex-row'>
                         <>
                             {
-                               !loading  && participantSnap &&  participantSnap.slice(0, 4).map((image) =>{ return(
+                               !loading  && participantSnap ?  participantSnap.slice(0, 4).map((image) =>{ return(
 
 
 
@@ -63,7 +63,8 @@ function Card({ event }) {
 
                                     </>)
                                 })
-                            }
+                           :<div className={`thumbnail-wrapper animated-background`}>
+                                   </div> }
                         </>
              </div>
                     <p className='spots'> +{parseInt(event?.EventCurrentParticipants) > 0 ? event?.EventCurrentParticipants : 0} going ({parseInt(event?.EventMaximumParticipants)-parseInt(event?.EventCurrentParticipants)} spots left)</p>

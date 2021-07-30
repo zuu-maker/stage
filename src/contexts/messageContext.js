@@ -51,9 +51,8 @@ export function ChatProvider({ children }) {
         notificationPopup,setNotificationPopup,
         // chatSnap
     }
-    useEffect(() =>{
-        alert(notificationPopup?.lastMessage)
-    },[notificationPopup])
+    // useEffect(() =>{
+    // },[notificationPopup])
 
     return (
         <ChatContext.Provider value={value}>

@@ -22,8 +22,8 @@ import {useList} from "react-firebase-hooks/database";
 function Events() {
     const {eventsList, setEventsList} = useEvent()
     const [participantList, setParticipantList] = useState([])
-    const [eventSnap,loading,error] = useList(realDB.ref('Events').orderByChild('EventTimestamp').limitToLast(20))
-    const orderedEvents = eventSnap?.reverse()
+    const [eventSnap,loading,error] = useList(realDB.ref('Events').orderByChild('EventTimestamp').limitToLast(5))
+    // const orderedEvents = eventSnap?.reverse()
 
     const {loader, setLoader} = useLoader()
     // const {setHasJoined} = useUser()
@@ -32,40 +32,43 @@ function Events() {
     let eventList = []
     let participants = []
 
-    useEffect(() => {
-        { loading ?
-            setLoader(true)
-            :
-            setLoader(false)
-        }
-        // eventList= []
-        // setEventsList([])
-        //
-        // //Fetch events ordered by timestamp
-        //  realDB.ref('Events').orderByChild('EventTimestamp').limitToLast(20)
-        //             .on('value', (snapshot) => {
-        //
-        //     snapshot.forEach(function (events) {eventList.push(Object.assign(events.val(),{id: events.key}));
-        //
-        //         //Set event list state and reverse the array order to display latest event
-        //         setEventsList(eventList.reverse())
-        //
-        //
-        //     });
-        //
-        //     setLoader(false);
-        //
-        //     return () =>{
-        //         console.log('Event unmounted')
-        //
-        //     }
-        //
-        //
-        // });
-
-
-
-    }, [loading])
+    // useEffect(() => {
+    //     console.log('card loading')
+    //     { loading ?
+    //         setLoader(true)
+    //         :
+    //         setLoader(false)
+    //     }
+    //     console.log('card finished loading')
+    //
+    //     // eventList= []
+    //     // setEventsList([])
+    //     //
+    //     // //Fetch events ordered by timestamp
+    //     //  realDB.ref('Events').orderByChild('EventTimestamp').limitToLast(20)
+    //     //             .on('value', (snapshot) => {
+    //     //
+    //     //     snapshot.forEach(function (events) {eventList.push(Object.assign(events.val(),{id: events.key}));
+    //     //
+    //     //         //Set event list state and reverse the array order to display latest event
+    //     //         setEventsList(eventList.reverse())
+    //     //
+    //     //
+    //     //     });
+    //     //
+    //     //     setLoader(false);
+    //     //
+    //     //     return () =>{
+    //     //         console.log('Event unmounted')
+    //     //
+    //     //     }
+    //     //
+    //     //
+    //     // });
+    //
+    //
+    //
+    // }, [loading])
 
 
     return (
@@ -113,7 +116,7 @@ function Events() {
             <div className='grid-container'>
                 <>
 
-                    {!loading && orderedEvents  ? orderedEvents.map(event => {
+                    {!loading && eventSnap  ? eventSnap.map(event => {
                         return (
                             <>
 

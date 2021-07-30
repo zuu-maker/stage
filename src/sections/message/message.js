@@ -25,17 +25,9 @@ function Message() {
     //new lines
     const [currentUser] = useAuthState(auth)
 
-    // const userChatRef = db.collection("Recent").where('members',"array-contains",currentUser?.uid)
-
-    const chatRef = db.collection("Recent").where('members',"array-contains",currentUser?.uid).orderBy('date','asc')
      const [{user}] = useStateValue()
-    // const {currentUser} = useAuth();
     const {chatRoom,show,notificationPopup,setNotificationPopup,setShow,chatList, setChatList} = useChat();
-    const recentChats = [];
-    const modifiedList =[]
-    // setChatList([])
     const [chats,setChats] = useState([])
-    // console.log(chatSnap?.docs);
     const [chatSnap,loading,error] = useCollection(db.collection("Recent").where("members", "array-contains", currentUser.uid).orderBy('date','desc'))
 
     const {setLoader,loader} = useLoader();
@@ -60,11 +52,11 @@ function Message() {
     if(chatSnap){
         const unsubscribe = chatSnap.docChanges().forEach((change) => {
                            if (change.type === "added") {
-                               console.log("New : ", change.doc.data());
+                               // console.log("New : ", change.doc.data());
 
                            }
                            if (change.type === "modified") {
-                               console.log("Modified : ", change.doc.data());
+                               // console.log("Modified : ", change.doc.data());
                                setNotificationPopup(change.doc.data())
 
                            }
@@ -108,7 +100,7 @@ function Message() {
                                  console.warn(chat.data().members)
                                 return (<>
 
-                                       {(chat.data().chatRoomID && chat.data().members) && <MessageCard uid={currentUser.uid} key={chat.data().chatRoomID} id={chat.data().chatRoomID} data={chat.data()}/> }
+                                       {(chat.data().chatRoomID && chat.data().members) && <MessageCard uid={currentUser.uid} key={chat.data().chatRoomID} id={chat.data().chatRoomID} chats={chat.data()}/> }
 
 
                                     </>
@@ -159,16 +151,17 @@ function Message() {
 
                                     </div>
                                     <div className='user-list'>
-                                        {chats ? chats.map(chats => {
+                                        { !loading && chatSnap ? chatSnap.docs.map(chat => {
+                                            // console.log(chat.data());
+                                            console.warn(chat.data().members)
                                             return (<>
 
-                                                    <MessageCard data={chats} id={chats.id} key={chats.chatRoomID} />
+                                                    {(chat.data().chatRoomID && chat.data().members) && <MessageCard uid={currentUser.uid} key={chat.data().chatRoomID} id={chat.data().chatRoomID} chats={chat.data()}/> }
 
 
                                                 </>
                                             )
                                         }) : 'No Chats Available'}
-
                                     </div>
 
 
@@ -180,7 +173,7 @@ function Message() {
                         </>
                         :
                         <>
-                            <div className='col-md-8 col-lg-8 col-sm-12'>
+                            <div className='col-md-8 p-0 col-lg-8 col-sm-12'>
                                 {
                                     messageId && currentUser.email && <MessageWindow />
 

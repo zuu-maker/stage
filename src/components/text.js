@@ -1,10 +1,10 @@
 import React from 'react';
 
-const Text = ({text}) => {
+const Text = ({text,loading}) => {
     return (
 
             <div className='chat-text-container'>
-                <span>{text}</span>
+                <span className={loading && 'animated-background'}>{text}</span>
 
             </div>
 
