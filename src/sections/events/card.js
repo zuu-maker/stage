@@ -1,10 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import basketball from '../../images/basketball.png'
-import dummy from '../../images/dummy.png'
-import mail from "../../images/mail.svg";
 import {Link, useHistory} from 'react-router-dom'
-import {getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
-import {useLoader} from "../../contexts/loaderContext";
+import football from '../../images/Football.png'
+import tennis from '../../images/tennis.png'
+import {useList, useObject} from 'react-firebase-hooks/database';
+import {realDB} from "../../firebase/firebase";
 
 const difficulty ={
     easy : '#18FF00',
@@ -18,35 +18,11 @@ const difficulty ={
 function Card({ event }) {
     const history = useHistory()
     const idRef = useRef()
-    const eventLevel = event?.EventDifficulty
-    const {setLoader} = useLoader()
-    const [participants,setParticipants] = useState([]);
-    const [loading,setLoading] = useState(false);
-    let participantsList =[]
-    
-    console.log(event);
+    const [participantSnap,loading, error] = useList(realDB.ref('Participants').orderByChild('EventId').equalTo(event.id && event.id))
 
-//     useEffect(() =>{
-//         setLoading(true)
-//         //Get participants object
-//         //Display participants Image on the event card
-// try {
-//     getRealtimeChild('Participants','EventId',event.id).get()
-//         .then(snapshot =>{
-//             snapshot.forEach( (doc) =>
-//             { participantsList.push(doc.val())})
-//             setParticipants(participantsList)
-//
-//             console.log(participants)
-//         })
-//         .catch(e => console.log(e.message))
-//
-// }
-// catch (e) {
-//     console.log(e)
-// }
-//         setLoading(false)
-//     },[])
+
+
+
     function handleClick(){
         // setLoader(true)
         // getRealtimeDoc('Events',idRef.current.id)
@@ -60,7 +36,7 @@ function Card({ event }) {
         <card onClick={handleClick} ref={idRef} id={event?.id} className='card pointer overflow-hidden border-0 grid-item event-card'>
 
                 <div className='cover-img-wrapper'>
-                    <img src={basketball} alt=""/>
+                    <img src={event?.Eventsport === 'Basketball' ? basketball :event?.Eventsport === 'Football' ? football: event?.Eventsport === 'Tennis' ? tennis: football} alt=""/>
                 </div>
             <card className='card-body
             '>
@@ -76,11 +52,14 @@ function Card({ event }) {
                     <div className='thumbnail-list d-flex flex-row'>
                         <>
                             {
-                               !loading && participants.userProfileImageUrl &&   participants?.map((image) =>{return(
+                               !loading  && participantSnap &&  participantSnap.slice(0, 4).map((image) =>{ return(
+
 
 
                                     <>
-                                        <li className='thumbnail-wrapper'><img src={image.userProfileImageUrl} alt=""/></li>
+
+                                           {  image.val().userProfileImageUrl !== undefined && image.val().userProfileImageUrl !== null && <li className='thumbnail-wrapper'><img style={{height:'100%',width: 'auto',maxWidth:'auto'}} src={image.val().userProfileImageUrl} alt=""/>
+                                        </li>}
 
                                     </>)
                                 })

@@ -17,5 +17,4 @@ export const StateProvider = ({reducer, initialState, children}) => (
 
 //wrap app in state provider
 
-//dont 4get this part nigga
 export const useStateValue = ()=> useContext(StateContext)

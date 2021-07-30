@@ -72,7 +72,7 @@ function Deposit(props) {
                         }
                         <button disabled={loading} onClick={() => {
                             setClickedDeposit(true)
-                        }} style={{backgroundImage: `url(${deposit})`}} className={`btn icon-btn btn-clear`}>
+                        }} style={{backgroundImage: `url(${deposit})`}} className={`btn w-50 icon-btn btn-clear`}>
                             {!loading ? 'Deposit' : 'Depositing...'}
 
                         </button>

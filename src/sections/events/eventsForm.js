@@ -40,14 +40,14 @@ function ValueLabelComponent(props) {
 }
 
 export default function EventsForm() {
-    const [currentUser] = useAuthState(auth)
+    const [user] = useAuthState(auth)
     const[{userData}] = useStateValue()
     const history =useHistory()
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
     const [loading, setLoading] = useState(false)
     const {setLoader, loader} = useLoader()
-    // const { currentUser,user} = useAuth()
+    // const { user,user} = useAuth()
     const [formOptions, setFormOptions] = useState([])
     const [maxParticipants, setMaxParticipants] = useState([])
     const [eventTotalPrizes, setEventTotalPrizes] = useState(0)
@@ -91,90 +91,65 @@ export default function EventsForm() {
 //On Change event
     function adjustSlider(e){
         // Get the sliders Id
+        document.getElementById(`${e.target.id}-value`).innerText=e.target.value + '%';
+
         getslider = e.target.id;
-        setSlider(e.target.ariaValueNow)
-        console.log(slider)
+        console.log(getslider)
+        // setSlider(e.target.ariaValueNow)
+        // console.log(slider)
 
         //Gather all slider values
-        tota = parseInt(document.getElementById('range1').ariaValueNow);
-        totb = parseInt(document.getElementById('range2').ariaValueNow);
-        totc = parseInt(document.getElementById('range3').ariaValueNow);
-        totd = parseInt(document.getElementById('range4').ariaValueNow);
+        tota = parseInt(document.getElementById('range-1').value);
+        totb =  parseInt(document.getElementById('range-2').value);
+        totc =  parseInt(document.getElementById('range-3').value);
+        totd =  parseInt(document.getElementById('range-4').value);
 
         alltot = tota + totb + totc +totd;
-        // console.log(tota)
-        // console.log(alltot)
+
         //check sliders total if greater than 100 and re-update slider
         if (alltot > chktot) {
-            if (getslider == "range1") {
+            if (getslider == "range-1") {
                 altval = chktot - totb - totc-totd;
-                setSlider({'s1':altval,'s2':0,'s3':0,'s4':0});
+                document.getElementById('range-1').value = altval
+                document.getElementById(`range-1-value`).innerText=altval+ '%';
+                // setSlider(altval);
+                console.log(altval)
 
             }
-            if (getslider == "range2") {
+            if (getslider == "range-2") {
                 altval = chktot - tota - totc-totd;
-                setSlider({'s1':0,'s2':altval,'s3':0,'s4':0});
+                document.getElementById('range-2').value = altval
+                document.getElementById(`range-2-value`).innerText=altval+ '%';
+
+
             }
-            if (getslider == "range3") {
+            if (getslider == "range-3") {
                 altval = chktot - tota - totb-totd;
-                setSlider({'s1':0,'s2':0,'s3':altval,'s4':0});
+                // setSlider(altval);
+                document.getElementById('range-3').value = altval
+                document.getElementById(`range-3-value`).innerText=altval+ '%';
+
             }
-            if (getslider == "range4") {
+            if (getslider == "range-4") {
                 altval = chktot - tota - totb-totc;
-                setSlider({'s1':0,'s2':0,'s3':0,'s4':altval});
+                document.getElementById('range-4').value = altval
+                document.getElementById(`range-4-value`).innerText=altval+ '%';
+
+
+                // setSlider(altval);
             }
         }
-
+        console.log(alltot)
     }
 
-    const useStyles = makeStyles((theme) => ({
-        root: {
-            width: 300 + theme.spacing(3) * 2,
-        },
-        margin: {
-            height: theme.spacing(3),
-        },
-    }));
-
-
-    ValueLabelComponent.propTypes = {
-        children: PropTypes.element.isRequired,
-        open: PropTypes.bool.isRequired,
-        value: PropTypes.number.isRequired,
-    };
 
 
 
 
-    const PrettoSlider = withStyles({
-        root: {
-            color: '#52af77',
-            height: 8,
-        },
-        thumb: {
-            height: 24,
-            width: 24,
-            backgroundColor: '#fff',
-            border: '2px solid currentColor',
-            marginTop: -8,
-            marginLeft: -12,
-            '&:focus, &:hover, &$active': {
-                boxShadow: 'inherit',
-            },
-        },
-        active: {},
-        valueLabel: {
-            left: 'calc(-50% + 4px)',
-        },
-        track: {
-            height: 8,
-            borderRadius: 4,
-        },
-        rail: {
-            height: 8,
-            borderRadius: 4,
-        },
-    })(Slider);
+
+
+
+
 
 
 
@@ -222,18 +197,17 @@ export default function EventsForm() {
             EventEntryFee: e.target.EventEntryFee.value,
             EventTotalPrizes: e.target.EventTotalPrizes.value,
             EventTimestamp: Date.now(),
-            EventCommissioner: currentUser.displayName,
-            EventCommissionerId : currentUser.uid,
-            EventCommissionerProfile: currentUser.photoURL,
-            EventFirstPlacePercent: '',
-            EventSecondPlacePercent:'',
-            EventThirdPlacePercent:'',
-            EventFourthPlacePercent:'',
+            EventCommissioner: user.displayName,
+            EventCommissionerId : user.uid,
+            EventCommissionerProfile: user.photoURL,
+            EventFirstPlacePercent: parseFloat(e.target.range_1.value).toFixed(1),
+            EventSecondPlacePercent:parseFloat(e.target.range_2.value).toFixed(1),
+            EventThirdPlacePercent:parseFloat(e.target.range_3.value).toFixed(1),
+            EventFourthPlacePercent:parseFloat(e.target.range_4.value).toFixed(1),
             EventSecondCommissioner:'Fantasy Sports',
             EventSecondCommissionerId:'',
             EventSecondCommissionerProfile:'',
-            EventPrizeTier: document.getElementsByClassName('PrivateSwitchBase-input-4').checkedB.checked
-
+            EventPrizeTier: document.querySelector("[name='checkedB']").checked
         }
         try {
             if (parseInt(userData.balance) >= parseInt(formData.EventEntryFee)) {
@@ -243,10 +217,10 @@ export default function EventsForm() {
 
                     //Remaining balance deducted from the user balance  after Joining event
                     const remainingBalance =  parseInt(userData.balance) - parseInt(formData.EventEntryFee)
-                    updateFirestoreDocument('Users',currentUser.uid,{balance:remainingBalance})
+                    updateFirestoreDocument('Users',user.uid,{balance:remainingBalance})
                         .then(() =>{
                             //Update userBalance in  firebase
-                                updateFirebaseDocument('Users',currentUser.uid,{userBalance:remainingBalance})
+                                updateFirebaseDocument('Users',user.uid,{userBalance:remainingBalance})
                                     .catch(e => console.log(e))
 
                             //Create event
@@ -433,23 +407,18 @@ export default function EventsForm() {
                             inputProps={{ 'aria-label': 'primary checkbox' }}
                         />
                     </div>
-                    {/*<PrettoSlider id='range1' onChange={adjustSlider} valueLabelDisplay="auto" aria-label="pretto slider" defaultValue={20} aria-valuenow={slider} />*/}
-                    {/*<PrettoSlider id='range2' onChange={adjustSlider} valueLabelDisplay="auto" aria-label="pretto slider" defaultValue={20} aria-valuenow={slider} />*/}
-                    {/*<PrettoSlider id='range3' onChange={adjustSlider} valueLabelDisplay="auto" aria-label="pretto slider" defaultValue={20} aria-valuenow={slider} />*/}
-                    {/*<PrettoSlider id='range4' onChange={adjustSlider} valueLabelDisplay="auto" aria-label="pretto slider" defaultValue={20} aria-valuenow={slider} />*/}
-                    {/*<Slider onChange={adjustSlider} id='range1' aria-valuenow={slider.s1} ValueLabelComponent={ValueLabelComponent} aria-label="custom thumb label" aria-labelledby='range1' defaultValue={0}/>*/}
-                    {/*<Slider onChange={adjustSlider} id='range2' aria-valuenow={slider.s2} ValueLabelComponent={ValueLabelComponent} aria-label="custom thumb label" aria-labelledby='range1' defaultValue={0}/>*/}
-                    {/*<Slider onChange={adjustSlider} id='range3' aria-valuenow={slider.s3} ValueLabelComponent={ValueLabelComponent} aria-label="custom thumb label" aria-labelledby='range1' defaultValue={0}/>*/}
-                    {/*<Slider onChange={adjustSlider} id='range4' aria-valuenow={slider.s4} ValueLabelComponent={ValueLabelComponent} aria-label="custom thumb label" aria-labelledby='range1' defaultValue={0}/>*/}
+                    <div className="range mx-auto">
+                        <div  className={`d-flex  text-light flex-column align-items-center`} ><div className={`flex w-100`} ><span className={` float-left`} >First Place</span> <span className={` float-right`} id={`range-1-value`}>0%</span> </div><input required type="range" name={'range_1'} defaultValue={0} onChange={adjustSlider} className={`scroll`} min={0} max={100} id={`range-1`}/></div>
+                        <div className={`d-flex  text-light flex-column align-items-center`} ><div className={`flex w-100` } ><span className={` float-left`}>Second Place</span><span className={` float-right`} id={`range-2-value`}>0%</span> </div><input type="range" name={'range_2'} defaultValue={0} onChange={adjustSlider} className={`scroll`} min={0} max={100} id={`range-2`}/></div>
+                        <div className={`d-flex  text-light flex-column  align-items-center`} ><div className={`flex w-100`} ><span className={` float-left`}>Third Place</span> <span className={` float-right`} id={`range-3-value`}>0%</span></div><input type="range" name={'range_3'} defaultValue={0} onChange={adjustSlider} className={`scroll`} min={0} max={100} id={`range-3`}/></div>
+                        <div className={`d-flex  text-light flex-column align-items-center`} ><div className={`flex w-100` } ><span className={` float-left`}>Fourth Place</span><span className={` float-right`} id={`range-4-value`}>0%</span> </div><input type="range" name={'range_4'} defaultValue={0} onChange={adjustSlider} className={`scroll`} min={0} max={100} id={`range-4`}/></div>
+                    </div>
 
-                </div>
+ </div>
                 <button disabled={loader} style={{background: loader ? '#ffffff' : ''}} type="submit"><span
                     className='form-btn'>Create Event</span></button>
 
-            {/*<input id="range1" className="slider" type="range" min="0" max="100" value='' />*/}
-            {/*<input id="range2" className="slider" type="range" min="0" max="100" value='0' />*/}
-            {/*<input id="range3" className="slider" type="range" min="0" max="100" value='0' />*/}
-            </form>
+ </form>
         </>
     );
 

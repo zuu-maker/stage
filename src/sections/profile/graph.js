@@ -19,7 +19,7 @@ function Graph({props})  {
         <div className="graph p-4">
             <div className={`d-flex text-light`}>
                 <h4>Winning ratio</h4>{
-                params.id === user?.uid &&   <span className={`ml-auto`}>$ {userData.balance}</span>
+                params.id === user?.uid &&   <span className={`ml-auto`}>$ {userData && userData.balance}</span>
 
             }
 

@@ -16,6 +16,7 @@ function ChatContent({sender, message, chats}) {
     const [senderSnap] = useCollection(db.collection("Users").where("email","==",sender));
 
     const senderData = senderSnap?.docs?.[0]?.data()
+    console.log(senderData)
     
    
 
@@ -25,14 +26,14 @@ function ChatContent({sender, message, chats}) {
     // ${currentUser && currentUser.uid === chats.senderObjId ? 'user-text': 'guest-text'
     return (
         <>
-            <div className={`d-flex mb-3 text-container `} >
-                <div className='user-list-thumb-wrapper mr-4 align-self-end'>
+            <div className={`d-flex mb-3 text-container ${currentUser && currentUser.uid === senderData?.userId ? 'user-text': 'guest-text'}`} >
+                <div className='user-list-thumb-wrapper align-self-end'>
                     <img src={senderData?.userProfileImageUrl} alt=""/>
                 </div>
                 <Text text={message.message}/>
             </div>
             {/*<small>{timeConverter(chats.dateTime.seconds,'H-M')}</small>*/}
-            <small className={`text-light `}>{senderData?.userName}</small>
+            {/*<small className={`text-light `}>{senderData?.userName}</small>*/}
 
         </>
 

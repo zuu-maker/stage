@@ -23,25 +23,25 @@ import {useCollection} from "react-firebase-hooks/firestore"
 import { useStateValue } from '../contexts/StateProvider';
 
 function MessageCard({uid,id, data, chats}) {
-   
+
     const [,dispatch] = useStateValue()
     const history = useHistory()
     const [currentUser] = useAuthState(auth)
     const receiverEmail = getReceiverUid(data?.members,currentUser)
-    console.log(receiverEmail);
+    // console.log(receiverEmail);
     const [receiverSnap] = useCollection(db.collection("Users").where("userId","==",receiverEmail));
 
-    console.log(data);
+    // console.log(data);
     const receiver = receiverSnap?.docs?.[0]?.data()
-    console.log(receiver);
+    // console.log(receiver);
     // console.log(receiver);
     // console.log(currentUser);
-   
+
     const enterChat = () => {
         // console.log(id);
         history.push(`/messages/${id}`)
     }
-    
+
     const [selectedChat ,setSelectedChat] =useState(false);
     const [loading ,setLoading] =useState(false);
     const [messageNotification ,setMessageNotification] =useState(false);
@@ -71,7 +71,7 @@ function MessageCard({uid,id, data, chats}) {
     // const [recentSnap] = useCollection(db.collection("Recent").where("chatRoomId","==",data.chatRoomId));
     // const recent = recentSnap?.docs?.[0]?.data()
     // console.log(receiverSnap);
-    
+
     // useEffect(()=>{
     //     setLoading(true)
     //     //Get unread messages
@@ -94,51 +94,51 @@ function MessageCard({uid,id, data, chats}) {
     //                 }
     //             })
     //         })
-        //         snapshot => {
-        //     // messageList = []
-                // readMessagesList =   snapshot.docs?.map( doc =>doc.data())
-        //     // var filteredMessages = messageList?.filter( (message) =>{
-        //     //     if(message.chatRoomId === params.id)
-        //     //         return message
-        //     //
-        //     // } )
-        //     // readMessagesList=[]
-        //     // var readMessages =
-        //     //
-        //     //     messageList.map((person) =>{
-        //     //         person.deliveredToParticipants?.filter( (id) =>{
-        //     //             if(id === currentUser.uid)
-        //     //                 readMessagesList.push(person)
-        //     //             console.log(id === currentUser.uid)
-        //     //             return readMessages
-        //     //
-        //     //         } )
-        //     //     })
-        //     // console.log(readMessages)
-        //     // console.log(readMessagesList)
-        //     // console.log(readMessagesList.length)
-        //     //
-        //     // console.log(filteredMessages)
-        //     // setChat(filteredMessages)
-        //         console.log(readMessages)
-        //
-                // setTotalNotificationCount(chats.counter-readMessages)
-        //
-        //
-        //
-        //
-        //
-        // })
+    //         snapshot => {
+    //     // messageList = []
+    // readMessagesList =   snapshot.docs?.map( doc =>doc.data())
+    //     // var filteredMessages = messageList?.filter( (message) =>{
+    //     //     if(message.chatRoomId === params.id)
+    //     //         return message
+    //     //
+    //     // } )
+    //     // readMessagesList=[]
+    //     // var readMessages =
+    //     //
+    //     //     messageList.map((person) =>{
+    //     //         person.deliveredToParticipants?.filter( (id) =>{
+    //     //             if(id === currentUser.uid)
+    //     //                 readMessagesList.push(person)
+    //     //             console.log(id === currentUser.uid)
+    //     //             return readMessages
+    //     //
+    //     //         } )
+    //     //     })
+    //     // console.log(readMessages)
+    //     // console.log(readMessagesList)
+    //     // console.log(readMessagesList.length)
+    //     //
+    //     // console.log(filteredMessages)
+    //     // setChat(filteredMessages)
+    //         console.log(readMessages)
+    //
+    // setTotalNotificationCount(chats.counter-readMessages)
+    //
+    //
+    //
+    //
+    //
+    // })
 
-        // {
-        //     currentUser.uid !== chats.fromUserId ? setMessageNotification(true)
-        //         :
-        //         setMessageNotification(false)
+    // {
+    //     currentUser.uid !== chats.fromUserId ? setMessageNotification(true)
+    //         :
+    //         setMessageNotification(false)
 
-        // }
-        // {
-        //     chats.counter - readMessages === 0 ? setMessageNotification(false): setMessageNotification(true)
-        // }
+    // }
+    // {
+    //     chats.counter - readMessages === 0 ? setMessageNotification(false): setMessageNotification(true)
+    // }
     //     setLoading(false)
     // },[])
 
@@ -234,29 +234,29 @@ function MessageCard({uid,id, data, chats}) {
 
     // }
     return (
-<>
+        <>
 
-    {/* <div onClick={enterChat} >
+            {/* <div onClick={enterChat} >
         <p>{data.isGroupChat ? data.groupChatName :receiver.userName}</p>
     </div> */}
-    
-    <div style={{background:selectedChat && '#13161AC3'}} onClick={enterChat} userId={receiver?.userId}
-         id={id}
-         className='d-flex pointer mb-2 user-list-sub-section'>
-    <div className='user-list-thumb-wrapper'>
-       <img ref={imageRef} src={ data.type === "group"? data?.profileimageUrl : receiver?.userProfileImageUrl }alt=""/>
-    </div>
-    <div className='ml-3 text-light w-100'>
-       <span>{data.type === "group" ? data?.groupChatName : receiver?.userName}</span>
-       {/* {data.type === "group" ? data?.groupChatName :receiver?.userName} */}
-       <div className="space-light">{data?.lastMessage}</div>
-    </div>
-    </div>
-     
 
-{/* ref={idRef} chatname={chat.fromUserName === currentUser.displayName ? chats.withUserName : chats.fromUserName } userId={receiver?.userId} */}
-{/* {!loading && chats.lastMessage} */}
-</>
+            <div style={{background:selectedChat && '#13161AC3'}} onClick={enterChat} userId={receiver?.userId}
+                 id={id}
+                 className='d-flex pointer mb-2 user-list-sub-section'>
+                <div className='user-list-thumb-wrapper'>
+                    <img ref={imageRef} src={ data.type === "group"? data?.profileimageUrl : receiver?.userProfileImageUrl }alt=""/>
+                </div>
+                <div className='ml-3 text-light w-100'>
+                    <span>{data.type === "group" ? data?.groupChatName : receiver?.userName}</span>
+                    {/* {data.type === "group" ? data?.groupChatName :receiver?.userName} */}
+                    <div className="space-light">{data?.lastMessage}</div>
+                </div>
+            </div>
+
+
+            {/* ref={idRef} chatname={chat.fromUserName === currentUser.displayName ? chats.withUserName : chats.fromUserName } userId={receiver?.userId} */}
+            {/* {!loading && chats.lastMessage} */}
+        </>
 
 
 
@@ -267,14 +267,10 @@ function MessageCard({uid,id, data, chats}) {
 export default MessageCard;
 {/* <p>{data.isGroupChat ? data?.groupChatName :receiver?.userName}</p> */}
 {/* <div className='user-list-thumb-wrapper'>
-
 </div>
 <div className='ml-3 text-light w-100'>
 <span className='space-medium'>{ chats.fromUserName === currentUser.displayName ? chats.withUserName : chats.fromUserName }</span>
-
-
 <span className=' float-right d-flex flex-column align-items-center justify-contents-center space-light'>
-
         <small>{timeConverter(parseInt(chats.date), 'D-M-Y')}</small>
         <>
             {
@@ -284,7 +280,6 @@ export default MessageCard;
         <span
             className={`mx-auto mt-auto mb-auto`}>{chats.counter && chats.counter - readMessages.length}</span>
     </span>
-
             }
         </>
     </span>

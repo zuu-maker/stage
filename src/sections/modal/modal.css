@@ -41,6 +41,26 @@ body.modal-open{
 }
 
 @media (max-width:991px) {
+    .event-popup .modal-content {
+        position: absolute;
+        top: initial;
+        bottom: initial;
+        border-radius: 30px;
+
+        height: fit-content;
+
+    }
+
+.event-popup .modal-content{
+    width: 90%;
+    margin: 0 auto;
+}
+    .event-popup .modal{
+        width: 90%;
+        margin: 0 auto;
+        height: fit-content;
+
+    }
     .modal-header, .modal-footer {
         display: flex;
         align-items: center;

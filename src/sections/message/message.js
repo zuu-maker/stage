@@ -27,17 +27,16 @@ function Message() {
 
     // const userChatRef = db.collection("Recent").where('members',"array-contains",currentUser?.uid)
 
-    const chatRef = db.collection("Recent").where('members',"array-contains","YbDgZU6l83YmhwsBY9iIwEOqB4f2").orderBy('date','asc')
-  
+    const chatRef = db.collection("Recent").where('members',"array-contains",currentUser?.uid).orderBy('date','asc')
      const [{user}] = useStateValue()
     // const {currentUser} = useAuth();
-    const [loading,setLoading] = useState(false);
-    const {chatRoom,show,setShow,chatList, setChatList} = useChat();
+    const {chatRoom,show,notificationPopup,setNotificationPopup,setShow,chatList, setChatList} = useChat();
     const recentChats = [];
     const modifiedList =[]
     // setChatList([])
     const [chats,setChats] = useState([])
-    // console.log(chatsSnap?.docs);
+    // console.log(chatSnap?.docs);
+    const [chatSnap,loading,error] = useCollection(db.collection("Recent").where("members", "array-contains", currentUser.uid).orderBy('date','desc'))
 
     const {setLoader,loader} = useLoader();
     let params = useParams();
@@ -48,8 +47,8 @@ function Message() {
 
         userName: user?.displayName
     };
-    const [chatsSnap] = useCollection(chatRef)
-    console.log(chatsSnap);
+
+
 
     
     useEffect(async () => {
@@ -57,149 +56,31 @@ function Message() {
             :
             setShow(false)
         }
+
+    if(chatSnap){
+        const unsubscribe = chatSnap.docChanges().forEach((change) => {
+                           if (change.type === "added") {
+                               console.log("New : ", change.doc.data());
+
+                           }
+                           if (change.type === "modified") {
+                               console.log("Modified : ", change.doc.data());
+                               setNotificationPopup(change.doc.data())
+
+                           }
+                           if (change.type === "removed") {
+                               console.log("Removed : ", change.doc.data());
+                           }
+                       })
+               // }
         // {messageId ? setOpenedChat(true): setOpenedChat(false)}
-        setLoading(true)
+        return () => {
+            // Unmouting
+            unsubscribe();
+        };
+    }
+    }, [chatSnap])
 
-         await db.collection("Recent").where("members", "array-contains", currentUser.uid).orderBy('date','desc')
-            .onSnapshot(
-                (snapshot) => {
-
-                    setChats(snapshot.docs.map(doc =>doc.data() ))
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === "added") {
-                            console.log("New : ", change.doc.data());
-
-                        }
-                        if (change.type === "modified") {
-                            console.log("Modified : ", change.doc.data());
-                            modifiedList.push(change.doc.data())
-                            console.log(modifiedList)
-                        }
-                        if (change.type === "removed") {
-                            console.log("Removed : ", change.doc.data());
-                        }
-                    })
-                })
-
-                // snapshot => {
-                // setChatList([])
-                // setChatList(snapshot.docs.map(doc =>doc.data() ))
-                // console.log(chatList)
-
-                // snapshot.docChanges().forEach(change => {
-                //     if (change.type === "added") {
-                //
-                //
-                //         console.log(change.doc.data())
-                //     }
-                //     if (change.type === "modified") {
-                //         recentChats.push(change.doc.data())
-                //         console.log(change.doc.data())
-                //     }
-                //     if (change.type === "removed") {
-                //         recentChats.push(change.doc.data())
-                //     }
-                // } )
-            // })
-
-
-
-
-        // db.collection('ChatRooms').orderBy('dateLastUpdated','desc').onSnapshot(snapshot => {
-        //
-        //
-        //     setChatList(snapshot.docs.map(doc =>doc.data()))
-        //
-        //
-        // })
-
-
-        // setChatList(await getRealtimeCollection('ChatRooms'))
-        // setChatList(x)
-        setLoading(false)
-
-    }, [])
-
-    useEffect(async () => {
-        { params.id ? setShow(true)
-            :
-            setShow(false)
-        }
-        // {messageId ? setOpenedChat(true): setOpenedChat(false)}
-        setLoading(true)
-
-        //  db.collection("Recent").where("members", "array-contains", user?.uid).orderBy('date','desc')
-        //     .onSnapshot(
-        //         (snapshot) => {
-        //             setChatList([])
-
-        //             setChatList(snapshot.docs.map(doc =>doc.data() ))
-        //             snapshot.docChanges().forEach((change) => {
-        //                 if (change.type === "added") {
-        //                     console.log("New : ", change.doc.data());
-
-        //                 }
-        //                 if (change.type === "modified") {
-        //                     console.log("Modified : ", change.doc.data());
-        //                     modifiedList.push(change.doc.data())
-        //                     console.log(modifiedList)
-        //                 }
-        //                 if (change.type === "removed") {
-        //                     console.log("Removed : ", change.doc.data());
-        //                 }
-        //             })
-        //         })
-
-                // snapshot => {
-                // setChatList([])
-                // setChatList(snapshot.docs.map(doc =>doc.data() ))
-                // console.log(chatList)
-
-                // snapshot.docChanges().forEach(change => {
-                //     if (change.type === "added") {
-                //
-                //
-                //         console.log(change.doc.data())
-                //     }
-                //     if (change.type === "modified") {
-                //         recentChats.push(change.doc.data())
-                //         console.log(change.doc.data())
-                //     }
-                //     if (change.type === "removed") {
-                //         recentChats.push(change.doc.data())
-                //     }
-                // } )
-            // })
-
-
-
-
-        // db.collection('ChatRooms').orderBy('dateLastUpdated','desc').onSnapshot(snapshot => {
-        //
-        //
-        //     setChatList(snapshot.docs.map(doc =>doc.data()))
-        //
-        //
-        // })
-
-
-        // setChatList(await getRealtimeCollection('ChatRooms'))
-        // setChatList(x)
-        setLoading(false)
-
-    }, [])
-    // const routes =[]
-    //  chatList.forEach((chat)=>{
-    //
-    //      routes.push([{
-    //          path: `/messages/${chat.chatRoomId}`,
-    //          exact: true,
-    //          dashboard: () => <></>,
-    //
-    //          main: () =><MessageWindow />
-    //      }])
-    //
-    // })
 
     return (
 <>
@@ -222,12 +103,12 @@ function Message() {
 
                         </div>
                         <div className='user-list'>
-                            { chats ? chats?.map(chat => {
+                            { !loading && chatSnap ? chatSnap.docs.map(chat => {
                                 // console.log(chat.data());
-                                 console.warn(chat.members) 
+                                 console.warn(chat.data().members)
                                 return (<>
 
-                                       {(chat.chatRoomID && chat.members) && <MessageCard uid={currentUser.uid} key={chat.chatRoomID} id={chat.chatRoomID} data={chat}/> } 
+                                       {(chat.data().chatRoomID && chat.data().members) && <MessageCard uid={currentUser.uid} key={chat.data().chatRoomID} id={chat.data().chatRoomID} data={chat.data()}/> }
 
 
                                     </>
@@ -312,7 +193,7 @@ function Message() {
             </div>
         </div>
     </div>}
-            <MobileNavbar/>
+    {!show && <MobileNavbar/>}
 </>
 
     );

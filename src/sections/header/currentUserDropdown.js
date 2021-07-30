@@ -23,16 +23,16 @@ function CurrentUserDropdown() {
     async function handleLogOut(e) {
         e.preventDefault()
         try {
-            alert("hey")
             // setError('')
             // setLoading(true)
-            auth.signOut()
-            // history.push('/')
+            await auth.signOut()
             dispatch({
                 type:"SET_USER",
                 user:{}
             })
-           
+            history.push('/')
+
+
         } catch (err) {
             setError(err.message)
             setLoading(false)

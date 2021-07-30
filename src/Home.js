@@ -9,7 +9,7 @@ import Footer from './sections/footer/footer';
 import {useAuth} from "./contexts/authContext";
 import {useLocation} from "react-router-dom";
 import { useStateValue } from './contexts/StateProvider';
-
+import './css/style.css'
 
 
 function Home() {

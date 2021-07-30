@@ -216,7 +216,7 @@ function Withdraw(props) {
                         {/*}*/}
                         <button disabled={loading} onClick={handleWithdrawal}
                                 style={{backgroundImage: `url(${withdraw})`}}
-                                className={`btn  text-danger border-danger icon-btn btn-clear`}>
+                                className={`btn w-50  text-danger border-danger icon-btn btn-clear`}>
                             {!loading ? 'Withdraw' : 'Withdrawing...'}
                         </button>
 

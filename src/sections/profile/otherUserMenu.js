@@ -31,13 +31,13 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
     // new lines
     const [currentUser] =  useAuthState(auth)
     const[{user,otherUser,hasFollowed},dispatch] = useStateValue()
-    const userChatRef = db.collection("chats").where('users',"array-contains",currentUser?.email)
+    const userChatRef = db.collection("chats").where('users',"array-contains",currentUser && currentUser?.email)
     const [chatsSnap] = useCollection(userChatRef)
 
 
     const {setChatRoom} =useChat();
-    
-    
+
+
     // const {hasFollowed,setHasFollowed,otherUser,setOtherUser} =useUser();
     const [followers,setFollowers] = useState();
     const [loading,setLoading] = useState();
@@ -60,26 +60,26 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
         setLoader(true)
 
         otherUserObj.FollowersIds?.find((follower) => {
-                // console.log('reached')
+            // console.log('reached')
 
-                if (user && user.uid === follower) {
-                    dispatch({
-                        type:"SET_HAS_FOLLWED",
-                        hasFollowed:true
-                    })
-                    // setHasFollowed(true)
+            if (user && user.uid === follower) {
+                dispatch({
+                    type:"SET_HAS_FOLLWED",
+                    hasFollowed:true
+                })
+                // setHasFollowed(true)
 
-                    return true;
-                } else {
-                    dispatch({
-                        type:"SET_HAS_FOLLWED",
-                        hasFollowed:false
-                    })
-                    // setHasFollowed(false)
-                    return false;
+                return true;
+            } else {
+                dispatch({
+                    type:"SET_HAS_FOLLWED",
+                    hasFollowed:false
+                })
+                // setHasFollowed(false)
+                return false;
 
-                }
-            })
+            }
+        })
 
 
 
@@ -92,32 +92,32 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
         // console.log(otherUserObj)
         // console.log(otherUser)
         {  otherUserObj.userId &&      //Get an array of participants that match the other user Id
-            getRealtimeChild('Participants', 'userId',   otherUserObj.userId).get()
-                .then((snapshot) => {
-                    snapshot.forEach((doc) => {
-                        userJoinedEventsList.push(doc.val())
-                    })
+        getRealtimeChild('Participants', 'userId',   otherUserObj.userId).get()
+            .then((snapshot) => {
+                snapshot.forEach((doc) => {
+                    userJoinedEventsList.push(doc.val())
+                })
 
-                    //Get an array of Events in the participants array
-                    userJoinedEventsList?.map((eventJoined) => {
-                        getRealtimeDoc('Events', eventJoined.EventId)
-                            .then((snapshot) => {
-                                joinedEventsList.push(snapshot.val())
-                                setJoinedEvents(joinedEventsList)
+                //Get an array of Events in the participants array
+                userJoinedEventsList?.map((eventJoined) => {
+                    getRealtimeDoc('Events', eventJoined.EventId)
+                        .then((snapshot) => {
+                            joinedEventsList.push(Object.assign(snapshot.val(),{id:snapshot.key}))
+                            setJoinedEvents(joinedEventsList)
 
-                            })
+                        })
 
 
-                            .catch(e => {
-                                console.log(e)
-                            })
-
-                    })
+                        .catch(e => {
+                            console.log(e)
+                        })
 
                 })
-                .catch(e => {
-                    console.log(e.message)
-                })
+
+            })
+            .catch(e => {
+                console.log(e.message)
+            })
             //Filter out events created by the current user
             // joinedEventsList.filter((eachEvent) => {
             //     if (eachEvent.EventCommissionerId != user.uid)
@@ -130,7 +130,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
     },[])
 
     const chatExists = (receiverEmail) => {
-       return !!chatsSnap?.docs.find(chat => chat.data().users.find(user => user === receiverEmail)?.length > 0)
+        return !!chatsSnap?.docs.find(chat => chat.data().users.find(user => user === receiverEmail)?.length > 0)
     }
 
     //Send a message
@@ -140,37 +140,52 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
         // console.log(otherUser);
         // console.log(!chatExists(otherUser.email));
         //adding chats to db
+        console.log(currentUser)
+        console.log(otherUser)
         if(currentUser.email && otherUser.email )
         {
-            alert("hey")
+
             db.collection("chats").add({
                 dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
                 isGroupChat: false,
-                users: [currentUser.email,otherUser.email],
-                participants: [currentUser.uid,otherUser.userId]
-              })
-              .then(docRef => {
-               setLoader(false)
-               docRef.update({chatRoomId: docRef.id})
-               // Redirect to the newly created chatRoom  endpoint
-               history.push(`/messages/${docRef.id}`)
+                // users: [currentUser.email,otherUser.email],
+                participants: [
+                    {
+                        objectId:currentUser.uid,
+                        email: currentUser.email,
+                        userName:currentUser.displayName ,
+                        userProfileImage:currentUser.photoURL
+                    },
+                    {
+                        objectId: otherUser.userId,
+                        email: otherUser.email,
+                        userName:otherUser.userName,
+                        userProfileImage:otherUser.userProfileImageUrl
+                    }
+                ]
+            })
+                .then(docRef => {
+                    setLoader(false)
+                    docRef.update({chatRoomId: docRef.id})
+                    // Redirect to the newly created chatRoom  endpoint
+                    history.push(`/messages/${docRef.id}`)
 
-              })
-              .catch(function (error) {
-               
-               console.error("Error adding document: ", error);
-               });
+                })
+                .catch(function (error) {
+
+                    console.error("Error adding document: ", error);
+                });
         }else if(chatExists(otherUser.email)){
             setLoader(false)
             history.push(`/messages`)
         }
-        
-            
-            
-         
-    
-           
-           // Chatroom Data
+
+
+
+
+
+
+        // Chatroom Data
         var data = {
             dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
             groupChatName: '',
@@ -184,16 +199,16 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
         //Create a chatroom once user clicks on message
         // await db.collection('ChatRooms').add(data).then(function (docRef) {
 
-            // setChatRoom(Object.assign(data,{chatRoomId: docRef.id}))
+        // setChatRoom(Object.assign(data,{chatRoomId: docRef.id}))
 
-            // Update Id field in the chatroom document using the document reference id
-            // docRef.update({chatRoomId: docRef.id})
+        // Update Id field in the chatroom document using the document reference id
+        // docRef.update({chatRoomId: docRef.id})
 
-            // Hide Loader
-            // setLoader(false)
+        // Hide Loader
+        // setLoader(false)
 
-            // Redirect to the newly created chatRoom  endpoint
-            // history.push(`/messages/${docRef.id}`)
+        // Redirect to the newly created chatRoom  endpoint
+        // history.push(`/messages/${docRef.id}`)
 
         // })
         //     .catch(function (error) {
@@ -209,41 +224,41 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
         try{
 
             await updateFirestoreDocument('Users',user.uid,{followedUsersIds:firebase.firestore.FieldValue.arrayUnion(otherUser.objectId)})
-               .then( () => {
-                dispatch({
-                    type:"SET_HAS_FOLLWED",
-                    hasFollowed:true
-                })   
-                // setHasFollowed(true)
-                   // otherUser.FollowersIds.length += 1;
+                .then( () => {
+                    dispatch({
+                        type:"SET_HAS_FOLLWED",
+                        hasFollowed:true
+                    })
+                    // setHasFollowed(true)
+                    // otherUser.FollowersIds.length += 1;
 
-                   updateFirestoreDocument('Users', otherUser.objectId, {FollowersIds: firebase.firestore.FieldValue.arrayUnion(user.uid)})
-                       .then(() =>{
-                           setLoading(false)
+                    updateFirestoreDocument('Users', otherUser.objectId, {FollowersIds: firebase.firestore.FieldValue.arrayUnion(user.uid)})
+                        .then(() =>{
+                            setLoading(false)
 
-                       })
-                       .catch(error => {
-                           console.log(error);
-                           dispatch({
-                            type:"SET_HAS_FOLLWED",
-                            hasFollowed:false
                         })
-                        //    setHasFollowed(false)
-                           setLoading(false)
+                        .catch(error => {
+                            console.log(error);
+                            dispatch({
+                                type:"SET_HAS_FOLLWED",
+                                hasFollowed:false
+                            })
+                            //    setHasFollowed(false)
+                            setLoading(false)
 
-                       })
-               })
-
-               .catch(e =>{
-                   console.log(e)
-                   dispatch({
-                    type:"SET_HAS_FOLLWED",
-                    hasFollowed:false
+                        })
                 })
-                //    setHasFollowed(false)
-                   setLoading(false)
 
-               })
+                .catch(e =>{
+                    console.log(e)
+                    dispatch({
+                        type:"SET_HAS_FOLLWED",
+                        hasFollowed:false
+                    })
+                    //    setHasFollowed(false)
+                    setLoading(false)
+
+                })
 
         }catch (e) {
             console.log(e)
@@ -281,7 +296,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
                                     hasFollowed:false,
                                 })
                                 // setHasFollowed(false)
-                            setLoading(false)
+                                setLoading(false)
                             }
 
                         )
@@ -300,7 +315,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
             console.log(e)
             setLoading(false)
         }
-setLoading(false)
+        setLoading(false)
     }
 
     return (
@@ -310,7 +325,7 @@ setLoading(false)
             {  otherUser.userId && <div className='d-flex user-menu-container'>
                 <div className='d-flex flex-column text-center card-body user-side-bar'>
                     <div className='text-left w-100 '>
-                    <BackButton />
+                        <BackButton />
                     </div>
                     <div className='text-center  user-info-container'>
 
@@ -381,7 +396,7 @@ setLoading(false)
                         </div>
 
                         <div className={`sm-view`}>
-<Graph/>
+                            <Graph/>
                         </div>
 
                     </div>
@@ -402,27 +417,27 @@ setLoading(false)
                                     style={{backgroundImage: `url(${message})`}}>Message
                             </button>
 
-                                <>
-                                    {
-                                        !loading && hasFollowed
-                                            ?
-                                            <button disabled={loader} onClick={handleUnfollow}
-                                                    className='btn flex-grow-1 m-2'
-                                                    style={{backgroundImage: `url(${follow})`}}>Unfollow</button>
+                            <>
+                                {
+                                    !loading && hasFollowed
+                                        ?
+                                        <button disabled={loader} onClick={handleUnfollow}
+                                                className='btn flex-grow-1 m-2'
+                                                style={{backgroundImage: `url(${follow})`}}>Unfollow</button>
 
-                                            :!loading && !hasFollowed ?
-                                            <button disabled={loader} onClick={handleFollow}
-                                                    className='btn flex-grow-1 m-2'
-                                                    style={{backgroundImage: `url(${follow})`}}>Follow</button>
+                                        :!loading && !hasFollowed ?
+                                        <button disabled={loader} onClick={handleFollow}
+                                                className='btn flex-grow-1 m-2'
+                                                style={{backgroundImage: `url(${follow})`}}>Follow</button>
 
-                                            :
-                                            <>
-                                                { loading && <button disabled={loading} className='btn flex-grow-1 m-2'>Loading...</button>}
+                                        :
+                                        <>
+                                            { loading && <button disabled={loading} className='btn flex-grow-1 m-2'>Loading...</button>}
 
-                                            </>
-                                    }
+                                        </>
+                                }
 
-                                </>
+                            </>
 
 
                         </div>
@@ -435,7 +450,7 @@ setLoading(false)
 
 
                     <div className='grid-container'>
-                        {!loading &&  joinedEvents ? joinedEvents?.map(event => {
+                        {!loader &&  joinedEvents ? joinedEvents?.map(event => {
                             return (
                                 <>
 

@@ -1,4 +1,8 @@
-import React, {useState, useContext} from 'react'
+import React, {useState, useContext, useEffect} from 'react'
+import {useCollection} from "react-firebase-hooks/firestore";
+import {auth, db} from "../firebase/firebase";
+import {useStateValue} from "./StateProvider";
+import {useAuthState} from "react-firebase-hooks/auth";
 
 const ChatContext = React.createContext()
 
@@ -7,6 +11,9 @@ export function useChat() {
 }
 
 export function ChatProvider({ children }) {
+    const [{user}] = useStateValue()
+    const [currentUser] = useAuthState(auth)
+
     const [chat,setChat] = useState([]);
     const [openedChat,setOpenedChat] = useState(false);
     const [sendMessage,setSendMessage] = useState('');
@@ -16,6 +23,8 @@ export function ChatProvider({ children }) {
     const [recent,setRecent] = useState();
     const [chatList, setChatList] = useState([]);
     const [totalNotificationCount,setTotalNotificationCount] = useState(0)
+    const [notificationPopup,setNotificationPopup] = useState()
+    // const [chatSnap] = useCollection(db.collection("Recent").where("members", "array-contains", currentUser.uid).orderBy('date','desc'))
 
     const [counter,setCounter] = useState(0);
     const [show,setShow] = useState(false);
@@ -38,9 +47,13 @@ export function ChatProvider({ children }) {
         show,setShow,
         participants,setParticipants,
         chatList, setChatList,
-        totalNotificationCount,setTotalNotificationCount
-
+        totalNotificationCount,setTotalNotificationCount,
+        notificationPopup,setNotificationPopup,
+        // chatSnap
     }
+    useEffect(() =>{
+        alert(notificationPopup?.lastMessage)
+    },[notificationPopup])
 
     return (
         <ChatContext.Provider value={value}>

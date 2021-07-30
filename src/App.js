@@ -24,10 +24,12 @@ import { useEffect } from 'react';
 import { auth, db } from './firebase/firebase';
 import { useStateValue } from './contexts/StateProvider';
 import {useAuthState} from "react-firebase-hooks/auth"
+import {getRealtimeChild} from "./helper/helper";
 
 function App() {
    
     const [currentUser] = useAuthState(auth)
+
     const  [{user}, dispatch] = useStateValue()
 
 
@@ -40,17 +42,27 @@ function App() {
                     user
                 })
 
-                db.collection('Users').where('objectId', "==", user.uid)
+                db.collection('Users').where('email', "==", user.email)
                  .onSnapshot((snapshot) => {
                     //  console.log(snapshot.docs.map(doc => doc.data()))
                      const userArr  = snapshot.docs.map(doc => doc.data())
                      const userData = userArr?.find( b=>{ return b})
+                     console.log(userData)
                      dispatch({
                         type:"SET_USER_DATA",
                         userData
                     })
 
                  })
+                // db.collection('Users').where('objectId', "==", 'bvi6ovzAN5XD8EynInm5NvfUo2A3')
+                //     .get()
+                //     .then((snapshot)=>{
+                //         console.log(snapshot.docs.map(doc => doc.data()))
+                //         console.log(snapshot)
+                //         snapshot.docs.forEach((doc)=>{
+                //             console.log(doc.data())
+                //         })
+                //     })
             }
         })
         return () => cleanup();
@@ -73,9 +85,10 @@ function App() {
              
               <EventProvider>
                   <TransactionProvider>
-                      <SlideRoutes  location={location}>
 
-                      <Route path="/events" component={Events} />
+                      <SlideRoutes animation={window.screen.width < 700 ? 'slide' : ''} location={location}>
+
+                      <Route exact path="/events" component={Events} />
                       {user?.uid && <Route path="/eventDetails/:id" component={EventDetails} />}
                           <Route path="/signup" component={Signup} />
 
@@ -87,10 +100,10 @@ function App() {
              {user?.uid &&<Route exact path="/user/:id/withdraw" component={Withdraw} />}
              {user?.uid &&<Route exact path="/messages" component={Message} />}
              {user?.uid && <Route path="/messages/:id" component={Message} />}
-              <Route path="/" component={Home} />  
-
                       </SlideRoutes>
-                      </TransactionProvider>
+                      {!user?.uid ? <Route exact path="/" component={ Home}/>:<Route exact path="/" component={ Events}/>}
+
+                  </TransactionProvider>
 
 
 

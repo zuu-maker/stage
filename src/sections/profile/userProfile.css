@@ -35,12 +35,16 @@
     width: 65%;
     background-color: #2B3038;
     border-radius: 15pt;
-    height: 80vh;
+    height: fit-content;
     min-width: 25vw;
     max-width: 25vw;
 }
 .user .user-side-bar{
     height: fit-content;
+}
+
+.other-user .user-side-bar{
+    height: 90vh;
 }
 .user-menu-container{
     flex-direction: row;
@@ -279,6 +283,10 @@
     }
     .user .user-side-bar.card-body{
         padding: 1.25rem 0;
+    }
+    .grid-container{
+        display: flex;
+        flex-direction: column;
     }
 
 }

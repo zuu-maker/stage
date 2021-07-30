@@ -28,7 +28,7 @@ function Signup() {
                 setError('')
                 setLoading(true)
                 console.log('before')
-                 auth.createUserWithEmailAndPassword(emailRef.current.value, passwordRef.current.value) 
+                await auth.createUserWithEmailAndPassword(emailRef.current.value, passwordRef.current.value)
                  .then( userInfo => {
                         var userObj = {
                             userName: username,

@@ -3,7 +3,7 @@ import '../../helper/helper'
 import {getDoc, getOptions, pushData, updateDocument} from "../../helper/helper";
 
 import mail from "../../images/mail.svg";
-import user from "../../images/user.svg";
+import userIcon from "../../images/user.svg";
 import password from "../../images/password.svg";
 import {useLoader} from "../../contexts/loaderContext";
 import {auth, storage} from "../../firebase/firebase";
@@ -16,10 +16,11 @@ import { useStateValue } from '../../contexts/StateProvider';
 export default function EditProfile() {
 
     const {setLoader,loader} = useLoader();
-    // const {currentUser} = useAuth();
-    const [currentUser] = useAuthState(auth)
+    // const {user} = useAuth();
+    const [user] = useAuthState(auth)
     const hiddenFileInput = React.useRef(null);
     const [file, setFile] = useState('');
+    const [loading, setLoading] = useState(false);
     const [{userData}] = useStateValue()
     // const {user, setUser} = useUser();
 
@@ -42,7 +43,7 @@ export default function EditProfile() {
 
     const handleSubmit = (e) => {
 
-        setLoader(true)
+        setLoading(true)
         e.preventDefault()
         // Create a reference to the hidden file input element
         var formData = {
@@ -60,38 +61,39 @@ export default function EditProfile() {
             {
                 file && file.size
                     ?
-                    storage.ref(`users/${currentUser.uid}/profilePhoto`).put(file)
+                    storage.ref(`users/${user.uid}/profilePhoto`).put(file)
                     .then(snapshot => {
                         snapshot.ref.getDownloadURL().then((url) => {
                             { formData &&
-                                currentUser.updateProfile({displayName: e.target.userName.value, photoURL: url})
+                                user.updateProfile({displayName: e.target.userName.value, photoURL: url})
                                     .then(() => {
-                                        console.log('Updated CurrentUser!')
+                                        console.log('Updated user!')
 
                                         var updatedInfo = {userProfileImageUrl: url}
 
                                         Object.assign(formData, updatedInfo)
                                         // //Update user Info
-                                        updateDocument('Users', currentUser.uid, formData)
+                                        updateDocument('Users', user.uid, formData)
 
                                     });
                             }
                         })
                         setFile('')
-                        setLoader(false)
+                        setLoading(false)
 
                     })
                     .catch(error => {
-                        setLoader(false)
+                        setLoading(false)
+                        console.log(error.message)
                     })
                     : formData
                 ?
-                    currentUser.updateProfile({displayName: e.target.userName.value})
+                    user.updateProfile({displayName: e.target.userName.value})
                         .then(() => {
                             console.log('No file!')
                             //Update user Info
-                            updateDocument('Users', currentUser.uid, formData)
-                            setLoader(false)
+                            updateDocument('Users', user.uid, formData)
+                            setLoading(false)
                         })
                         .catch(e => console.log(e))
                     :
@@ -105,6 +107,7 @@ export default function EditProfile() {
             setLoader(false)
             console.log(e.message)
             console.log('error')
+            setLoading(false)
 
         }
 
@@ -155,13 +158,13 @@ export default function EditProfile() {
                         style={{display: 'none'}}
 
                     />
-                    <input  type={`text`} style={{display: 'none'}} value={currentUser.photoURL}/>
-                    <input required defaultValue={currentUser.email} name="email" style={{backgroundImage: `url(${mail})`}} type="Email" placeholder="Email"/>
-                    <input required defaultValue={currentUser.displayName} name="userName" style={{backgroundImage: `url(${user})`}} type="text"
+                    <input  type={`text`} style={{display: 'none'}} value={user.photoURL}/>
+                    <input required defaultValue={user.email} name="email" style={{backgroundImage: `url(${mail})`}} type="Email" placeholder="Email"/>
+                    <input required defaultValue={user.displayName || userData.userName} name="userName" style={{backgroundImage: `url(${userIcon})`}} type="text"
                            placeholder="Username"/>
-                    <input  name="facebook" style={{backgroundImage: `url(${password})`}} type="text"
+                    <input  name="facebook"  type="text"
                            placeholder="Facebook"/>
-                    <input  name="twitter" style={{backgroundImage: `url(${password})`}} type="text"
+                    <input  name="twitter"  type="text"
                            placeholder="Twitter"/>
 
                 </div>

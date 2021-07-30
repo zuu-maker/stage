@@ -13,66 +13,71 @@ import {useAuth} from "../../contexts/authContext";
 import {realDB} from "../../firebase/firebase";
 import MobileNavbar from "../../components/mobileNavbar";
 import { useStateValue } from '../../contexts/StateProvider';
-
+import { useDocument } from 'react-firebase-hooks/firestore';
+import {useList, useObject} from "react-firebase-hooks/database";
 const EventDetails = () => {
+    let params = useParams();
 
-    const [{ hasJoined, user}] = useStateValue()   
+    const [{user, hasJoined}] = useStateValue()
     const [eventData,setEventData] =useState();
+    const [eventDetailsSnap,loading] = useObject(realDB.ref(`Events/${params.id}`))
+    const [participantsSnap] = useList(getRealtimeChild('Participants','EventId',params.id))
     const [participants,setParticipants] =useState([]);
     const {loader, setLoader} =useLoader();
     // const { hasJoined,setHasJoined} =useUser();
     // const {currentUser} =useAuth();
 
 
-    let params = useParams();
     var event = []
     let  childList =[]
 
-    useEffect( ()=>{
-        setLoader(true)
-        // setHasJoined(false)
-
-        //Fetch event details
-        getRealtimeDoc('Events',params.id).then( async function(snapshot) {
-            const data = snapshot.val();
-           await setEventData(data)
-        });
-        // console.log(eventData)
-
-        //Fetch participants of the matched id from the URL parameter
-
-        getRealtimeChild('Participants','EventId',params.id).on("child_added", function(snapshot) {
-            setParticipants([])
-            childList.push(snapshot.val())
-            setParticipants(childList)
-            console.log(childList)
-        });
-
-        console.log(hasJoined)
-
-        console.log(participants);
-
-        setLoader(false)
-        return ()=>{
-            console.log('unmounted')
-        }
-
-
-    },[])
+    // useEffect( ()=>{
+    //
+    //     setLoader(true)
+    //     // setHasJoined(false)
+    //
+    //     //Fetch event details
+    //     const cleanup = getRealtimeDoc('Events',params.id).then( async function(snapshot) {
+    //         const data = snapshot.val();
+    //        await setEventData(data)
+    //     });
+    //     // console.log(eventData)
+    //
+    //     //Fetch participants of the matched id from the URL parameter
+    //
+    //     getRealtimeChild('Participants','EventId',params.id).on("child_added", function(snapshot) {
+    //         setParticipants([])
+    //         childList.push(snapshot.val())
+    //         setParticipants(childList)
+    //         console.log(childList)
+    //     });
+    //
+    //     console.log(hasJoined)
+    //
+    //     console.log(participants);
+    //
+    //
+    //     setLoader(false)
+    //     return ()=> cleanup
+    //
+    //
+    //
+    //
+    // },[])
 
     return (
         <>
             <Header/>
-            {!loader && participants.length > 0 && eventData &&<div className='container event-details '>
-                <EventSection event={eventData} participantsList={participants}/>
+            {!loading && eventDetailsSnap && participantsSnap && <div className='container event-details '>
+                <EventSection event={eventDetailsSnap.val()} participantsList={participantsSnap}/>
                 <div className='flex-grow-1 user-list-section'>
                     <div className=' pt-3 '>
                         <h5 className='pl-4 text-light'>Participants</h5>
                         <div className='user-list'>
-                            {participants ? participants?.map(user => {
+                            {participantsSnap ? participantsSnap.map(user => {
                                 return (<>
 
-                                        <UserList user={user} key={user.userId}/>
+                                        <UserList user={user.val()} key={user.val().userId}/>
 
 
                                     </>

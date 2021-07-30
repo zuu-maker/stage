@@ -13,7 +13,7 @@ import {useAuth} from "../../contexts/authContext";
 import {useParams} from "react-router-dom";
 import OtherUserMenu from "./otherUserMenu";
 import {
-    getDoc,
+    getDoc, getDocWithRef,
     getFirestoreDocument,
     getRealtimeChild,
     getRealtimeCollection,
@@ -45,6 +45,7 @@ function UserProfile() {
             if(userData && user.uid !== params.id ){
             setLoader(true)
 
+
             db.collection('Users').where('objectId', "==", params.id)
                 // .get()
                 .onSnapshot((snapshot) => {
@@ -54,6 +55,7 @@ function UserProfile() {
                         type:"SET_OTHER_USER",
                         otherUser,
                     })
+                    console.log(otherUser)
                     // setOtherUser(snapshot.docs.map(doc => doc.data()).find(b => {return b}))
 
                     // user.followedUsersIds?.find((follower) => {
@@ -79,8 +81,7 @@ function UserProfile() {
             else{
                 setLoading(true)
                 //Get an array of participants that match the current user Id
-                console.log(user);
-                
+
                     getRealtimeChild('Participants', 'userId', user?.uid).get()
                     .then((snapshot) => {
                         snapshot.forEach((doc) => {
@@ -89,10 +90,14 @@ function UserProfile() {
 
                         //Get an array of Events in the participants array
                         userJoinedEventsList?.map((eventJoined) => {
-                            getRealtimeDoc('Events', eventJoined.EventId)
+                            getDocWithRef('Events', eventJoined.EventId)
+                                .get()
                                 .then((snapshot) => {
-                                    joinedEventsList.push(snapshot.val())
+                                    joinedEventsList.push(Object.assign(snapshot.val(),{id:snapshot.key}))
+                                    console.log(snapshot.val())
+
                                     setJoinedEvents(joinedEventsList)
+
                                     setLoading(false)
 
                                 })
@@ -119,7 +124,7 @@ function UserProfile() {
                 realDB.ref('Events').orderByChild('EventStartDate').startAt(parseInt( Date.now())).get()
                     .then(snapshot =>{
                             snapshot.forEach(doc =>{
-                                console.log(doc.val())
+                                // console.log(doc.val())
                             })
                         })
         }
@@ -141,21 +146,21 @@ function UserProfile() {
                 <Sidebar/>
                 <div className={`lg-view flex-column`}>
                     <Graph/>
+                    <h4 className={`text-light`}>Joined Events</h4>
                     <div className='grid-container w-100'>
-                        <div className={`flex-column`}>
 
 
-                        <h4 className={`text-light`}>Joined Events</h4>
-                        {!loading &&  joinedEvents ? joinedEvents?.map(event => {
+
+
+                        {!loading &&  joinedEvents?.length > 0 ? joinedEvents?.slice(0,2).map(event => {
                             return (
                                 <>
 
-                                    <Card event={event} key={event?.id}/>
+                                    {event !== undefined && event !== null && <Card event={event} key={event?.id}/>}
                                 </>
                             )
                         }) :<>
                             <p className={`mx-auto text-center justify-content-center align-items-center text-light`}>{!loading &&'No recent activity'}</p></> }
-                        </div>
                     </div>
 
                 </div>

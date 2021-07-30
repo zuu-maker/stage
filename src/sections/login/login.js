@@ -27,20 +27,20 @@ export default function Login() {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         try {
             setError('')
             setLoading(true)
             //logging user in
-            auth.signInWithEmailAndPassword(emailRef.current.value,passwordRef.current.value)
-            .then((user) => {
-                dispatch({
-                    type: "SET_USER",
-                    user
+            await auth.signInWithEmailAndPassword(emailRef.current.value, passwordRef.current.value)
+                .then((user) => {
+                    dispatch({
+                        type: "SET_USER",
+                        user
+                    })
+                    history.push(`/user/${user.user.uid}`)
                 })
-                history.push(`/user/${user.user.uid}`)
-            })
 
         } catch (err) {
             switch (err.code) {
@@ -53,10 +53,11 @@ export default function Login() {
                     break;
                 case 'auth/wrong-password':
                     setError("Password entered is wrong")
-                    break;        }
-        setLoading(false)
+                    break;
+            }
+            setLoading(false)
 
-    }
+        }
     }
 
     return (

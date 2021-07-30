@@ -70,15 +70,15 @@ export default function Header() {
                                     <li className="nav-item active">
                                         <Link className="nav-link" to='/events'>Home</Link>
                                     </li>
-                                    { user 
+                                    { user && user.email
                                         ? <li className="nav-item">
-                                            <Link to='/events' className="nav-link" href="#">Events</Link>
+                                            <Link to='/' className="nav-link" href="#">Events</Link>
                                         </li>
                                         : <li className="nav-item">
                                             <Link className="nav-link" href="#">How does it work</Link>
                                         </li>
                                     }
-                                    {user 
+                                    {user && user.email
                                         ? <li className="nav-item d-flex position-relative">
                                             <Link className="nav-link" to='/messages' href="#">Messages</Link>
                                             <>

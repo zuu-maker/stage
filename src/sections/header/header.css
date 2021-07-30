@@ -117,14 +117,15 @@
     color: #18ff00;
 }
 .user-img-wrapper {
-    width: 40%;
-    height: 40%;
+    width: 25pt;
+    height: 25pt;
     overflow: hidden;
-    border-radius: 100%;
+    border-radius: 50%;
     margin: 5pt;
 }
-.user-img-wrapper img{
 
+.user-list-thumb-wrapper img,.user-profile-pic-wrapper img , .user-img-wrapper img{
+height: 100%;
 }
 .center{
     align-items: center;

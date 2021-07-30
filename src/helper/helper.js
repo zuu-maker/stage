@@ -5,8 +5,7 @@ export const getReceiverUid = (members, currentUser) => (
   members?.filter(filteredUser => filteredUser !== currentUser?.uid)[0]
 )
 export const getReceiverEmail = (users, currentUser) => (
-     users?.filter(filteredUser => filteredUser !== currentUser?.email)[0]
-)
+    users?.filter(filteredUser => filteredUser?.email !== currentUser?.email)[0])
 
 export const pushData = async (path,data,id) =>{
 
@@ -135,10 +134,13 @@ export const getRealtimeDoc = (path,id) =>{
 }
 
 export const  getRealtimeChild =  (path,child,id) =>{
-console.log(id);
-
 
   return  realDB.ref(path).orderByChild(child).equalTo(id)
+}
+
+export const  getDocWithRef =  (path,ref) =>{
+
+  return  realDB.ref(path +'/'+ ref)
 }
 
 export const getDoc = (collection,field,value) =>{

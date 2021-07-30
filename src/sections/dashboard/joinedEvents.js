@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Card from "../events/card";
 import Sidebar from "./sidebar";
-import {getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
+import {getDocWithRef, getRealtimeChild, getRealtimeDoc} from "../../helper/helper";
 import {useAuth} from "../../contexts/authContext";
 import {useLoader} from "../../contexts/loaderContext";
 import Header from "../header/header";
@@ -11,53 +11,64 @@ import { useStateValue } from '../../contexts/StateProvider';
 import { realDB } from '../../firebase/firebase';
 
 function JoinedEvents(props) {
-    const [{user,userData,joinedEvents}, dispatch] = useStateValue()
+    const [{user,userData}, dispatch] = useStateValue()
     // const {joinedEvents, setJoinedEvents} = useUser();
     const [loading,setLoading] = useState(false)
     const {setLoader,loader} = useLoader();
-    
+    const [joinedEvents, setJoinedEvents] = useState([]);
+
     let userJoinedEventsList = [];
     let joinedEventsList = [];
     let createdEventsList = [];
-
+    let filteredList = [];
     useEffect( ()=>{
+
         setLoader(true)
         console.log(userData);
         //Get an array of participants that match the current user Is
-        console.log(user.uid);
-        // 'YbDgZU6l83YmhwsBY9iIwEOqB4f2'
-        // getRealtimeChild('Participants', 'userId', user.uid)
+
         if(user.uid){
-            realDB.ref('Participants').orderByChild('userId').equalTo(user.uid).get()
-            .then((snapshot) => {
-                snapshot.forEach((doc) => {
-                    userJoinedEventsList.push(doc.val())
-                })
+            //Get an array of participants that match the current user Id
 
-                //Get an array of Events in the participants array
-                userJoinedEventsList?.map((eventJoined) => {
-                    getRealtimeDoc('Events', eventJoined?.EventId)
-                        .then((snapshot) => {
-                            joinedEventsList.push(snapshot.val())
-                            dispatch({
-                                type:"SET_JOINED_EVENTS",
-                                joinedEvents:joinedEventsList
+            getRealtimeChild('Participants', 'userId', user?.uid).get()
+                .then((snapshot) => {
+                    snapshot.forEach((doc) => {
+                        userJoinedEventsList.push(doc.val())
+                    })
+
+                    //Get an array of Events in the participants array
+                    userJoinedEventsList?.map((eventJoined) => {
+                        getDocWithRef('Events', eventJoined.EventId)
+                            .get()
+                            .then(async (snapshot) => {
+                                joinedEventsList.push(Object.assign(snapshot.val(), {id: snapshot.key}))
+                                console.log(snapshot.val())
+
+                                await setJoinedEvents(joinedEventsList)
+
+                                setLoading(false)
+
                             })
-                            // setJoinedEvents(joinedEventsList)
-
-                        })
 
 
-                        .catch(e => {
-                            console.log(e)
-                        })
+                            .catch(e => {
+                                console.log(e)
+                                setLoading(false)
+                            })
+
+                    })
 
                 })
+                .catch(e => {
+                    console.log(e)
+                    setLoading(false)
+                })
+            // Filter out events created by the current user
+            // joinedEventsList.filter((eachEvent) => {
+            //     if (eachEvent.EventCommissionerId != currentUser.uid)
+            //         return eachEvent})
 
-            })
-            .catch(e => {
-                console.log(e)
-            })
+
         }
        
         //Filter out events created by the current user
@@ -66,9 +77,8 @@ function JoinedEvents(props) {
         //         return eachEvent})
         setLoader(false)
         
-    },[user])
-    console.log(joinedEvents[0]);
-    
+    },[])
+
     return (
         <>
             <Header/>
@@ -84,11 +94,11 @@ function JoinedEvents(props) {
                         </div>
 
                         <div className='grid-container'>
-                            {!loader && joinedEvents ? joinedEvents[0]?.map(event => {
+                            {!loading && joinedEvents ? joinedEvents?.map(event => {
                               
                                 return (
                                     <>
-                                        <Card event={event} key={event.id}/>
+                                        {event !== undefined && event !== null && <Card event={event} key={event?.id}/>}
                                     </>
                                 )
                             }) :<>

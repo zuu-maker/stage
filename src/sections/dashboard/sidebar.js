@@ -20,7 +20,7 @@ import axios from "axios";
 import { useStateValue } from '../../contexts/StateProvider';
 
 function Sidebar() {
-    const[{user,joinedEvents,createdEvents}, dispatch] = useStateValue()
+    const[{user,joinedEvents,createdEvents,userData}, dispatch] = useStateValue()
     // const {currentUser} = useAuth();
     let params = useParams();
     // const {joinedEvents, createdEvents, setJoinedEvents, setCreatedEvents} = useUser();
@@ -33,9 +33,10 @@ function Sidebar() {
     const transactionList = []
 
 
-
     //Fetch Joined events on click
     const handleJoinedEvents = () => {
+
+
         setLoader(true)
         //Get an array of participants that match the current user Is
         getRealtimeChild('Participants', 'userId', user.uid).get()
@@ -54,7 +55,7 @@ function Sidebar() {
                                 joinedEvents:joinedEventsList
                             })
                             // setJoinedEvents(joinedEventsList)
-                            
+
                         })
 
 
@@ -165,7 +166,7 @@ function Sidebar() {
                     <div className='position-relative'>
                         <div className='mx-auto d-block user-profile-pic-wrapper'>
 
-                            <img src={user && user.photoURL} alt=""/>
+                            <img src={user && user.photoURL || userData && userData.userProfileImageUrl} alt=""/>
 
                         </div>
                         <div className='badge-wrapper'>
@@ -176,8 +177,8 @@ function Sidebar() {
 
 
                     <div className='mt-3 text-light'>
-                        <div className='space-medium f-18'>{user.displayName}</div>
-                        <div className="space-light mb-4">@{user.displayName}</div>
+                        <div className='space-medium f-18'>{user.displayName || userData.userName}</div>
+                        <div className="space-light mb-4">@{user.displayName || userData.userName}</div>
 
                     </div>
                     <div className='sm-view'>
@@ -186,9 +187,7 @@ function Sidebar() {
                     </div>
 
                 </div>
-                <div className='d-sm-block d-lg-none d-md-block'>
-                    <Graph/>
-                </div>
+
                 <div className='menu-options'>
 
                     <div onClick={handleJoinedEvents} className=' m-3 pointer  menu-item'>

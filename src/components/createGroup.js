@@ -13,13 +13,14 @@ import {useHistory} from "react-router-dom";
 import { useStateValue } from '../contexts/StateProvider';
 
 function CreateGroup(props) {
-    const [{user}] = useStateValue() 
+    const [{user}] = useStateValue()
     // const {currentUser} = useAuth();
     const [createdEvents,setCreatedEvents] = useState([]);
     const {participants,setParticipants} = useChat();
     let eventsList = [];
     let invitationList = [];
     let usersList = []
+    let participantsList = []
     const [file, setFile] = useState('');
     const hiddenFileInput = React.useRef(null);
     const {setLoader,loader} = useLoader();
@@ -43,19 +44,32 @@ function CreateGroup(props) {
         console.log(file)
     };
 
+    console.log(participants)
     const handleSubmit = async (e) => {
         e.preventDefault()
-        // alert("hey!!!")
         // invitationList=[]
         // usersList = []
+
+        // console.log(participants)
+        let userPush = {}
+
         participants.map((p) =>{
             document.querySelectorAll(`[name=${p.userName}]:checked`).forEach((node) =>{
-                console.log(node);
-                usersList.push(node.getAttribute('email'))
-                invitationList.push(node.getAttribute('userId') )
+                // console.log(node)
+
+                userPush = {
+                    userName:p.userName,
+                    email: node.getAttribute('email'),
+                    objectId: node.getAttribute('userId'),
+                    userProfileImage:p.userProfileImageUrl
+
+                }
+                participantsList.push(userPush)
+                invitationList.push(node.getAttribute('userId'))
+                // usersList.push(node.getAttribute('email'))
             })
         })
-        console.log(invitationList)
+
 
 
         //Chatroom Data
@@ -63,26 +77,26 @@ function CreateGroup(props) {
             dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
             groupChatName: e.target.groupName.value,
             isGroupChat: true,
-            participants: invitationList,
-            users:usersList
+            participants: participantsList,
+            // users:usersList
         }
 
         const otherFormData = {
-          
-                counter: 0,
-                date: Date.now(),
-                groupChatName: e.target.groupName.value,
-                lastMessage: " ",
-                membersToPush:invitationList,
-                members:invitationList,
-                type:'group'
 
-                // fromUserId: currentUser.uid,
-                // fromUserName: currentUser.displayName,
-                // fromUserProfileimageUrl: currentUser.photoURL,
-                // date: Date.now(),
-              
-                // chatRoomID: params.id,
+            counter: 0,
+            date: Date.now(),
+            groupChatName: e.target.groupName.value,
+            lastMessage: " ",
+            membersToPush:invitationList,
+            members:invitationList,
+            type:'group'
+
+            // fromUserId: currentUser.uid,
+            // fromUserName: currentUser.displayName,
+            // fromUserProfileimageUrl: currentUser.photoURL,
+            // date: Date.now(),
+
+            // chatRoomID: params.id,
         }
         //Show Loader
         setLoader(true)
@@ -102,25 +116,22 @@ function CreateGroup(props) {
             // dateTime : firebase.firestore.FieldValue.serverTimestamp()
         }
 
-        
-        db.collection("chats").add(formData)
-        .then(docRef => {
-            console.log(invitationList);
-            setLoader(false)
-            
-            db.collection('Recent').add(
-                otherFormData,
-            ).then(function (doc) {
-                doc.update({chatRoomID: docRef.id})
-                doc.update({recentId: doc.id})
-                alert("added to recent")
-            }).catch(() => {
-                alert("error here")
-            })
 
-            docRef.update({chatRoomId: docRef.id})
-            history.push(`/messages/${docRef.id}`)
-        }).catch(function (error) {
+        db.collection("chats").add(formData)
+            .then(docRef => {
+                console.log(invitationList);
+                setLoader(false)
+                db.collection('Recent').add(
+                    otherFormData,
+                ).then(function (doc) {
+                    doc.update({chatRoomID: docRef.id})
+                    doc.update({recentId: doc.id})
+                }).catch(() => {
+                })
+
+                docRef.update({chatRoomId: docRef.id})
+                history.push(`/messages/${docRef.id}`)
+            }).catch(function (error) {
             setLoader(false)
             console.error("Error adding document: ", error);
         });
@@ -187,7 +198,7 @@ function CreateGroup(props) {
         //             )
 
 
-            // })
+        // })
 
 
         //     // Hide Loader
@@ -221,7 +232,7 @@ function CreateGroup(props) {
     return (
         <form id={`create-group-form`} action="" onSubmit={handleSubmit}>
 
-        <div className={`row`}>
+            <div className={`row`}>
                 <div className={`col border-right border-secondary`}>
                     <div className="input-group">
                         <div className={`ml-5 mb-3 d-flex text-light align-items-center`}>
@@ -271,7 +282,7 @@ function CreateGroup(props) {
                         { createdEvents ? createdEvents?.map(event  =>{
                             return(
                                 <>
-                            <SearchItem  event={event}/>
+                                    <SearchItem  event={event}/>
                                 </>
                             )
                         }) : 'p'}
@@ -282,17 +293,17 @@ function CreateGroup(props) {
                     <div className='user-list w-100 d-flex flex-column '>
                         { participants ? participants?.map(user  =>{
                             return(<>
-                                <div className={`d-flex align-items-center`}>
-                                    <UserList  user={user} key={user.userId} />
-                                    <div className={`form-group ml-auto text-right`}>
+                                    <div className={`d-flex align-items-center`}>
+                                        <UserList  user={user} key={user.userId} />
+                                        <div className={`form-group ml-auto text-right`}>
 
 
-                                    <input type="checkbox" userId={user.userId} email={user.email} id={user.userName} name={user.userName} />
-                                        <label htmlFor={user.userName}></label>
+                                            <input type="checkbox" userId={user.userId} email={user.email} id={user.userName} name={user.userName} />
+                                            <label htmlFor={user.userName}></label>
 
+                                        </div>
                                     </div>
-                                    </div>
-                                    </>
+                                </>
                             )
                         }) : 'No participants yet'}
 
@@ -303,7 +314,7 @@ function CreateGroup(props) {
 
 
 
-        </div>
+            </div>
             <button className={`btn btn-clear`}> Create</button>
         </form>
 
