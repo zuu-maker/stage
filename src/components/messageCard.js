@@ -21,6 +21,7 @@ import Icon from "./icon";
 import {useAuthState} from "react-firebase-hooks/auth"
 import {useCollection} from "react-firebase-hooks/firestore"
 import { useStateValue } from '../contexts/StateProvider';
+import DisplayPicture from "./DisplayPicture";
 
 function MessageCard({uid,id, chats}) {
 
@@ -235,6 +236,7 @@ useEffect(() =>{
             <div style={{background:selectedChat && '#13161AC3'}} onClick={enterChat} userId={receiver?.userId}
                  id={id}
                  className='d-flex pointer mb-2 user-list-sub-section'>
+
                 <div className='user-list-thumb-wrapper'>
                     <img ref={imageRef} src={ chats.type === "group"? chats?.profileimageUrl : receiver?.userProfileImageUrl }alt=""/>
                 </div>

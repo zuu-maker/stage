@@ -98,7 +98,8 @@ function JoinedEvents(props) {
                               
                                 return (
                                     <>
-                                        {event !== undefined && event !== null && <Card event={event} key={event?.id}/>}
+                                        {event !== undefined && event !== null && event.EventCommissionerId !== user?.uid &&
+                                        <Card event={event} key={event.id}/>}
                                     </>
                                 )
                             }) :<>

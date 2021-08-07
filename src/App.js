@@ -134,7 +134,7 @@ function App() {
                                     animationIn: ["animate__animated", "animate__fadeIn"],
                                     animationOut: ["animate__animated", "animate__fadeOut"],
                                     dismiss: {
-                                        duration: 500000,
+                                        duration: 500,
 
                                         pauseOnHover: true
                                     },

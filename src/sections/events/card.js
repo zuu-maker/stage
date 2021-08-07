@@ -18,7 +18,7 @@ const difficulty ={
 function Card({ event }) {
     const history = useHistory()
     const idRef = useRef()
-    const [participantSnap,loading, error] = useList(realDB.ref('Participants').orderByChild('EventId').equalTo(event.id && event.id))
+    const [participantSnap,loading, error] = useList(realDB.ref('Participants').orderByChild('EventId').equalTo(event && event.id))
 
 
 

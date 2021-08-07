@@ -6,6 +6,27 @@
     padding: 0;
 }
 
+#red {
+    background: red;
+}
+#green {
+    background: green;
+}
+#yellow {
+    background: yellow;
+}
+.wipe {
+    height: 200px;
+    -webkit-transition: width 2s;
+    transition: width 2s;
+    float:left;
+}
+.open {
+    width: 100%;
+}
+.closed {
+    width: 0px;
+}
 label{
     margin-bottom: 0;
 }
@@ -66,7 +87,21 @@ label{
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
 }
+.spinner-loader{
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    /* margin-left: 0; */
+    /* margin-right: 0; */
 
+}
+.preview-image-wrapper{
+    height: inherit;
+}
 .chat-icon-group .icon-wrapper{
     background-color:#2B3038 ;
 }
@@ -178,6 +213,13 @@ html {
     max-width: 40%;
     height: auto;
     margin-right: 4%;
+}
+.create-group .user-list-thumb-wrapper{
+    overflow: hidden;
+    border-radius: 100%;
+    width: 38pt;
+    height: 38pt;
+
 }
 /* The Modal (background) */
 .media-modal {

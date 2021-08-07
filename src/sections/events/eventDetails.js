@@ -77,7 +77,7 @@ const EventDetails = () => {
                             {participantsSnap ? participantsSnap.map(user => {
                                 return (<>
 
-                                        <UserList user={user.val()} key={user.val().userId}/>
+                                        <UserList clickable={true} user={user.val()} key={user.val().userId}/>
 
 
                                     </>

@@ -1,25 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
-import dummy from '../images/dummy.png'
-import deposit from "../images/deposit_fund.svg";
-import Icon from "./icon";
 import ChatContent from "./chatContent";
-import user from "../images/arrow right.svg";
 import {useChat} from "../contexts/messageContext";
-import MessageCard from "./messageCard";
-import {
-    getRealtimeSubCollection,
-    getReceiverEmail,
-    getSubCollection,
-    pushFireStoreData,
-    pushSubCollection,
-    updateFirestoreDocument, updateFirestoreSubCollection
-} from "../helper/helper";
+import {getReceiverEmail} from "../helper/helper";
 import {useLoader} from "../contexts/loaderContext";
-import {useAuth} from "../contexts/authContext";
 import firebase from "firebase";
-import {auth, db} from "../firebase/firebase";
+import {auth, db, storage} from "../firebase/firebase";
 import {Dropdown} from "react-bootstrap";
-import arrow from "../images/arrow.svg";
 import BackButton from "./backButton";
 import {useStateValue} from "../contexts/StateProvider"
 import {Link, useHistory, useParams} from "react-router-dom";
@@ -27,9 +13,10 @@ import {useAuthState} from "react-firebase-hooks/auth"
 import {useCollection} from "react-firebase-hooks/firestore"
 import DisplayName from './DisplayName';
 import DisplayPicture from './DisplayPicture';
+import spinner from '../images/spinner.gif'
 
 const MessageWindow = ({}) => {
-    const [{user}] = useStateValue()
+    const [{user,userData}] = useStateValue()
     const {chat,setChat ,recent,setOpenedChat,openedChat,setRecent,chatRoom} = useChat();
     const [currentUser] = useAuthState(auth)
     let history = useHistory();
@@ -37,34 +24,65 @@ const MessageWindow = ({}) => {
     // const receiverEmail = ''
     // const {user} = useAuth();
     const scrollView = useRef();
+    const [preview, setPreview] = useState()
+    const [file, setFile] = useState('');
+
+    const [previewImageOnSend, setPreviewImageOnSend] = useState([])
+
     const {setLoader} = useLoader();
     const [textId ,setTextId] =useState()
     const [showSendButton ,setShowSendButton] =useState(false)
     // const [receiver ,setReceiver] =useState()
     const [sender,setSender] = useState('')
-    // const [loading,setLoading] = useState(false)
+    const [fileLoading,setFileLoading] = useState(false)
     //  let params = useParams();
     var messageId = params.id;
     const [input,setInput] = useState('');
     let readMessagesList =[]
+    const hiddenFileInput = React.useRef(null);
+
     let messageList = []
     // const textClass = user.uid === ? 'sent' : 'received'
     var recentData;
 
     // const [chatSnap] = useCollection(db.collection("chats").doc(params.id))
-    const [messagesSnap,loading ,error] = useCollection(db.collection("chats").doc(params.id).collection("messages").orderBy("timestamp","asc"));
+    const [messagesSnap,loading ,error] = useCollection(db.collection('ChatRooms').doc(params.id).collection('chat').orderBy("dateTime","asc"));
     // console.log(params.id);
-    const [senderSnap] = useCollection(db.collection("chats").where("chatRoomId","==",params.id));
+    const [senderSnap] = useCollection(db.collection("ChatRooms").where("chatRoomId","==",params.id));
     //  console.log(params.id);
 
+
+    // Programatically click the hidden file input element
+    // when the Button component is clicked
+    const handleSendMedia = (event) => {
+        setFile('')
+        hiddenFileInput.current.click();
+
+    };
+    // Call a function (passed as a prop from the parent component)
+    // to handle the user-selected file
+    const handleChange = (event) => {
+        setFile(event.target.files[0])
+        const fileUploaded = event.target.files[0];
+        var reader = new FileReader();
+        var url = reader.readAsDataURL(fileUploaded);
+
+        reader.onloadend = function (e) {
+            setPreview(reader.result)
+        }
+        console.log(preview)
+        console.log(url)
+        console.log(event.target.files[0])
+    };
 useEffect(()=>{
     scrollView.current.scrollIntoView({behavior: 'smooth'})
 
 },[])
 
-    // senderSnap?.docs?.[0]?.data()
+    console.log(senderSnap?.docs?.[0]?.data())
 
     const groupData = senderSnap?.docs?.[0]?.data();
+    console.log(groupData)
     const receiverEmail = getReceiverEmail(groupData?.participants,currentUser)
 
 
@@ -73,8 +91,9 @@ useEffect(()=>{
     // console.log(currentUser);
 
     // const [receiverSnap] = useCollection(db.collection("Users").where("email","==",receiverEmail));
-
+    //
     // const receiver = receiverSnap?.docs?.[0]?.data()
+    // console.log(receiver)
     // console.log(otherUser);
     const showMessages = () => {
         if(messagesSnap){
@@ -82,11 +101,11 @@ useEffect(()=>{
                 <ChatContent
                     key={message.id}
                     sender={message.data().user}
+                    preview={''}
                     loading={loading}
-                    message={{
-                        ...message.data(),
-                        timestamp: message.data().timestamp?.toDate().getTime()
-                    }} />
+                    message={
+                        message.data()
+                    } />
             ))
         }
     }
@@ -132,12 +151,11 @@ useEffect(()=>{
     },[])
 
     //Read message
-    const messageRead = () =>{
-        updateFirestoreSubCollection('ChatRooms','','','','')
-    }
-
+    // const messageRead = () =>{
+    //     updateFirestoreSubCollection('ChatRooms','','','','')
+    // }
     //Send chat message
-    const handleSendText = (e) => {
+    const handleSendText = async (e) => {
         e.preventDefault()
         setShowSendButton(false)
 
@@ -160,29 +178,166 @@ useEffect(()=>{
 
         //     dateTime: firebase.firestore.FieldValue.serverTimestamp()
         // }
+        if (file && file.size) {
+            setFileLoading(true)
+            // setPreviewImageOnSend([...previewImageOnSend,preview])
+            setPreviewImageOnSend(preview)
+            // Push File to the firebase storage
+            await storage.ref(`chatRoom/${params.id}/chats/media`).put(file)
+                .then(snapshot => {
+                    console.log('pushed to storage')
+                    setFile('')
 
-        db.collection("chats").doc(params.id).collection("messages").add({
-            chatRoomId: params.id,
-            timestamp:firebase.firestore.FieldValue.serverTimestamp(),
-            message:input,
-            user:currentUser.email,
-            photoURL:currentUser.photoURL,
-            isDelivered:false,
+                    //Fetch the file url
+                    snapshot.ref.getDownloadURL().then((url) => {
+                        console.log(url)
+                        var data = {
+                            text: e.target.message.value,
+                            senderEmail: currentUser.email,
+                            senderObjId: currentUser.uid,
+                            userProfileImageUrl: userData?.userProfileImageUrl,
+                            senderName: userData?.userName,
+                            isDelivered: false,
+                            isImage: false,
+                            isVideo: false,
+                            isVoiceNote: false,
+                            storageMediaUrl: url,
+                            deliveredToParticipants: [],
+                            chatRoomId: params.id,
+                            dateTime: firebase.firestore.FieldValue.serverTimestamp()
+                        }
+
+                        if (file.type.match('image.*')) {
+                            data.storageMediaUrl = url;
+                            data.isImage =true
+                        } else if (file.type.match('video.*')) {
+                            data.storageMediaUrl = url;
+                            data.isVideo =true
+                        } else if (file.type.match('audio.*')) {
+
+                            data.storageMediaUrl = url;
+                            data.isVoiceNote =true
+                        } else
+                            data.storageMediaUrl = url;
+
+                        db.collection('ChatRooms').doc(params.id).collection('chat').add(data)
+                            .then(async docRef => {
+                                console.log('added')
+                                //Update message chatId field
+                                await docRef.update({chatId: docRef.id})
+                                db.collection("Recent").where("chatRoomID", "==", params.id).get()
+                                    .then(snapshot => {
+                                        let recentArray = snapshot.docs.map(doc => doc.data())
+                                        // console.log(recentArray.length);
+
+                                        if (recentArray.length > 0) {
+                                            recentArray.forEach((r) => {
+                                                setRecent(r)
+                                                var recentData={
+                                                    date: Date.now(),
+                                                    lastMessage: input,
+                                                    fromUserId: currentUser.uid,
+                                                    fromUserName: currentUser.displayName,
+                                                    fromUserProfileimageUrl: currentUser.photoURL,
+                                                    counter: firebase.firestore.FieldValue.increment(1)
+                                                }
+                                                if (file.type.match('image.*')) {
+                                                    recentData.lastMessage = '[Image]';
+                                                } else if (file.type.match('video.*')) {
+                                                    recentData.lastMessage = '[Video]';
+                                                } else if (file.type.match('audio.*')) {
+
+                                                    recentData.lastMessage = '[Audio]';
+                                                } else
+                                                    recentData.lastMessage = '';
+
+                                                //Update Recent Document
+                                                db.collection('Recent').doc(r.recentId).update(recentData).then(
+                                                    () => {
+
+                                                    }
+                                                )
+
+                                            })
+                                        } else {
+
+
+                                            db.collection('Recent').add({
+                                                chatRoomID: params.id,
+                                                date: Date.now(),
+                                                groupChatName: groupData.isGroupChat ? groupData.groupChatName : " ",
+                                                lastMessage: input,
+                                                membersToPush: members,
+                                                members: members,
+                                                type: groupData.isGroupChat ? 'group' : 'private',
+                                                fromUserId: currentUser.uid,
+                                                fromUserName: currentUser.displayName,
+                                                fromUserProfileimageUrl: currentUser.photoURL,
+                                                // date: Date.now(),
+
+                                                // chatRoomID: params.id,
+                                            }).then(function (docRef) {
+
+                                                docRef.update({recentId: docRef.id, counter: firebase.firestore.FieldValue.increment(1)})
+                                            }).catch(() => {
+                                            })
+
+                                        }
+                                    }).catch(err => {
+                                    // console.log(err.message);
+                                })
+                            }).catch((err) => {
+                            console.log(err.message)
+                        })
+                        // // Update Chatroom storageMedia field
+                        // updateFirestoreSubCollection('ChatRooms', params.id, 'chat', docRef.id, updatedInfo)
+                        // // var latestRecentObj = Object.assign(recentSnapshot.data(),{storageMediaUrl:url})
+                        // console.log('updated firestore')
+
+
+
+                    })
+                    setFile('')
+
+                    setFileLoading(false)
+                    setPreviewImageOnSend('')
+
+                })
+                .catch(error => {
+                    setLoader(false)
+                    console.log(error)
+                })
+
+
+
+
+        }
+
+        db.collection('ChatRooms').doc(params.id).collection('chat').add({
+            text: e.target.message.value,
+            senderEmail: currentUser.email,
+            senderObjId: currentUser.uid,
+            userProfileImageUrl: userData?.userProfileImageUrl,
+            senderName: userData?.userName,
+            isDelivered: false,
             isImage: false,
             isVideo: false,
             isVoiceNote: false,
-            storageMediaUrl:'',
-            senderName:currentUser.displayName,
-            senderObjId: currentUser.uid,
+            storageMediaUrl: '',
+            deliveredToParticipants: [],
+            chatRoomId: params.id,
             dateTime: firebase.firestore.FieldValue.serverTimestamp()
         })
-            .then(docRef => {
+            .then(async docRef => {
+                console.log('added')
+                //Update message chatId field
+                await docRef.update({chatId: docRef.id})
                 db.collection("Recent").where("chatRoomID", "==", params.id).get()
                     .then(snapshot => {
-                        let recentArray =  snapshot.docs.map(doc => doc.data())
+                        let recentArray = snapshot.docs.map(doc => doc.data())
                         // console.log(recentArray.length);
 
-                        if (recentArray.length >  0 ) {
+                        if (recentArray.length > 0) {
                             recentArray.forEach((r) => {
                                 setRecent(r)
 
@@ -195,14 +350,14 @@ useEffect(()=>{
                                     fromUserProfileimageUrl: currentUser.photoURL,
                                     counter: r.counter + 1
                                 }).then(
-                                    ()=>{
+                                    () => {
 
                                     }
                                 )
 
 
                             })
-                        }else{
+                        } else {
 
 
                             db.collection('Recent').add({
@@ -212,7 +367,7 @@ useEffect(()=>{
                                 lastMessage: input,
                                 membersToPush: members,
                                 members: members,
-                                type:groupData.isGroupChat ? 'group': 'private',
+                                type: groupData.isGroupChat ? 'group' : 'private',
                                 fromUserId: currentUser.uid,
                                 fromUserName: currentUser.displayName,
                                 fromUserProfileimageUrl: currentUser.photoURL,
@@ -221,7 +376,7 @@ useEffect(()=>{
                                 // chatRoomID: params.id,
                             }).then(function (docRef) {
 
-                                docRef.update({recentId: docRef.id,counter: 1})
+                                docRef.update({recentId: docRef.id, counter: 1})
                             }).catch(() => {
                             })
 
@@ -392,7 +547,7 @@ useEffect(()=>{
                 <div className='d-flex center chat-header mb-2'>
                     <BackButton/>
                     {receiverEmail &&
-                        <div className={`lg-view-flex d-md-none`}>
+                        <div className={`lg-view-flex `}>
                     <DisplayPicture
                         chatRoom={chatRoom}
                         receiver={receiverEmail}
@@ -411,7 +566,7 @@ useEffect(()=>{
 
                         <Dropdown className={`ml-2`}>
                             <Dropdown.Toggle variant="" id="">
-                                <div className={' icon-wrapper   pointer text-center'}><div className={'dots-dropdown'}>&#8942;</div></div>
+                                <div className={' icon-wrapper   pointer text-center'}><div className={'dots-dropdown'}>&#9432;</div></div>
 
                             </Dropdown.Toggle>
 
@@ -431,34 +586,50 @@ useEffect(()=>{
 
                 <div className={`chat-container`}>
 
-                    {/* { chat ? chat.map(chats  =>{
-                                    return(<>
-                                            { chats.text ? <>
-                                                <ChatContent sender={sender} chats={chats} key={chats.chatId} />
-                                            </> : <></>}
-                                        </>
-                                    )
-                                }) : ''} */}
+                    {/*{chat ? chat.map(chats => {*/}
+                    {/*    return (<>*/}
+                    {/*            {chats.text || chats.storageMediaUrl ? <>*/}
+                    {/*                <ChatContent preview={previewImageOnSend} sender={sender} chats={chats}*/}
+                    {/*                             key={chats.chatId}/>*/}
+
+
+                    {/*            </> : <></>}*/}
+                    {/*        </>*/}
+                    {/*    )*/}
+                    {/*})}*/}
                     {showMessages()}
+                    <>
+                        {previewImageOnSend &&
+                        <div className={`d-flex  text-container position-relative`}>
+                            <img className={`spinner-loader`} width={24} style={{display: fileLoading ? 'flex': 'none'}} src={spinner} alt=""/>
+                            <img src={previewImageOnSend} alt=""/>
+                        </div>
+                        }
+                    </>
 
                     <div ref={scrollView}></div>
 
 
                 </div>
-                <form onSubmit={handleSendText} className=' d-flex chat-input align-items-center'>
-                    {/*<input*/}
-                    {/*    name={`media`}*/}
-                    {/*    type="file"*/}
-                    {/*    ref={hiddenFileInput}*/}
-                    {/*    onChange={handleChange}*/}
-                    {/*    style={{display: 'none'}}*/}
+                <form onSubmit={handleSendText} className=' d-flex chat-input '>
+                    <input
+                        accept="image/x-png,image/gif,image/jpeg"
+                        name={`media`}
+                        type="file"
+                        ref={hiddenFileInput}
+                        onChange={handleChange}
+                        style={{display: 'none'}}
 
-                    {/*/>*/}
-                    {/*{preview && <img height={30} src={preview}/>}*/}
+                    />
+                    <div className={`preview-image-wrapper overflow-hidden`}>
+                        {preview && <img  src={preview}/>}
+
+                    </div>
+
 
                     <input value={input} onChange={(e) => {setInput(e.target.value);setShowSendButton(true)}} name='message'
                            placeholder='Enter Message' type="text" />
-                    <>{showSendButton && input !== "" ? <button type={`submit`} className={`btn m-2 w-25`}>Send</button> : <><div className={' icon-wrapper   pointer text-center'}></div><div className={' icon-wrapper   pointer text-center'}></div></> }</>
+                    <>{showSendButton && input !== "" ? <button type={`submit`} className={`btn m-2 w-25`}>Send</button> : <><div className={' icon-wrapper   pointer text-center'} onClick={handleSendMedia}></div><div className={' icon-wrapper   pointer text-center'}></div></> }</>
                 </form>
                 <br/>
                 <br/>

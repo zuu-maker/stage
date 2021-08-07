@@ -1,41 +1,62 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import dummy from "../images/dummy.png";
 import Text from "./text";
 import {useAuth} from "../contexts/authContext";
 import {useChat} from "../contexts/messageContext";
-import {useAuthState} from "react-firebase-hooks/auth"
-import { auth, db } from '../firebase/firebase';
-import {useCollection} from "react-firebase-hooks/firestore"
-import moment from "moment/moment";
-
-function ChatContent({sender,loading, message, chats}) {
-    
+import moment from "moment";
+import {useAuthState} from "react-firebase-hooks/auth";
+import {auth, db} from "../firebase/firebase";
+import {useCollection} from "react-firebase-hooks/firestore";
+export const Modal = ({src, onClose,type}) => {
+    return (
+        <div className="media-modal">
+      <span className="close" onClick={onClose}>
+        &times;
+      </span>
+            { type === 'image'?<img className="media-modal-content" src={src}/>
+                : type === 'video' ? <video className="media-modal-content" src={src} preload={`true`} autoPlay controls />
+                    :
+                    <></>
+            }
+        </div>
+    )
+}
+function ChatContent({message,preview,sender,loading}) {
     const [currentUser] = useAuthState(auth)
-   
+
     // const {currentUser} = useAuth();
+    // const [senderSnap] = useCollection(db.collection("Users").where("email","==",sender));
+    //
+    // const senderData = senderSnap?.docs?.[0]?.data()
     const {chatRoom} = useChat();
-    const [senderSnap] = useCollection(db.collection("Users").where("email","==",sender));
+    const [isOpen, setIsOpen] = useState(false)
+    const showModal = () => setIsOpen(true)
 
-    const senderData = senderSnap?.docs?.[0]?.data()
-
-   
-
-    // var getSender = chats.find((message, index)  =>{
-    //     if(message.senderObj != currentUser.uid)
-    //         return true;})
-    // ${currentUser && currentUser.uid === chats.senderObjId ? 'user-text': 'guest-text'
     return (
         <>
-            <div className={`d-flex mb-3  text-container ${currentUser && currentUser.uid === senderData?.userId ? 'user-text': 'guest-text'}`} >
+            <div className={`d-flex mb-3 text-container ${currentUser && currentUser.uid === message.senderObjId ? 'user-text': 'guest-text'}`} >
                 <div className='user-list-thumb-wrapper align-self-end'>
-                    <img className={`user-chat-image`} src={senderData?.userProfileImageUrl} alt=""/>
+                    <img src={message.userProfileImageUrl} alt=""/>
                 </div>
-                <Text loading={loading} text={message.message}/>
-                <small  className={`text-light`}>{moment(message.dateTime?.seconds*1000).format("DD/MM/YYYY h:mm")}</small>
+                {message.text !== '' ?
+                    <Text message={message} preview={''}/>
+                    : message.isImage || preview ?
 
+                        <img className="image"  onClick={showModal} src={message.storageMediaUrl || preview} alt=""/>
+
+                        :
+                        message.isVideo|| preview ?
+                            <video onClick={showModal} className="image" src={message.storageMediaUrl || preview}  />
+                            :
+                            <></>}
+                {isOpen &&
+                <Modal
+                    src={message.storageMediaUrl}
+                    type = {message.isImage ? 'image': message.isVideo ? 'video':''}
+                    onClose={() => setIsOpen(false)}
+                />}
             </div>
-            {/*<small>{timeConverter(chats.dateTime.seconds,'H-M')}</small>*/}
-            {/*<small className={`text-light `}>{senderData?.userName}</small>*/}
+            {/*<small>{timeConverter(message.dateTime.seconds,'H-M')}</small>*/}
 
         </>
 

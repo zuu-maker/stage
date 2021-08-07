@@ -47,7 +47,6 @@ export default function EventsForm() {
     const [success, setSuccess] = useState("")
     const [loading, setLoading] = useState(false)
     const {setLoader, loader} = useLoader()
-    // const { user,user} = useAuth()
     const [formOptions, setFormOptions] = useState([])
     const [maxParticipants, setMaxParticipants] = useState([])
     const [eventTotalPrizes, setEventTotalPrizes] = useState(0)

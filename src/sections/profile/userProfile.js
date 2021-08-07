@@ -23,18 +23,20 @@ import {auth, db, realDB} from "../../firebase/firebase";
 import {useUser} from "../../contexts/userContext";
 import {useLoader} from "../../contexts/loaderContext";
 import Sidebar from "../dashboard/sidebar";
-import { useStateValue } from '../../contexts/StateProvider';
+import {useStateValue} from '../../contexts/StateProvider';
 import {useAuthState} from "react-firebase-hooks/auth"
+import {useList} from "react-firebase-hooks/database";
 
 function UserProfile() {
     const [currentUser] = useAuthState(auth)
-    const [{user,userData,otherUser},dispatch] = useStateValue();
+    const [{user, userData, otherUser}, dispatch] = useStateValue();
     // const {currentUser, user} = useAuth()
     let params = useParams();
     // const {otherUser, setOtherUser, setHasFollowed} = useUser();
     const [joinedEvents, setJoinedEvents] = useState([]);
     const [loading, setLoading] = useState(false);
     const {setLoader, loader} = useLoader();
+    const [joinedEventSnap] = useList(realDB.ref('Participants').orderByChild('userId').equalTo(user?.uid))
     let userJoinedEventsList = [];
     let joinedEventsList = [];
 
@@ -42,7 +44,7 @@ function UserProfile() {
     useEffect(() => {
 
         //Get other user object from firestore User collection
-            if(userData && user.uid !== params.id ){
+        if (userData && user.uid !== params.id) {
             setLoader(true)
 
 
@@ -50,9 +52,11 @@ function UserProfile() {
                 // .get()
                 .onSnapshot((snapshot) => {
                     console.log(snapshot.docs.map(doc => doc.data()))
-                    const otherUser =  snapshot.docs.map(doc => doc.data()).find(b => {return b})
+                    const otherUser = snapshot.docs.map(doc => doc.data()).find(b => {
+                        return b
+                    })
                     dispatch({
-                        type:"SET_OTHER_USER",
+                        type: "SET_OTHER_USER",
                         otherUser,
                     })
                     console.log(otherUser)
@@ -71,116 +75,115 @@ function UserProfile() {
                     // })
 
                 });
-                setLoader(false)
+            setLoader(false)
 
-            return () =>{
+            return () => {
                 console.log('other user unmounted')
             }
-            }
+        } else {
+            setLoading(true)
+            //Get an array of participants that match the current user Id
 
-            else{
-                setLoading(true)
-                //Get an array of participants that match the current user Id
+            //
+            //         userJoinedEventListSnap.forEach((doc) => {
+            //             userJoinedEventsList.push(doc.val())
+            //         })
+            //
+            //         //Get an array of Events in the participants array
+                    joinedEventSnap.map((eventJoined) => {
+                        getDocWithRef('Events', eventJoined.val().EventId)
+                            .get()
+                            .then((snapshot) => {
+                                joinedEventsList.push(Object.assign(snapshot.val(),{id:snapshot.key}))
+                                console.log(snapshot.val())
 
-                    getRealtimeChild('Participants', 'userId', user?.uid).get()
-                    .then((snapshot) => {
-                        snapshot.forEach((doc) => {
-                            userJoinedEventsList.push(doc.val())
-                        })
+                                setJoinedEvents(joinedEventsList)
 
-                        //Get an array of Events in the participants array
-                        userJoinedEventsList?.map((eventJoined) => {
-                            getDocWithRef('Events', eventJoined.EventId)
-                                .get()
-                                .then((snapshot) => {
-                                    joinedEventsList.push(Object.assign(snapshot.val(),{id:snapshot.key}))
-                                    console.log(snapshot.val())
+                                setLoading(false)
 
-                                    setJoinedEvents(joinedEventsList)
-
-                                    setLoading(false)
-
-                                })
-
-
-                                .catch(e => {
-                                    console.log(e)
-                                    setLoading(false)
-                                })
-
-                        })
-
-                    })
-                    .catch(e => {
-                        console.log(e)
-                        setLoading(false)
-                    })
-                // Filter out events created by the current user
-                joinedEventsList.filter((eachEvent) => {
-                    if (eachEvent.EventCommissionerId != currentUser.uid)
-                        return eachEvent})
-
-                //Get future events based on current time compared to the EventStartDate field
-                realDB.ref('Events').orderByChild('EventStartDate').startAt(parseInt( Date.now())).get()
-                    .then(snapshot =>{
-                            snapshot.forEach(doc =>{
-                                // console.log(doc.val())
                             })
-                        })
-        }
-    }, [])
+            //
 
+                            .catch(e => {
+                                console.log(e)
+                                setLoading(false)
+                            })
+            //
+                    })
+            //
+            //
+            // // Filter out events created by the current user
+            // joinedEventsList.filter((eachEvent) => {
+            //     if (eachEvent.EventCommissionerId != currentUser.uid)
+            //         return eachEvent})
+            // joinedEventSnap.map(event => {
+            //     console.log(event.val())})
+
+            //Get future events based on current time compared to the EventStartDate field
+            realDB.ref('Events').orderByChild('EventStartDate').startAt(parseInt(Date.now())).get()
+                .then(snapshot => {
+                    snapshot.forEach(doc => {
+                        // console.log(doc.val())
+                    })
+                })
+        }
+        setLoader(false)
+    }, [])
 
 
     return (
         <>
 
             <Header/>
-<>
-
-    { !loader && <>
-        {user && user.uid == params.id ?
-
-            <div className='container user d-flex'>
-                {/* <UserMenu  user={user} /> */}
-                <Sidebar/>
-                <div className={`lg-view flex-column`}>
-                    <Graph/>
-                    <h4 className={`text-light`}>Joined Events</h4>
-                    <div className='grid-container w-100'>
-
-
-
-
-                        {!loading &&  joinedEvents?.length > 0 ? joinedEvents?.slice(0,2).map(event => {
-                            return (
-                                <>
-
-                                    {event !== undefined && event !== null && <Card event={event} key={event?.id}/>}
-                                </>
-                            )
-                        }) :<>
-                            <p className={`mx-auto text-center justify-content-center align-items-center text-light`}>{!loading &&'No recent activity'}</p></> }
-                    </div>
-
-                </div>
-
-            </div>
-            :
             <>
-                <div className='container other-user d-flex'>
-                    <>
-                        {!loader && user.uid && otherUser?.userId && <OtherUserMenu otherUserObj={otherUser}/>}
 
-                    </>
+                <>
+                    {user && user.uid === params.id ?
+                        <>
+                            <div className='container user d-flex'>
+                                {/* <UserMenu  user={user} /> */}
+                                <Sidebar/>
+                                <div className={`lg-view flex-column`}>
+                                    <Graph/>
+                                    <h4 className={`text-light`}>Joined Events</h4>
+                                    <div className='grid-container w-100'>
 
-                </div>
 
-            </>}
-    </>}
-            <MobileNavbar/>
+                                        <>
 
-</>
+                                            {!loading && joinedEvents ? joinedEvents?.map(event => {
+                                                return (
+                                                    <>
+
+                                                        {event !== undefined && event !== null && event.EventCommissionerId !== currentUser.uid &&
+                                                        <Card event={event} key={event.id}/>}
+                                                    </>
+                                                )
+                                            }) : <></>}
+                                        </>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </>
+
+                        :
+                        <>
+                            <div className='container other-user d-flex'>
+                                <>
+                                    {!loader && user.uid && otherUser?.userId &&
+                                    <OtherUserMenu otherUserObj={otherUser}/>}
+
+                                </>
+
+                            </div>
+
+                        </>}
+                </>
+                <MobileNavbar/>
+
+            </>
         </>
     );
 }

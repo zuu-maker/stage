@@ -123,7 +123,9 @@ function Events() {
                                 <Card event={event.val()}  key={event.val().id}/>
                             </>
                         )
-                    }) : <></>}
+                    }) : <>
+                    <div className={`card pointer overflow-hidden border-0 grid-item event-card animated-background`}></div>
+                    </>}
 
                 </>
 
