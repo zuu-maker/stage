@@ -238,10 +238,12 @@ useEffect(() =>{
                  className='d-flex pointer mb-2 user-list-sub-section'>
 
                 <div className='user-list-thumb-wrapper'>
-                    <img ref={imageRef} src={ chats.type === "group"? chats?.profileimageUrl : receiver?.userProfileImageUrl }alt=""/>
+                    {/*<img ref={imageRef} src={ chats.type === "group"? chats?.profileimageUrl : receiver?.userProfileImageUrl }alt=""/>*/}
+                    <img ref={imageRef} src={ chats.userProfileImageUrl}alt=""/>
                 </div>
                 <div className='ml-3 text-light w-100'>
-                    <span>{chats.type === "group" ? chats?.groupChatName : receiver?.userName}</span>
+                    {/*<span>{chats.type === "group" ? chats?.groupChatName : receiver?.userName}</span>*/}
+                    <span>{chats.withUserName}</span>
                     <span className=' float-right d-flex flex-column align-items-center justify-contents-center space-light'>
         <small>{timeConverter(parseInt(chats.date), 'D-M-Y')}</small>
         <>

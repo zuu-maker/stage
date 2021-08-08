@@ -10,10 +10,10 @@ import BackButton from "./backButton";
 import {useStateValue} from "../contexts/StateProvider"
 import {Link, useHistory, useParams} from "react-router-dom";
 import {useAuthState} from "react-firebase-hooks/auth"
-import {useCollection} from "react-firebase-hooks/firestore"
+import {useCollection, useDocumentOnce} from "react-firebase-hooks/firestore"
 import DisplayName from './DisplayName';
-import DisplayPicture from './DisplayPicture';
 import spinner from '../images/spinner.gif'
+import {useObject} from "react-firebase-hooks/database";
 
 const MessageWindow = ({}) => {
     const [{user,userData}] = useStateValue()
@@ -48,7 +48,7 @@ const MessageWindow = ({}) => {
     // const [chatSnap] = useCollection(db.collection("chats").doc(params.id))
     const [messagesSnap,loading ,error] = useCollection(db.collection('ChatRooms').doc(params.id).collection('chat').orderBy("dateTime","asc"));
     // console.log(params.id);
-    const [senderSnap] = useCollection(db.collection("ChatRooms").where("chatRoomId","==",params.id));
+    const [chatRoomSnap] = useDocumentOnce(db.collection("ChatRooms").where("chatRoomId","==",params.id));
     //  console.log(params.id);
 
 
@@ -79,12 +79,14 @@ useEffect(()=>{
 
 },[])
 
-    console.log(senderSnap?.docs?.[0]?.data())
 
-    const groupData = senderSnap?.docs?.[0]?.data();
-    console.log(groupData)
-    const receiverEmail = getReceiverEmail(groupData?.participants,currentUser)
-
+    const chatRoomObject = chatRoomSnap?.docs?.[0]?.data();
+    console.log(chatRoomObject)
+    const receiverEmail = getReceiverEmail(chatRoomObject?.participants,currentUser)
+    const receiverObject =  chatRoomObject?.participants?.filter(userObj =>{
+        if(userObj.objectId !== user.uid)
+            return userObj
+    })
 
 
 
@@ -110,7 +112,7 @@ useEffect(()=>{
         }
     }
     // console.log(currentUser);
-    // console.log(groupData);
+    // console.log(chatRoomObject);
     useEffect(  () =>{
         // setLoader(true)
         // db.collection('ChatRooms').doc( messageId).collection('chat').orderBy('dateTime').onSnapshot(snapshot => {
@@ -159,7 +161,7 @@ useEffect(()=>{
         e.preventDefault()
         setShowSendButton(false)
 
-        const members = groupData?.participants?.map((participant) => (participant.objectId))
+        const members = chatRoomObject?.participants?.map((participant) => (participant.objectId))
 
         // var data = {
         //     text: e.target.message.value,
@@ -265,11 +267,11 @@ useEffect(()=>{
                                             db.collection('Recent').add({
                                                 chatRoomID: params.id,
                                                 date: Date.now(),
-                                                groupChatName: groupData.isGroupChat ? groupData.groupChatName : " ",
+                                                groupChatName: chatRoomObject.isGroupChat ? chatRoomObject.groupChatName : " ",
                                                 lastMessage: input,
                                                 membersToPush: members,
                                                 members: members,
-                                                type: groupData.isGroupChat ? 'group' : 'private',
+                                                type: chatRoomObject.isGroupChat ? 'group' : 'private',
                                                 fromUserId: currentUser.uid,
                                                 fromUserName: currentUser.displayName,
                                                 fromUserProfileimageUrl: currentUser.photoURL,
@@ -363,11 +365,11 @@ useEffect(()=>{
                             db.collection('Recent').add({
                                 chatRoomID: params.id,
                                 date: Date.now(),
-                                groupChatName: groupData.isGroupChat ? groupData.groupChatName : " ",
+                                groupChatName: chatRoomObject.isGroupChat ? chatRoomObject.groupChatName : " ",
                                 lastMessage: input,
                                 membersToPush: members,
                                 members: members,
-                                type: groupData.isGroupChat ? 'group' : 'private',
+                                type: chatRoomObject.isGroupChat ? 'group' : 'private',
                                 fromUserId: currentUser.uid,
                                 fromUserName: currentUser.displayName,
                                 fromUserProfileimageUrl: currentUser.photoURL,
@@ -536,8 +538,8 @@ useEffect(()=>{
     // }).catch((err) => {
     //     console.log(err)
     // })
-    // console.log(groupData?.users);
-    // console.log(groupData?.groupChatName);
+    // console.log(chatRoomObject?.users);
+    // console.log(chatRoomObject?.groupChatName);
 
     return (
         <>
@@ -546,15 +548,12 @@ useEffect(()=>{
 
                 <div className='d-flex center chat-header mb-2'>
                     <BackButton/>
-                    {receiverEmail &&
-                        <div className={`lg-view-flex `}>
-                    <DisplayPicture
-                        chatRoom={chatRoom}
-                        receiver={receiverEmail}
-                    /></div>}
+                    <div className='user-list-thumb-wrapper'>
+                        {/*<img src={chatRoomObject.userProfileImageUrl} alt=""/>*/}
+                    </div>
                     <div className='ml-3 text-light guest-name'>
-                        {receiverEmail && <DisplayName groupName={groupData?.groupChatName} receiver={receiverEmail}/>}
-
+                        {/*{receiverEmail && <DisplayName groupName={chatRoomObject?.groupChatName} receiver={receiverEmail}/>}*/}
+                        {receiverObject[0]?.userName}
 
                     </div>
 

@@ -187,7 +187,7 @@ function App() {
               <EventProvider>
                   <TransactionProvider>
 
-                      <SlideRoutes animation={window.screen.width < 700 ? 'slide' : ''} location={location}>
+                      <SlideRoutes duration={600} animation={window.screen.width < 700 ? 'slide' : ''} location={location}>
 
                       <Route exact path="/events" component={Events} />
                       {user?.uid && <Route path="/eventDetails/:id" component={EventDetails} />}

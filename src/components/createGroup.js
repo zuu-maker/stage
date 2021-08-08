@@ -255,7 +255,7 @@ function CreateGroup(props) {
                             {obj.user.map(each => {
                                 return (
                                     <div className={`user-list`}>
-                                        <div key={each.objectId} style={{backgroundColor: selected ? '#2B3038' : 'initial'}} onClick={handleMessage} ref={idRef} id={each.userId || each.objectId} userName={each.userName} userProfileImageUrl={each.userProfileImageUrl} email={each.email} className='d-flex pointer user-list-sub-section'>
+                                        <div key={each.objectId} style={{backgroundColor: selected ? '#2B3038' : 'initial'}} onClick={!loading ? handleMessage : null} ref={idRef} id={each.userId || each.objectId} userName={each.userName} userProfileImageUrl={each.userProfileImageUrl} email={each.email} className='d-flex pointer user-list-sub-section'>
                                             <div className='user-list-thumb-wrapper'>
                                                 <img src={each.userProfileImageUrl} alt=""/>
                                             </div>
