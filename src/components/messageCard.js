@@ -22,24 +22,29 @@ import {useAuthState} from "react-firebase-hooks/auth"
 import {useCollection} from "react-firebase-hooks/firestore"
 import { useStateValue } from '../contexts/StateProvider';
 import DisplayPicture from "./DisplayPicture";
+import moment from "moment";
 
 function MessageCard({uid,id, chats}) {
 
     const [,dispatch] = useStateValue()
     const history = useHistory()
     const [currentUser] = useAuthState(auth)
-    const receiverEmail = getReceiverUid(chats?.members,currentUser)
-    // console.log(receiverEmail);
-    const [receiverSnap] = useCollection(db.collection("Users").where("userId","==",receiverEmail));
+    // const receiverEmail = getReceiverUid(chats?.members,currentUser)
+    // const [receiverSnap] = useCollection(db.collection("Users").where("userId","==",receiverEmail));
     //Get unread messages
     //This will return chat objects in which the current user is  in the deliveredTo array
+    const [lastMessageSnap,error] = useCollection(db.collection('ChatRooms').doc(chats.chatRoomId).collection('chat').orderBy('dateTime','desc'))
     const [readMessagesSnap] = useCollection(db.collection('ChatRooms').doc( chats.chatRoomID).collection('chat').where('deliveredToParticipants','array-contains',currentUser.uid)
     )
     // console.log(chats);
-    const receiver = receiverSnap?.docs?.[0]?.data()
-    // console.log(receiver);
-    // console.log(receiver);
-    // console.log(currentUser);
+    // const receiver = receiverSnap?.docs?.[0]?.data()
+    const [receiver] =chats.participants.filter( (receiverObj) =>{
+        if(receiverObj.objId !== currentUser.uid)
+            return receiverObj
+
+    } )
+
+
 
     const enterChat = () => {
         // console.log(id);
@@ -50,6 +55,7 @@ function MessageCard({uid,id, chats}) {
     }
 
     const [selectedChat ,setSelectedChat] =useState(false);
+    const [lastMessage ,setLastMessage] =useState([]);
     const [loading ,setLoading] =useState(false);
     const [messageNotification ,setMessageNotification] =useState(true);
     const [readMessages ,setReadMessages] =useState(0);
@@ -79,13 +85,14 @@ function MessageCard({uid,id, chats}) {
     // const recent = recentSnap?.docs?.[0]?.data()
     // console.log(receiverSnap);
 useEffect(() =>{
-    setTotalNotificationCount( currentValue => currentValue + parseInt(chats.counter))
+    // setTotalNotificationCount( currentValue => currentValue + parseInt(chats.counter))
 
 },[])
     useEffect(()=>{
-        if(readMessagesSnap) {
-            console.log(readMessagesSnap)
-            console.log(readMessagesSnap.docs.map(doc => doc.data()))
+        console.log(error)
+        if(readMessagesSnap && lastMessageSnap) {
+            console.log(lastMessageSnap.docs.map(doc => doc.data()))
+            setLastMessage(lastMessageSnap.docs[0].data())
 
 
             // setReadMessages(snapshot.docs?.map( doc =>doc.data()))
@@ -125,15 +132,15 @@ useEffect(() =>{
 
 
 
-    {
-        currentUser.uid !== chats.fromUserId ? setMessageNotification(true)
-            :
-            setMessageNotification(false)
-
-    }
-    {
-        chats.counter - readMessages === 0 ? setMessageNotification(false): setMessageNotification(true)
-    }
+    // {
+    //     currentUser.uid !== chats.fromUserId ? setMessageNotification(true)
+    //         :
+    //         setMessageNotification(false)
+    //
+    // }
+    // {
+    //     chats.counter - readMessages === 0 ? setMessageNotification(false): setMessageNotification(true)
+    // }
     },[])
 
     //Read message
@@ -233,32 +240,32 @@ useEffect(() =>{
         <p>{chats.isGroupChat ? chats.groupChatName :receiver.userName}</p>
     </div> */}
 
-            <div style={{background:selectedChat && '#13161AC3'}} onClick={enterChat} userId={receiver?.userId}
+            <div style={{background:selectedChat && '#13161AC3'}} onClick={enterChat} userId={receiver.userId}
                  id={id}
                  className='d-flex pointer mb-2 user-list-sub-section'>
 
                 <div className='user-list-thumb-wrapper'>
                     {/*<img ref={imageRef} src={ chats.type === "group"? chats?.profileimageUrl : receiver?.userProfileImageUrl }alt=""/>*/}
-                    <img ref={imageRef} src={ chats.userProfileImageUrl}alt=""/>
+                    <img ref={imageRef} src={ chats.isGroupChat ? chats.groupImageUrl:  receiver.userProfileImage}alt=""/>
                 </div>
                 <div className='ml-3 text-light w-100'>
                     {/*<span>{chats.type === "group" ? chats?.groupChatName : receiver?.userName}</span>*/}
-                    <span>{chats.withUserName}</span>
+                    <span>{chats.isGroupChat ? chats.groupChatName  : receiver.userName}</span>
                     <span className=' float-right d-flex flex-column align-items-center justify-contents-center space-light'>
-        <small>{timeConverter(parseInt(chats.date), 'D-M-Y')}</small>
-        <>
-            {
-                // chats.counter - readMessages.length > 0 &&
-                <span style={{visibility: messageNotification ? 'visible' : 'hidden'}}
-                      className={`message-card-notification text-light mt-1`}>
-        <span
-            className={`mx-auto mt-auto mb-auto`}>{chats.counter && chats.counter }</span>
-    </span>
-            }
-        </>
+        <small>{moment(chats.dateLastUpdated?.seconds * 1000).format("DD/MM/YYYY h:mm")}</small>
+    {/*    <>*/}
+    {/*        {*/}
+    {/*            // chats.counter - readMessages.length > 0 &&*/}
+    {/*            <span style={{visibility: messageNotification ? 'visible' : 'hidden'}}*/}
+    {/*                  className={`message-card-notification text-light mt-1`}>*/}
+    {/*    <span*/}
+    {/*        className={`mx-auto mt-auto mb-auto`}>{chats.counter && chats.counter }</span>*/}
+    {/*</span>*/}
+    {/*        }*/}
+    {/*    </>*/}
     </span>
                     <div
-                        className="space-light">  {!loading && chats.lastMessage}</div>
+                        className="space-light">  {!loading && lastMessage.text}</div>
                     {/* {chats.type === "group" ? chats?.groupChatName :receiver?.userName} */}
 
                 </div>

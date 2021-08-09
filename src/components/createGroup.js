@@ -68,13 +68,13 @@ function CreateGroup(props) {
                 // users: [user.email,otherUser.email],
                 participants: [
                     {
-                        objectId: userData.objectId,
+                        objId: userData.objectId,
                         email: userData.email,
                         userName:userData.userName,
                         userProfileImage:userData.userProfileImageUrl
                     },
                     {
-                        objectId: otherUser.objectId,
+                        objId: otherUser.objectId,
                         email: otherUser.email,
                         userName:otherUser.userName,
                         userProfileImage:otherUser.userProfileImageUrl
