@@ -3,13 +3,14 @@
 export const initialState = {
     //states
 
-    user:{},
-    userData:{},
-    otherUser:{},
+    user:null,
+    userData:null,
+    otherUser:null,
     hasJoined:false,
     hasFollowed:false,
     joinedEvents:[], 
-    createdEvents:[], 
+    createdEvents:[],
+    selectedParticipants:[],
    }
 //    window.localStorage.setItem(user ForgotPassword, 12345);
 //    window.localStorage.johndoe
@@ -51,6 +52,12 @@ export const initialState = {
              return{
                  ...state,
                  joinedEvents:[...state.joinedEvents,action.joinedEvents ]
+             }
+         case "SET_SELECTED_PARTICIPANTS":
+            //  console.log(action.joinedEvents)
+             return{
+                 ...state,
+                 selectedParticipants:[...state.selectedParticipants,action.selectedParticipants ]
              }
          case "SET_HAS_FOLLWED":
             //  console.log(action.hasFollowed);

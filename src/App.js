@@ -71,7 +71,6 @@ function App() {
 
 
     useEffect(() => {
-        console.log('app mounted')
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if(user){
                 // console.log(user);

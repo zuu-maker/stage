@@ -22,10 +22,9 @@ import Icon from "./icon";
 import '../sections/message/message.css'
 
 function CreateGroup(props) {
-    const [{user,userData}] = useStateValue()
+    const [{user,selectedParticipants,userData}] = useStateValue()
     const [contacts,setContacts] = useState([])
     const [participants,setParticipants] = useState([])
-    const [selectedParticipants,setSelectedParticipants] = useState([])
     const [file, setFile] = useState('');
     const [loading, setLoading] = useState(true);
     const hiddenFileInput = React.useRef(null);
@@ -121,7 +120,46 @@ function CreateGroup(props) {
 
 
     }
+    const handleCreateGroupChat = async (e) => {
+        setLoading(true)
+        e.preventDefault()
 
+        if(selectedParticipants.length > 0 )
+        {
+            const data = {
+                dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                groupChatName: e.target.groupChatName.value,
+                groupImageUrl: '',
+                isGroupChat: true,
+                // users: [user.email,otherUser.email],
+                participants: selectedParticipants
+            }
+            console.log(data)
+
+            db.collection("ChatRooms").add(data)
+                .then(docRef => {
+                    setLoading(false)
+                    docRef.update({chatRoomId: docRef.id})
+                    // Redirect to the newly created chatRoom  endpoint
+                    history.push(`/messages/${docRef.id}`)
+
+                })
+                .catch(function (error) {
+
+                    console.error("Error adding document: ", error);
+                });
+        }
+
+
+
+
+
+
+        setLoading(false)
+
+
+
+    }
     useEffect(() =>{
 
         if(userData.FollowersIds){
@@ -302,23 +340,22 @@ function CreateGroup(props) {
                             </div>
                             {obj.user.map((each, index) => {
                                 return (
-                                    <div style={{backgroundColor: selected ? '#2B3038' : 'initial'}}
-                                         userName={each.userName} ref={ref => {
-                                        refArray.current[index] = ref;
-                                    }} onClick={handleSelectParticipants.bind(null, index)} index={index}
-                                         className={` d-flex align-items-center w-100`}>
-                                        <UserList user={each} key={each.objectId}/>
+                                    <UserList canBeSelected={true} user={each} key={each.objectId}/>
 
-
-                                        <div className={`form-group ml-auto text-right`}>
-
-
-                                            <input type="checkbox" userId={each.objectId} email={each.email}
-                                                   id={each.userName} name={each.userName}/>
-                                            <label htmlFor={each.userName}></label>
-
-                                        </div>
-                                    </div>
+                                // <div style={{backgroundColor: selected ? '#2B3038' : 'initial'}}
+                                //          userName={each.userName}  index={index}
+                                //          className={` d-flex align-items-center w-100`}>
+                                //
+                                //
+                                //         <div className={`form-group ml-auto text-right`}>
+                                //
+                                //
+                                //             <input type="checkbox" userId={each.objectId} email={each.email}
+                                //                    id={each.userName} name={each.userName}/>
+                                //             <label htmlFor={each.userName}></label>
+                                //
+                                //         </div>
+                                //     </div>
                                 )
                             })}
                         </>
@@ -327,14 +364,14 @@ function CreateGroup(props) {
                     )
                 }) : <></>}
             </div>}
-            { !showSelectUsers && showAddGroupInfo &&  <form className={`d-flex flex-column`}>
+            { !showSelectUsers && showAddGroupInfo &&  <form onSubmit={handleCreateGroupChat} className={`d-flex flex-column`}>
                    <div className={`d-flex text-light mb-4`}>
 
                        <span onClick={()=>{ setShowSelectUsers(true);setAddGroupInfo(false)}} className={`flex-grow-1`}>Cancel</span>
                        <div className={`flex-grow-1`}>
                            <h5>New Group</h5>
                        </div>
-                       <span  className={`flex-grow-1`}>Create</span>
+                       <button type={`submit`}  className={`flex-grow-1 text-btn`}>Create</button>
                    </div>
                         <div className="input-group">
                             <div className={`ml-5 mb-3 d-flex text-light align-items-center`}>
@@ -377,7 +414,7 @@ function CreateGroup(props) {
 
                         </div>
 
-                        <input style={{backgroundImage: `url(${group})`}} placeholder={`Group name`} name={`groupName`} type="text"/>
+                        <input style={{backgroundImage: `url(${group})`}} placeholder={`Group name`} name={`groupChatName`} type="text"/>
 
 
                 </form>}

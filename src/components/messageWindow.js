@@ -80,7 +80,7 @@ useEffect(()=>{
 },[])
 
 
-    const chatRoomObject = chatRoomSnap?.docs?.[0]?.data();
+    const chatRoomObject = chatRoomSnap?.docs[0]?.data();
     console.log(chatRoomObject)
     const receiverEmail = getReceiverEmail(chatRoomObject?.participants,currentUser)
     const receiverObject =  chatRoomObject?.participants?.filter(userObj =>{
@@ -553,7 +553,7 @@ useEffect(()=>{
                     </div>
                     <div className='ml-3 text-light guest-name'>
                         {/*{receiverEmail && <DisplayName groupName={chatRoomObject?.groupChatName} receiver={receiverEmail}/>}*/}
-                        {receiverObject[0]?.userName}
+                        {chatRoomObject?.isGroupChat ? chatRoomObject.groupChatName  : receiverObject?.userName}
 
                     </div>
 
