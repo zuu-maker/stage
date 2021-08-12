@@ -35,6 +35,7 @@ const UserList = ({user,canBeSelected}) => {
         }
         else{
 
+
             setOtherUser({
                 objectId: idRef.current.id,
                 email: idRef.current.getAttribute('email'),

@@ -59,7 +59,7 @@ export const initialState = {
                  ...state,
                  selectedParticipants:[...state.selectedParticipants,action.selectedParticipants ]
              }
-         case "SET_HAS_FOLLWED":
+         case "SET_HAS_FOLLOWED":
             //  console.log(action.hasFollowed);
              return{
                  ...state,

@@ -104,64 +104,64 @@ function App() {
         })
         return () => unsubscribe();
     },[])
-    useEffect(() =>{
-        if(user?.uid){
-            console.log('notification mounted')
-
-            const unsubscribe = db.collection("Recent").where("members", "array-contains", user.uid).orderBy('date','desc')
-                .onSnapshot(snapshot => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === "added") {
-                            // console.log("New : ", change.doc.data());
-
-                        }
-                        if (change.type === "modified") {
-                            console.log("new message : ", change.doc.data());
-                            setNewNotification(change.doc.data())
-                            // setModalShow(true)
-                            {newNotification !==undefined && store.removeNotification(change.doc.data().recentId)}
-                            {
-                                change.doc.data().fromUserId !== user?.uid &&
-
-                                store.addNotification({
-                                    id: change.doc.data().recentId,
-                                    title: change.doc.data().fromUserName,
-                                    message: change.doc.data().lastMessage,
-                                    type: "success",
-                                    insert: "top",
-                                    container: "top-right",
-                                    animationIn: ["animate__animated", "animate__fadeIn"],
-                                    animationOut: ["animate__animated", "animate__fadeOut"],
-                                    dismiss: {
-                                        duration: 500,
-
-                                        pauseOnHover: true
-                                    },
-                                    touchSlidingExit: {
-                                        swipe: {
-                                            duration: 400,
-                                            timingFunction: 'ease-out',
-                                            delay: 0,
-                                        },
-                                        fade: {
-                                            duration: 400,
-                                            timingFunction: 'ease-out',
-                                            delay: 0
-                                        }
-                                    }
-                                });
-                            }
-                            // setNotificationPopup(change.doc.data())
-
-                        }
-                        if (change.type === "removed") {
-                            console.log("Removed : ", change.doc.data());
-                        }
-                    })
-                })
-            return () => unsubscribe();
-        }
-    },[user?.uid])
+    // useEffect(() =>{
+    //     if(user?.uid){
+    //         console.log('notification mounted')
+    //
+    //         const unsubscribe = db.collection("Recent").where("members", "array-contains", user.uid).orderBy('date','desc')
+    //             .onSnapshot(snapshot => {
+    //                 snapshot.docChanges().forEach((change) => {
+    //                     if (change.type === "added") {
+    //                         // console.log("New : ", change.doc.data());
+    //
+    //                     }
+    //                     if (change.type === "modified") {
+    //                         console.log("new message : ", change.doc.data());
+    //                         setNewNotification(change.doc.data())
+    //                         // setModalShow(true)
+    //                         {newNotification !==undefined && store.removeNotification(change.doc.data().recentId)}
+    //                         {
+    //                             change.doc.data().fromUserId !== user?.uid &&
+    //
+    //                             store.addNotification({
+    //                                 id: change.doc.data().recentId,
+    //                                 title: change.doc.data().fromUserName,
+    //                                 message: change.doc.data().lastMessage,
+    //                                 type: "success",
+    //                                 insert: "top",
+    //                                 container: "top-right",
+    //                                 animationIn: ["animate__animated", "animate__fadeIn"],
+    //                                 animationOut: ["animate__animated", "animate__fadeOut"],
+    //                                 dismiss: {
+    //                                     duration: 500,
+    //
+    //                                     pauseOnHover: true
+    //                                 },
+    //                                 touchSlidingExit: {
+    //                                     swipe: {
+    //                                         duration: 400,
+    //                                         timingFunction: 'ease-out',
+    //                                         delay: 0,
+    //                                     },
+    //                                     fade: {
+    //                                         duration: 400,
+    //                                         timingFunction: 'ease-out',
+    //                                         delay: 0
+    //                                     }
+    //                                 }
+    //                             });
+    //                         }
+    //                         // setNotificationPopup(change.doc.data())
+    //
+    //                     }
+    //                     if (change.type === "removed") {
+    //                         console.log("Removed : ", change.doc.data());
+    //                     }
+    //                 })
+    //             })
+    //         return () => unsubscribe();
+    //     }
+    // },[user?.uid])
 
     const location = useLocation();
     return (

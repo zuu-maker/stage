@@ -5,7 +5,7 @@ import {getReceiverEmail} from "../helper/helper";
 import {useLoader} from "../contexts/loaderContext";
 import firebase from "firebase";
 import {auth, db, storage} from "../firebase/firebase";
-import {Dropdown} from "react-bootstrap";
+import {Dropdown, Modal} from "react-bootstrap";
 import BackButton from "./backButton";
 import {useStateValue} from "../contexts/StateProvider"
 import {Link, useHistory, useParams} from "react-router-dom";
@@ -14,7 +14,45 @@ import {useCollection, useDocumentOnce} from "react-firebase-hooks/firestore"
 import DisplayName from './DisplayName';
 import spinner from '../images/spinner.gif'
 import {useObject} from "react-firebase-hooks/database";
+import {css} from "@emotion/react";
+import PuffLoader from "react-spinners/PuffLoader";
+import UserList from "../sections/events/userList";
+function ModalPopup(props) {
+  //   const override = css`
+  // display: block;
+  //     margin: 0 7%;`;
+    let [color, setColor] = useState("#18ff00");
+    return (
+        <Modal
+            {...props}
+            size="lg"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+            animation={`true`}
+            // className={`event-popup`}
+        >
+            <Modal.Header >
+                <div className={`text-right text-light mr-0 ml-auto`}>
+                    <span onClick={ props.onHide}>Close</span>
+                </div>
+            </Modal.Header>
 
+            <Modal.Body>
+
+
+                    {
+                        props.participants?.map(each =>{return(
+                            <UserList user={each} />
+                        )})
+                    }
+
+
+
+            </Modal.Body>
+
+        </Modal>
+    );
+}
 const MessageWindow = ({}) => {
     const [{user,userData}] = useStateValue()
     const {chat,setChat ,recent,setOpenedChat,openedChat,setRecent,chatRoom} = useChat();
@@ -29,6 +67,7 @@ const MessageWindow = ({}) => {
 
     const [previewImageOnSend, setPreviewImageOnSend] = useState([])
 
+    const [modalShow, setModalShow] = React.useState(false);
     const {setLoader} = useLoader();
     const [textId ,setTextId] =useState()
     const [showSendButton ,setShowSendButton] =useState(false)
@@ -204,7 +243,7 @@ useEffect(()=>{
                             isVideo: false,
                             isVoiceNote: false,
                             storageMediaUrl: url,
-                            deliveredToParticipants: [],
+                            deliveredToParticipants: [currentUser.uid],
                             chatRoomId: params.id,
                             dateTime: firebase.firestore.FieldValue.serverTimestamp()
                         }
@@ -224,71 +263,12 @@ useEffect(()=>{
 
                         db.collection('ChatRooms').doc(params.id).collection('chat').add(data)
                             .then(async docRef => {
-                                console.log('added')
                                 //Update message chatId field
                                 await docRef.update({chatId: docRef.id})
-                                db.collection("Recent").where("chatRoomID", "==", params.id).get()
-                                    .then(snapshot => {
-                                        let recentArray = snapshot.docs.map(doc => doc.data())
-                                        // console.log(recentArray.length);
+                                db.collection('ChatRooms').doc(params.id).update({dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp()})
 
-                                        if (recentArray.length > 0) {
-                                            recentArray.forEach((r) => {
-                                                setRecent(r)
-                                                var recentData={
-                                                    date: Date.now(),
-                                                    lastMessage: input,
-                                                    fromUserId: currentUser.uid,
-                                                    fromUserName: currentUser.displayName,
-                                                    fromUserProfileimageUrl: currentUser.photoURL,
-                                                    counter: firebase.firestore.FieldValue.increment(1)
-                                                }
-                                                if (file.type.match('image.*')) {
-                                                    recentData.lastMessage = '[Image]';
-                                                } else if (file.type.match('video.*')) {
-                                                    recentData.lastMessage = '[Video]';
-                                                } else if (file.type.match('audio.*')) {
-
-                                                    recentData.lastMessage = '[Audio]';
-                                                } else
-                                                    recentData.lastMessage = '';
-
-                                                //Update Recent Document
-                                                db.collection('Recent').doc(r.recentId).update(recentData).then(
-                                                    () => {
-
-                                                    }
-                                                )
-
-                                            })
-                                        } else {
-
-
-                                            db.collection('Recent').add({
-                                                chatRoomID: params.id,
-                                                date: Date.now(),
-                                                groupChatName: chatRoomObject.isGroupChat ? chatRoomObject.groupChatName : " ",
-                                                lastMessage: input,
-                                                membersToPush: members,
-                                                members: members,
-                                                type: chatRoomObject.isGroupChat ? 'group' : 'private',
-                                                fromUserId: currentUser.uid,
-                                                fromUserName: currentUser.displayName,
-                                                fromUserProfileimageUrl: currentUser.photoURL,
-                                                // date: Date.now(),
-
-                                                // chatRoomID: params.id,
-                                            }).then(function (docRef) {
-
-                                                docRef.update({recentId: docRef.id, counter: firebase.firestore.FieldValue.increment(1)})
-                                            }).catch(() => {
-                                            })
-
-                                        }
-                                    }).catch(err => {
-                                    // console.log(err.message);
-                                })
-                            }).catch((err) => {
+                            })
+                            .catch((err) => {
                             console.log(err.message)
                         })
                         // // Update Chatroom storageMedia field
@@ -326,7 +306,7 @@ useEffect(()=>{
             isVideo: false,
             isVoiceNote: false,
             storageMediaUrl: '',
-            deliveredToParticipants: [],
+            deliveredToParticipants: [currentUser.uid],
             chatRoomId: params.id,
             dateTime: firebase.firestore.FieldValue.serverTimestamp()
         })
@@ -334,67 +314,17 @@ useEffect(()=>{
                 console.log('added')
                 //Update message chatId field
                 await docRef.update({chatId: docRef.id})
-                db.collection("Recent").where("chatRoomID", "==", params.id).get()
-                    .then(snapshot => {
-                        let recentArray = snapshot.docs.map(doc => doc.data())
-                        // console.log(recentArray.length);
+                db.collection('ChatRooms').doc(params.id).update({dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp()})
 
-                        if (recentArray.length > 0) {
-                            recentArray.forEach((r) => {
-                                setRecent(r)
-
-                                //Update Recent Document
-                                db.collection('Recent').doc(r.recentId).update({
-                                    date: Date.now(),
-                                    lastMessage: input,
-                                    fromUserId: currentUser.uid,
-                                    fromUserName: currentUser.displayName,
-                                    fromUserProfileimageUrl: currentUser.photoURL,
-                                    counter: r.counter + 1
-                                }).then(
-                                    () => {
-
-                                    }
-                                )
-
-
-                            })
-                        } else {
-
-
-                            db.collection('Recent').add({
-                                chatRoomID: params.id,
-                                date: Date.now(),
-                                groupChatName: chatRoomObject.isGroupChat ? chatRoomObject.groupChatName : " ",
-                                lastMessage: input,
-                                membersToPush: members,
-                                members: members,
-                                type: chatRoomObject.isGroupChat ? 'group' : 'private',
-                                fromUserId: currentUser.uid,
-                                fromUserName: currentUser.displayName,
-                                fromUserProfileimageUrl: currentUser.photoURL,
-                                // date: Date.now(),
-
-                                // chatRoomID: params.id,
-                            }).then(function (docRef) {
-
-                                docRef.update({recentId: docRef.id, counter: 1})
-                            }).catch(() => {
-                            })
-
-                        }
-                    }).catch(err => {
-                    // console.log(err.message);
-                })
-            }).catch((err) => {
-            console.log(err.message)
-        })
 
         setInput('')
         scrollView.current.scrollIntoView({behavior: 'smooth'})
         // setLoading(false)
 
-    }
+    })
+            .catch(e =>{
+                console.log(e.message)
+    })
 
     // setLoading(true)
     // setSender(user.uid)
@@ -532,7 +462,7 @@ useEffect(()=>{
     //     console.log(e)
     // })
 
-    // }
+    }
 
 
     // }).catch((err) => {
@@ -543,7 +473,11 @@ useEffect(()=>{
 
     return (
         <>
-
+            <ModalPopup
+                show={modalShow}
+                participants={chatRoomObject?.participants}
+                onHide={() => setModalShow(false)}
+            />
             <>
 
                 <div className='d-flex center chat-header mb-2'>
@@ -562,19 +496,21 @@ useEffect(()=>{
                         <div className={` lg-view-flex`}>
 
                         </div>
+                        <div className={' icon-wrapper   pointer text-center'}><div onClick={() =>  setModalShow(true)} style={{color:'#18ff00'}} className={'dots-dropdown'}>&#9432;</div></div>
 
-                        <Dropdown className={`ml-2`}>
-                            <Dropdown.Toggle variant="" id="">
-                                <div className={' icon-wrapper   pointer text-center'}><div className={'dots-dropdown'}>&#9432;</div></div>
 
-                            </Dropdown.Toggle>
+                        {/*<Dropdown className={`ml-2`}>*/}
+                        {/*    <Dropdown.Toggle variant="" id="">*/}
+                        {/*        <div className={' icon-wrapper   pointer text-center'}><div className={'dots-dropdown'}>&#9432;</div></div>*/}
 
-                            <Dropdown.Menu>
-                                <Dropdown.Item  ><Link >Invite Participants</Link></Dropdown.Item>
-                                <Dropdown.Item  >Exit Group</Dropdown.Item>
-                                <Dropdown.Item  >Delete Group</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
+                        {/*    </Dropdown.Toggle>*/}
+
+                        {/*    <Dropdown.Menu>*/}
+                        {/*        <Dropdown.Item  ><Link >Invite Participants</Link></Dropdown.Item>*/}
+                        {/*        <Dropdown.Item  >Exit Group</Dropdown.Item>*/}
+                        {/*        <Dropdown.Item  >Delete Group</Dropdown.Item>*/}
+                        {/*    </Dropdown.Menu>*/}
+                        {/*</Dropdown>*/}
 
                     </div>
 
@@ -584,6 +520,9 @@ useEffect(()=>{
                 </div>
 
                 <div className={`chat-container`}>
+                    <br/>
+                    <br/>
+                    <br/>
 
                     {/*{chat ? chat.map(chats => {*/}
                     {/*    return (<>*/}

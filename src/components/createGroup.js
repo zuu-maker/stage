@@ -22,7 +22,7 @@ import Icon from "./icon";
 import '../sections/message/message.css'
 
 function CreateGroup(props) {
-    const [{user,selectedParticipants,userData}] = useStateValue()
+    const [{user,selectedParticipants,userData},dispatch] = useStateValue()
     const [contacts,setContacts] = useState([])
     const [participants,setParticipants] = useState([])
     const [file, setFile] = useState('');
@@ -41,7 +41,6 @@ function CreateGroup(props) {
     const history = useHistory()
     const contactList = []
     const participantsList = []
-    const people = ["jason", "rowe", "age", "poop", "weweqwe"];
 
 
     const handleMessage = async (e) => {
@@ -84,13 +83,26 @@ function CreateGroup(props) {
 
             db.collection("ChatRooms").add(data)
                 .then(docRef => {
-                    setLoading(false)
                     docRef.update({chatRoomId: docRef.id})
                     // Redirect to the newly created chatRoom  endpoint
-                    history.push(`/messages/${docRef.id}`)
+                    db.collection('Users').doc(user.uid).collection('ChatRoomIds').add(
+                        {
+                            id: docRef.id,
+                            isDeleted: false,
+                            isDelivered: false,
+                        }).then(() => {
+                        setLoading(false)
+
+                        history.push(`/messages/${docRef.id}`)
+                    }).catch((error) => {
+                        console.log(error.message)
+                        setLoading(false)
+
+                    })
 
                 })
                 .catch(function (error) {
+                    setLoading(false)
 
                     console.error("Error adding document: ", error);
                 });
@@ -124,7 +136,9 @@ function CreateGroup(props) {
         setLoading(true)
         e.preventDefault()
 
+
         if(selectedParticipants.length > 0 )
+
         {
             const data = {
                 dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
@@ -132,19 +146,44 @@ function CreateGroup(props) {
                 groupImageUrl: '',
                 isGroupChat: true,
                 // users: [user.email,otherUser.email],
-                participants: selectedParticipants
+                participants: [...selectedParticipants,{
+                    objId: user.uid,
+                    email: user.email,
+                    userName: userData?.userName,
+                    userProfileImageUrl: userData?.userProfileImageUrl
+                }]
             }
             console.log(data)
 
             db.collection("ChatRooms").add(data)
                 .then(docRef => {
-                    setLoading(false)
                     docRef.update({chatRoomId: docRef.id})
                     // Redirect to the newly created chatRoom  endpoint
-                    history.push(`/messages/${docRef.id}`)
+                    data.participants.map(each =>{
+                        db.collection('Users').doc(each.objId).collection('ChatRoomIds').add(
+                            {
+                                id: docRef.id,
+                                isDeleted: false,
+                                isDelivered: true,
+                            }).then(() => {
+                            dispatch({
+                                type:"SET_SELECTED_PARTICIPANTS",
+                                selectedParticipants: {}
+                            })
+                            setLoading(false)
+
+                            history.push(`/messages/${docRef.id}`)
+                        })
+                            .catch((error) => {
+                                console.log(error.message)
+                                setLoading(false)
+
+                            })
+                    })
 
                 })
                 .catch(function (error) {
+                    setLoading(false)
 
                     console.error("Error adding document: ", error);
                 });
@@ -162,8 +201,8 @@ function CreateGroup(props) {
     }
     useEffect(() =>{
 
-        if(userData.FollowersIds){
-            userData.FollowersIds.map((each) =>{
+        if(userData.followedUsersIds){
+            userData.followedUsersIds.map((each) =>{
                 db.collection('Users').doc(each).get()
                 // getFirestoreDocument('Users','objectId',each)
                     .then(doc =>{

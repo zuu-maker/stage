@@ -24,19 +24,16 @@ import { useStateValue } from '../contexts/StateProvider';
 import DisplayPicture from "./DisplayPicture";
 import moment from "moment";
 
-function MessageCard({uid,id, chats}) {
+function MessageCard({id, chats}) {
 
-    const [,dispatch] = useStateValue()
     const history = useHistory()
     const [currentUser] = useAuthState(auth)
     // const receiverEmail = getReceiverUid(chats?.members,currentUser)
     // const [receiverSnap] = useCollection(db.collection("Users").where("userId","==",receiverEmail));
     //Get unread messages
     //This will return chat objects in which the current user is  in the deliveredTo array
-    const [lastMessageSnap,error] = useCollection(db.collection('ChatRooms').doc(chats.chatRoomId).collection('chat').orderBy('dateTime','desc'))
-    const [readMessagesSnap] = useCollection(db.collection('ChatRooms').doc( chats.chatRoomID).collection('chat').where('deliveredToParticipants','array-contains',currentUser.uid)
-    )
-    // console.log(chats);
+    const [messagesSnap,error] = useCollection(db.collection('ChatRooms').doc(chats.chatRoomId).collection('chat').orderBy('dateTime','desc'))
+    const [readMessagesSnap] = useCollection(db.collection('ChatRooms').doc( chats.chatRoomId).collection('chat').where('deliveredToParticipants','array-contains',currentUser?.uid))
     // const receiver = receiverSnap?.docs?.[0]?.data()
     const [receiver] =chats.participants.filter( (receiverObj) =>{
         if(receiverObj.objId !== currentUser.uid)
@@ -49,8 +46,27 @@ function MessageCard({uid,id, chats}) {
     const enterChat = () => {
         // console.log(id);
         setSelectedChat(true)
+        if(messagesSnap?.docs.length - readMessagesSnap?.docs.length > 0){
+            db.collection('ChatRooms').doc(id).collection('chat')
+                .get().then(function(querySnapshot) {
+                querySnapshot.forEach(function(doc) {
+                    doc.ref.update({deliveredToParticipants:firebase.firestore.FieldValue.arrayUnion(currentUser?.uid)})
 
-        history.push(`/messages/${id}`)
+                })
+            })
+
+                .then(() =>{
+                    history.push(`/messages/${id}`)
+
+                })
+                .catch(e =>{
+                    console.log(e.message)
+                })
+
+        }
+        else
+            history.push(`/messages/${id}`)
+
 
     }
 
@@ -84,44 +100,42 @@ function MessageCard({uid,id, chats}) {
     // const [recentSnap] = useCollection(db.collection("Recent").where("chatRoomId","==",chats.chatRoomId));
     // const recent = recentSnap?.docs?.[0]?.data()
     // console.log(receiverSnap);
-useEffect(() =>{
-    // setTotalNotificationCount( currentValue => currentValue + parseInt(chats.counter))
 
-},[])
-    useEffect(()=>{
-        console.log(error)
-        if(readMessagesSnap && lastMessageSnap) {
-            console.log(lastMessageSnap.docs.map(doc => doc.data()))
-            setLastMessage(lastMessageSnap.docs[0].data())
+        // console.log(error)
+        // if( messagesSnap && messagesSnap.docs[0] !== undefined) {
+        //     console.log(messagesSnap.docs.map(doc => doc.data()))
+        //     setLastMessage(messagesSnap.docs[0].data())
+        //
+        //
+        //     // setReadMessages(snapshot.docs?.map( doc =>doc.data()))
+        //
+        //     messagesSnap.docChanges().forEach((change) => {
+        //         if (change.type === "added") {
+        //
+        //             console.log("current: ", change.doc.data());
+        //             // setLastMessage(change.doc.data())
+        //         }
+        //         if (change.type === "modified") {
+        //             console.log("has read : ", change.doc.data());
+        //         }
+        //         if (change.type === "removed") {
+        //             console.log("Removed city: ", change.doc.data());
+        //         }
+        //     })
+        // }
 
-
-            // setReadMessages(snapshot.docs?.map( doc =>doc.data()))
-
-            readMessagesSnap.docChanges().forEach((change) => {
-                if (change.type === "added") {
-                    // console.log("has read: ", change.doc.data());
-                }
-                if (change.type === "modified") {
-                    console.log("has read : ", change.doc.data());
-                }
-                if (change.type === "removed") {
-                    console.log("Removed city: ", change.doc.data());
-                }
-            })
-        }
-
-        readMessagesList=[]
-        var readMessages =
-
-            messageList.map((person) =>{
-                person.deliveredToParticipants?.filter( (id) =>{
-                    if(id === currentUser.uid)
-                        readMessagesList.push(person)
-                    console.log(id === currentUser.uid)
-                    return readMessages
-
-                } )
-            })
+        // readMessagesList=[]
+        // var readMessages =
+        //
+        //     messageList.map((person) =>{
+        //         person.deliveredToParticipants?.filter( (id) =>{
+        //             if(id === currentUser.uid)
+        //                 readMessagesList.push(person)
+        //             console.log(id === currentUser.uid)
+        //             return readMessages
+        //
+        //         } )
+        //     })
 
 
     // setTotalNotificationCount(chats.counter-readMessages)
@@ -141,7 +155,6 @@ useEffect(() =>{
     // {
     //     chats.counter - readMessages === 0 ? setMessageNotification(false): setMessageNotification(true)
     // }
-    },[])
 
     //Read message
     // const messageRead = (docId,subCollectionId,chats) =>{
@@ -253,19 +266,18 @@ useEffect(() =>{
                     <span>{chats.isGroupChat ? chats.groupChatName  : receiver.userName}</span>
                     <span className=' float-right d-flex flex-column align-items-center justify-contents-center space-light'>
         <small>{moment(chats.dateLastUpdated?.seconds * 1000).format("DD/MM/YYYY h:mm")}</small>
-    {/*    <>*/}
-    {/*        {*/}
-    {/*            // chats.counter - readMessages.length > 0 &&*/}
-    {/*            <span style={{visibility: messageNotification ? 'visible' : 'hidden'}}*/}
-    {/*                  className={`message-card-notification text-light mt-1`}>*/}
-    {/*    <span*/}
-    {/*        className={`mx-auto mt-auto mb-auto`}>{chats.counter && chats.counter }</span>*/}
-    {/*</span>*/}
-    {/*        }*/}
-    {/*    </>*/}
+        <>
+            {
+                messagesSnap?.docs.length - readMessagesSnap?.docs.length > 0 &&
+                <span
+                      className={`message-card-notification text-light mt-1`}>
+        <span
+            className={`mx-auto mt-auto mb-auto`}>{messagesSnap.docs.length - readMessagesSnap.docs.length }</span>
     </span>
-                    <div
-                        className="space-light">  {!loading && lastMessage.text}</div>
+            }
+        </>
+    </span>
+                    <div className="space-light">  {!loading && messagesSnap?.docs[0] !== undefined && messagesSnap.docs[0].data().text}</div>
                     {/* {chats.type === "group" ? chats?.groupChatName :receiver?.userName} */}
 
                 </div>

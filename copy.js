@@ -26,7 +26,6 @@ import { useStateValue } from '../../contexts/StateProvider';
 import {useAuthState} from "react-firebase-hooks/auth"
 import {useCollection} from "react-firebase-hooks/firestore"
 
-
 function OtherUserMenu({otherUserObj,joinedEventsArray}) {
     // new lines
     const [currentUser] =  useAuthState(auth)
@@ -34,9 +33,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
     const userChatRef = db.collection("chats").where('users',"array-contains",currentUser && currentUser?.email)
     const [chatsSnap] = useCollection(userChatRef)
 
-
     const {setChatRoom} =useChat();
-
 
     // const {hasFollowed,setHasFollowed,otherUser,setOtherUser} =useUser();
     const [followers,setFollowers] = useState();
@@ -50,10 +47,9 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
     let userJoinedEventsList = [];
     let joinedEventsList = [];
 
-
     useEffect(   () => {
         dispatch({
-            type:"SET_HAS_FOLLOWED",
+            type:"SET_HAS_FOLLWED",
             hasFollowed:false
         })
         // setHasFollowed(false)
@@ -64,7 +60,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
 
             if (user && user.uid === follower) {
                 dispatch({
-                    type:"SET_HAS_FOLLOWED",
+                    type:"SET_HAS_FOLLWED",
                     hasFollowed:true
                 })
                 // setHasFollowed(true)
@@ -72,7 +68,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
                 return true;
             } else {
                 dispatch({
-                    type:"SET_HAS_FOLLOWED",
+                    type:"SET_HAS_FOLLWED",
                     hasFollowed:false
                 })
                 // setHasFollowed(false)
@@ -82,10 +78,8 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
         })
 
 
-
     },[])
     useEffect(   () => {
-
 
 
         setLoading(true)
@@ -106,7 +100,6 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
                             setJoinedEvents(joinedEventsList)
 
                         })
-
 
                         .catch(e => {
                             console.log(e)
@@ -165,22 +158,25 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
                 ]
             })
                 .then(docRef => {
+                    setLoader(false)
                     docRef.update({chatRoomId: docRef.id})
+
                     db.collection('Users').doc(currentUser.uid).collection('ChatRoomIds').add(
                         {
                             id: docRef.id,
                             isDeleted: false,
                             isDelivered: false,
                         }).then(() => {
-                        history.push(`/messages/${docRef.id}`)
+                        alert("added to users")
                     }).catch((error) => {
-                        console.log(error.message)
+                        alert(error)
                     })
+
                     // Redirect to the newly created chatRoom  endpoint
+                    history.push(`/messages/${docRef.id}`)
 
                 })
                 .catch(function (error) {
-                    setLoader(false)
 
                     console.error("Error adding document: ", error);
                 });
@@ -188,7 +184,6 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
             setLoader(false)
             history.push(`/messages`)
         }
-
 
 
 
@@ -235,7 +230,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
             await updateFirestoreDocument('Users',user.uid,{followedUsersIds:firebase.firestore.FieldValue.arrayUnion(otherUser.objectId)})
                 .then( () => {
                     dispatch({
-                        type:"SET_HAS_FOLLOWED",
+                        type:"SET_HAS_FOLLWED",
                         hasFollowed:true
                     })
                     // setHasFollowed(true)
@@ -249,7 +244,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
                         .catch(error => {
                             console.log(error);
                             dispatch({
-                                type:"SET_HAS_FOLLOWED",
+                                type:"SET_HAS_FOLLWED",
                                 hasFollowed:false
                             })
                             //    setHasFollowed(false)
@@ -261,7 +256,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
                 .catch(e =>{
                     console.log(e)
                     dispatch({
-                        type:"SET_HAS_FOLLOWED",
+                        type:"SET_HAS_FOLLWED",
                         hasFollowed:false
                     })
                     //    setHasFollowed(false)
@@ -272,7 +267,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
         }catch (e) {
             console.log(e)
             dispatch({
-                type:"SET_HAS_FOLLOWED",
+                type:"SET_HAS_FOLLWED",
                 hasFollowed:false
             })
             // setHasFollowed(false)
@@ -291,7 +286,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
             await updateFirestoreDocument('Users',user.uid,{followedUsersIds:firebase.firestore.FieldValue.arrayRemove(otherUser.objectId)})
                 .then( () => {
                     dispatch({
-                        type:"SET_HAS_FOLLOWED",
+                        type:"SET_HAS_FOLLWED",
                         hasFollowed:false
                     })
                     // setHasFollowed(false)
@@ -301,7 +296,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
 
                             () =>{
                                 dispatch({
-                                    type:"SET_HAS_FOLLOWED",
+                                    type:"SET_HAS_FOLLWED",
                                     hasFollowed:false,
                                 })
                                 // setHasFollowed(false)
@@ -312,7 +307,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
                         .catch(error => {
                             console.log(error);
                             dispatch({
-                                type:"SET_HAS_FOLLOWED",
+                                type:"SET_HAS_FOLLWED",
                                 hasFollowed:true
                             })
                             // setHasFollowed(true)
@@ -329,7 +324,6 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
 
     return (
         <>
-
 
             {  otherUser.userId && <div className='d-flex user-menu-container'>
                 <div className='d-flex flex-column text-center card-body user-side-bar'>
@@ -352,11 +346,9 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
                                 <div className='mx-auto user-profile-pic-wrapper'
                                      style={{backgroundImage: `url(${otherUser.userProfileImageUrl})`}}></div>
 
-
                                 :
                                 <div className='mx-auto user-profile-pic-wrapper'
                                      style={{backgroundImage: `url(${defaultProfilePhoto})`}}></div>
-
 
                             }
                             {/*<img src={otherUser.userProfileImageUrl} alt=""/>*/}
@@ -389,18 +381,14 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
 
                                     </>
 
-
                                 </div>
                             </div>
 
-
                         </div>
-
 
                         <div className='mt-5 mb-4 text-light'>
                             <div className='space-medium f-18'>{otherUser.userName}</div>
                             <div className="space-light ">@{otherUser.userName}</div>
-
 
                         </div>
 
@@ -448,15 +436,12 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
 
                             </>
 
-
                         </div>
                     </div>
-
 
                 </div>
                 <div className={`flex-column`}>
                     <h4 className={`text-light d-block ml-1`}>Activity</h4>
-
 
                     <div className='grid-container'>
                         {!loader &&  joinedEvents ? joinedEvents?.map(event => {
@@ -475,9 +460,7 @@ function OtherUserMenu({otherUserObj,joinedEventsArray}) {
 
 
 
-
             </div>}
-
 
         </>
     );
