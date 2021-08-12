@@ -326,7 +326,7 @@ function CreateGroup(props) {
 
                 {!loading && contacts ? contacts?.map(obj => {
                     return (<>
-                            <div className={`bg-secondary  text-left  text-light`}>
+                            <div className={`sub-heading`}>
                                 <span className={`ml-3 `}>{obj.letter}</span>
                             </div>
                             {obj.user.map(each => {
@@ -374,7 +374,7 @@ function CreateGroup(props) {
 
                 {!loading && contacts ? contacts.map(obj => {
                     return (<>
-                            <div className={`bg-secondary ml-3 text-left  text-light`}>
+                            <div className={`sub-heading`}>
                                 <span className={`ml-3 `}>{obj.letter}</span>
                             </div>
                             {obj.user.map((each, index) => {

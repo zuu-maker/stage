@@ -7,6 +7,7 @@ import moment from "moment";
 import {useAuthState} from "react-firebase-hooks/auth";
 import {auth, db} from "../firebase/firebase";
 import {useCollection} from "react-firebase-hooks/firestore";
+import spinner from "../images/spinner.gif";
 export const Modal = ({src, onClose,type}) => {
     return (
         <div className="media-modal">
@@ -21,8 +22,9 @@ export const Modal = ({src, onClose,type}) => {
         </div>
     )
 }
-function ChatContent({message,preview,sender,loading}) {
+function ChatContent({message,preview,sender,loading,fileLoading}) {
     const [currentUser] = useAuthState(auth)
+    console.log(preview)
 
     // const {currentUser} = useAuth();
     // const [senderSnap] = useCollection(db.collection("Users").where("email","==",sender));
@@ -42,8 +44,11 @@ function ChatContent({message,preview,sender,loading}) {
                     <Text message={message} preview={''}/>
                     : message.isImage || preview ?
 
-                        <img className="image"  onClick={showModal} src={message.storageMediaUrl || preview} alt=""/>
-
+                        <img className="image"  onClick={showModal} src={message.storageMediaUrl } alt=""/>
+                        // <div className={`d-flex   position-relative`}>
+                        //     <img className={`spinner-loader`} width={24} style={{display: fileLoading ? 'flex': 'none'}} src={spinner} alt=""/>
+                        //     <img className="image" style={{backgroundImage:`url(${preview})`}} onClick={showModal} src={message.storageMediaUrl } alt=""/>
+                        // </div>
                         :
                         message.isVideo|| preview ?
                             <video onClick={showModal} className="image" src={message.storageMediaUrl || preview}  />

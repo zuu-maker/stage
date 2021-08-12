@@ -33,12 +33,14 @@ function ModalPopup(props) {
         >
             <Modal.Header >
                 <div className={`text-right text-light mr-0 ml-auto`}>
-                    <span onClick={ props.onHide}>Close</span>
+                    <span onClick={ props.onHide}>Dismiss</span>
                 </div>
             </Modal.Header>
 
             <Modal.Body>
-
+<div className={`sub-heading`}>
+    Group Participants
+</div>
 
                     {
                         props.participants?.map(each =>{return(
@@ -120,7 +122,6 @@ useEffect(()=>{
 
 
     const chatRoomObject = chatRoomSnap?.docs[0]?.data();
-    console.log(chatRoomObject)
     const receiverEmail = getReceiverEmail(chatRoomObject?.participants,currentUser)
     const receiverObject =  chatRoomObject?.participants?.filter(userObj =>{
         if(userObj.objectId !== user.uid)
@@ -142,8 +143,9 @@ useEffect(()=>{
                 <ChatContent
                     key={message.id}
                     sender={message.data().user}
-                    preview={''}
+                    preview={previewImageOnSend}
                     loading={loading}
+                    fileLoading={fileLoading}
                     message={
                         message.data()
                     } />
@@ -480,19 +482,22 @@ useEffect(()=>{
             />
             <>
 
-                <div className='d-flex center chat-header mb-2'>
-                    <BackButton/>
-                    <div className='user-list-thumb-wrapper'>
+                <nav className='nav navbar center  chat-header mb-2'>
+                    <div className={`flex-grow-1`}>
+                        <BackButton/>
+
+                    </div>
+                    <div className='flex-grow-1 lg-view user-list-thumb-wrapper'>
                         {/*<img src={chatRoomObject.userProfileImageUrl} alt=""/>*/}
                     </div>
-                    <div className='ml-3 text-light guest-name'>
+                    <div className='text-sm-center text-lg-left text-md-left flex-grow-1 text-light guest-name'>
                         {/*{receiverEmail && <DisplayName groupName={chatRoomObject?.groupChatName} receiver={receiverEmail}/>}*/}
                         {chatRoomObject?.isGroupChat ? chatRoomObject.groupChatName  : receiverObject?.userName}
 
                     </div>
 
 
-                    <div className=' chat-icon-group mr-0 ml-auto d-flex'>
+                    <div className='justify-content-end flex-grow-1 chat-icon-group mr-0 ml-auto d-flex'>
                         <div className={` lg-view-flex`}>
 
                         </div>
@@ -517,12 +522,13 @@ useEffect(()=>{
 
 
 
-                </div>
+                </nav>
 
                 <div className={`chat-container`}>
                     <br/>
                     <br/>
                     <br/>
+
 
                     {/*{chat ? chat.map(chats => {*/}
                     {/*    return (<>*/}
@@ -537,12 +543,12 @@ useEffect(()=>{
                     {/*})}*/}
                     {showMessages()}
                     <>
-                        {previewImageOnSend &&
-                        <div className={`d-flex  text-container position-relative`}>
-                            <img className={`spinner-loader`} width={24} style={{display: fileLoading ? 'flex': 'none'}} src={spinner} alt=""/>
-                            <img src={previewImageOnSend} alt=""/>
-                        </div>
-                        }
+                        {/*{previewImageOnSend &&*/}
+                        {/*<div className={`d-flex  text-container position-relative`}>*/}
+                        {/*    <img className={`spinner-loader`} width={24} style={{display: fileLoading ? 'flex': 'none'}} src={spinner} alt=""/>*/}
+                        {/*    <img src={previewImageOnSend} alt=""/>*/}
+                        {/*</div>*/}
+                        {/*}*/}
                     </>
 
                     <div ref={scrollView}></div>
@@ -559,9 +565,9 @@ useEffect(()=>{
                         style={{display: 'none'}}
 
                     />
-                    <div className={`preview-image-wrapper overflow-hidden`}>
-                        {preview && <img  src={preview}/>}
-
+                    <div className={`d-flex  text-container position-relative`}>
+                        <img className={`spinner-loader`} width={24} style={{display: fileLoading ? 'flex': 'none'}} src={spinner} alt=""/>
+                        <img src={preview} alt=""/>
                     </div>
 
 

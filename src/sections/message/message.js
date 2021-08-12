@@ -28,7 +28,7 @@ function Message() {
     const {show, setNotificationPopup, setShow} = useChat();
     const [chats, setChats] = useState([])
     const [chatRoomArraySnap, loading, error] = useCollection(db.collection("Users").doc(user?.uid).collection('ChatRoomIds'))
-    let chatList = []
+    const chatList = []
 
     const {setLoader, loader} = useLoader();
     let chatRoomIds = []
@@ -59,7 +59,7 @@ function Message() {
                 chatRoomIds.push(each.data())
             })
             // chatList=[]
-            setChats([])
+            // setChats([])
 
             chatRoomIds.map((each) => {
                 db.collection('ChatRooms').where("chatRoomId", "==", each.id).orderBy('dateLastUpdated','desc').onSnapshot(snapshot => {
@@ -87,12 +87,12 @@ function Message() {
                     //                                console.log("Removed : ", change.doc.data());
                     //                            }
                     //                        })
-                    // setChats([])
-                    setChats(chatList)
+
 
                 })
             })
-
+            setChats(chatList)
+            console.log(chatList)
 
         }
     },[chatRoomArraySnap])
@@ -118,7 +118,7 @@ function Message() {
 
                                 </div>
                                 <div className='user-list'>
-                                    {!loading && chats ? chats?.map(chat => {
+                                    {!loading && chats ? chats.map(chat => {
                                         // console.log(chat.data());
                                         return (<>
 
@@ -139,8 +139,8 @@ function Message() {
                         </div>
                         {
                             !show ? <>
-                                    <div className='sm-view d-flex align-items-center flex-column w-100 pl-3 pr-3 '>
-                                        <div className=' w-100 d-flex justify-content-center align-items-center pt-4'>
+                                    <div className='sm-view   w-100 pl-3 pr-3 '>
+                                        <div className=' w-100  d-flex justify-content-center  pt-4'>
                                             <div className='flex-grow-1'>
                                                 <h4 className='text-light'>Messages</h4>
                                                 <p>Talk with your friends</p>

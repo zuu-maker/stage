@@ -277,7 +277,7 @@ function MessageCard({id, chats}) {
             }
         </>
     </span>
-                    <div className="space-light">  {!loading && messagesSnap?.docs[0] !== undefined && messagesSnap.docs[0].data().text}</div>
+                    <div className="space-light text-break">  {!loading && messagesSnap?.docs[0] !== undefined && messagesSnap.docs[0].data().text}</div>
                     {/* {chats.type === "group" ? chats?.groupChatName :receiver?.userName} */}
 
                 </div>

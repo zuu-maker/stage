@@ -132,7 +132,14 @@ textarea.form-control{
     background-size: 800px 104px;
     height: fit-content;
     position: relative;
-}@media (min-width:991px) {
+}
+.sub-heading{
+    text-align: left;
+    color: white;
+    background-color:#2b3038 ;
+    padding: 2%;
+}
+@media (min-width:991px) {
     .lg-view-flex{
         display: flex;
     }

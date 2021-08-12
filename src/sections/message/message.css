@@ -116,6 +116,8 @@ label{
     color: white;
     border-radius: 18.75pt 18.75pt 18.75pt 0;
     height: fit-content;
+    overflow-wrap: anywhere;
+
 }
 .chat-container {
     height: 65vh;
@@ -129,7 +131,7 @@ label{
 .chat-input {
     background-color: #2B3038;
     width: 100%;
-    height: fit-content;
+    height: 8%;
     /*padding: 3%;*/
     border-radius: 7.5pt;
     background-size: 24px;
@@ -307,24 +309,27 @@ html {
     .user-text .chat-text-container {
         border-radius: 18.75pt 18.75pt 0 18.75pt;
         margin-right: 4%;
-        max-width: 90%;
-        width: 134px;
+        max-width: 70%;
+        width: fit-content;
     }
     .chat-text-container {
         max-width: 90%;
         width: 134px;
+
     }
     .message{
         /*padding-top: 8%;*/
     }
     .chat-container {
-        height: 100%;
+        height: auto;
         max-height: 100%;
         overflow-y: auto;
         display: flex;
         width: 100%;
         flex-direction: column;
-
+    }
+    .message .guest-name{
+        text-align: center;
     }
 
     .guest-name div{
@@ -332,7 +337,7 @@ html {
     }
     .chat-header{
 
-        position: sticky;
+        position: fixed;
         top: 0;
         width: 100%;
         background-color: #2B3038;
@@ -344,6 +349,7 @@ html {
         max-height: 10%;
         right: 0;
         position: fixed;
+        height: 10%;
         bottom: 0;
         width: 100%;
         left: 0;
