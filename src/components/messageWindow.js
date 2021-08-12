@@ -17,6 +17,8 @@ import {useObject} from "react-firebase-hooks/database";
 import {css} from "@emotion/react";
 import PuffLoader from "react-spinners/PuffLoader";
 import UserList from "../sections/events/userList";
+import sendText from '../images/send-text.svg'
+import mail from "../images/mail.svg";
 function ModalPopup(props) {
   //   const override = css`
   // display: block;
@@ -573,7 +575,7 @@ useEffect(()=>{
 
                     <input value={input} onChange={(e) => {setInput(e.target.value);setShowSendButton(true)}} name='message'
                            placeholder='Enter Message' type="text" />
-                    <>{showSendButton && input !== "" ? <button type={`submit`} className={`btn m-2 w-25`}>Send</button> : <><div className={' icon-wrapper   pointer text-center'} onClick={handleSendMedia}></div><div className={' icon-wrapper   pointer text-center'}></div></> }</>
+                    <>{showSendButton && input !== "" ? <button type={`submit`}  style={{backgroundImage: `url(${sendText})`}}className={`btn send-text-btn  m-2 `}></button> : <><div className={' icon-wrapper   pointer text-center'} onClick={handleSendMedia}></div><div className={' icon-wrapper   pointer text-center'}></div></> }</>
                 </form>
                 <br/>
                 <br/>

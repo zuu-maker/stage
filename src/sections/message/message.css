@@ -171,7 +171,12 @@ label{
     /* margin-right: auto; */
     display: inline-flex;
 }
+.send-text-btn{
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 20%;
 
+}
 .dots-dropdown {
     font-size: 24px;
     color: white;

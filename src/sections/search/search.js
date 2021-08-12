@@ -6,7 +6,7 @@ import {useEvent} from "../../contexts/eventsContext";
 import '../events/events.css'
 import SearchItem from "./searchItem";
 
-function Search({props}) {
+function Search({props,functionHandler}) {
     const [search, setSearch] = useState([])
     const {setLoader} = useLoader();
     const {setEventsList} = useEvent()
@@ -82,7 +82,7 @@ function Search({props}) {
     return (
             <div className='position-relative search-input'>
                 <form className="d-flex">
-                    <input  onChange={handleSearch} className='' name="search" style={{backgroundImage: `url(${search})`,backgroundColor: props}} type="text"
+                    <input  onChange={functionHandler} className='' name="search" style={{backgroundImage: `url(${search})`,backgroundColor: props}} type="text"
                            placeholder="Search"/>
 
                 </form>

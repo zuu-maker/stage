@@ -27,7 +27,8 @@ function Message() {
     const [{user}] = useStateValue()
     const {show, setNotificationPopup, setShow} = useChat();
     const [chats, setChats] = useState([])
-    const [chatRoomArraySnap, loading, error] = useCollection(db.collection("Users").doc(user?.uid).collection('ChatRoomIds'))
+    const [loading, setLoading] = useState(true)
+    const [chatRoomArraySnap, error] = useCollection(db.collection("Users").doc(user?.uid).collection('ChatRoomIds'))
     const chatList = []
 
     const {setLoader, loader} = useLoader();
@@ -53,50 +54,152 @@ function Message() {
 
     useEffect(() =>{
         // chatList = []
-        if (chatRoomArraySnap) {
+        if(user.uid){
+            db.collection("Users").doc(user.uid).collection('ChatRoomIds').get()
+                .then(
+                snapshot => {
 
-            chatRoomArraySnap.docs.map((each) => {
-                chatRoomIds.push(each.data())
-            })
-            // chatList=[]
-            // setChats([])
+                    snapshot.docs.map((each) => {
 
-            chatRoomIds.map((each) => {
-                db.collection('ChatRooms').where("chatRoomId", "==", each.id).orderBy('dateLastUpdated','desc').onSnapshot(snapshot => {
-                    snapshot.docs.forEach(doc => {
-                        chatList.push(doc.data())
+                        // chatRoomIds.push(each.data())
+                        db.collection('ChatRooms').where("chatRoomId", "==", each.data().id).orderBy('dateLastUpdated','desc').onSnapshot(snapshot => {
+                            snapshot.docs.forEach(doc => {
+                                chats.push(doc.data())
+                                console.log(doc.data())
+                            })
+
+                            // setChats(chatList)
+                            setLoading(false)
+
+
+
+
+
+                            // snapshot.docChanges().forEach((change) => {
+                            //                            if (change.type === "added") {
+                            //                                console.log("New : ", change.doc.data());
+                            //                                chatList.push(change.doc.data())
+                            //
+                            //                            }
+                            //                            if (change.type === "modified") {
+                            //                                console.log("Modified : ", change.doc.data());
+                            //                                setNotificationPopup(change.doc.data())
+                            //
+                            //                            }
+                            //                            if (change.type === "removed") {
+                            //                                console.log("Removed : ", change.doc.data());
+                            //                            }
+                            //                        })
+
+
+                        })
+
                     })
-
-
-
-
-
-
-                    // snapshot.docChanges().forEach((change) => {
-                    //                            if (change.type === "added") {
-                    //                                console.log("New : ", change.doc.data());
-                    //                                chatList.push(change.doc.data())
+                    console.log(chatRoomIds)
+                    // chatRoomIds?.map((each) => {
+                    //     db.collection('ChatRooms').where("chatRoomId", "==", each.id).orderBy('dateLastUpdated','desc').onSnapshot(snapshot => {
+                    //         snapshot.docs.forEach(doc => {
+                    //             chatList.push(doc.data())
+                    //             console.log(doc.data())
+                    //         })
                     //
-                    //                            }
-                    //                            if (change.type === "modified") {
-                    //                                console.log("Modified : ", change.doc.data());
-                    //                                setNotificationPopup(change.doc.data())
+                    //         setChats(chatList)
+                    //         setLoading(false)
                     //
-                    //                            }
-                    //                            if (change.type === "removed") {
-                    //                                console.log("Removed : ", change.doc.data());
-                    //                            }
-                    //                        })
+                    //
+                    //
+                    //
+                    //
+                    //         // snapshot.docChanges().forEach((change) => {
+                    //         //                            if (change.type === "added") {
+                    //         //                                console.log("New : ", change.doc.data());
+                    //         //                                chatList.push(change.doc.data())
+                    //         //
+                    //         //                            }
+                    //         //                            if (change.type === "modified") {
+                    //         //                                console.log("Modified : ", change.doc.data());
+                    //         //                                setNotificationPopup(change.doc.data())
+                    //         //
+                    //         //                            }
+                    //         //                            if (change.type === "removed") {
+                    //         //                                console.log("Removed : ", change.doc.data());
+                    //         //                            }
+                    //         //                        })
+                    //
+                    //
+                    //     })
+                    // })
+                }
+
+            )
 
 
-                })
-            })
-            setChats(chatList)
             console.log(chatList)
-
+            // if (chatRoomArraySnap) {
+            //
+            //     chatRoomArraySnap.docs.map((each) => {
+            //         chatRoomIds.push(each.data())
+            //     })
+            //     // chatList=[]
+            //     // setChats([])
+            //
+            //     chatRoomIds.map((each) => {
+            //         db.collection('ChatRooms').where("chatRoomId", "==", each.id).orderBy('dateLastUpdated','desc').onSnapshot(snapshot => {
+            //             snapshot.docs.forEach(doc => {
+            //                 chatList.push(doc.data())
+            //             })
+            //
+            //
+            //
+            //
+            //
+            //
+            //             // snapshot.docChanges().forEach((change) => {
+            //             //                            if (change.type === "added") {
+            //             //                                console.log("New : ", change.doc.data());
+            //             //                                chatList.push(change.doc.data())
+            //             //
+            //             //                            }
+            //             //                            if (change.type === "modified") {
+            //             //                                console.log("Modified : ", change.doc.data());
+            //             //                                setNotificationPopup(change.doc.data())
+            //             //
+            //             //                            }
+            //             //                            if (change.type === "removed") {
+            //             //                                console.log("Removed : ", change.doc.data());
+            //             //                            }
+            //             //                        })
+            //
+            //
+            //         })
+            //     })
+            //     setChats(chatList)
+            //     console.log(chatList)
+            //
+            // }
         }
-    },[chatRoomArraySnap])
 
+    },[user?.uid])
+    const checkName = (name, str) => {
+        var pattern = str.split("").map((x)=>{
+            return `(?=.*${x})`
+        }).join("");
+        var regex = new RegExp(`${pattern}`, "g")
+        return name.match(regex);
+    }
+    const handleSearchChat = (e) =>{
+        var str = e.target.value.toLowerCase().substring(0, 3)
+        console.log(str)
+        var filteredArr = chats?.filter((x)=>{
+            var xSub = x.substring(0, 3).toLowerCase()
+            return x.toLowerCase().includes(str) || checkName(xSub, str)
+        })
+        if (filteredArr.length > 0){
+            console.log(filteredArr)
+        } else {
+            console.log("no results")
+        }
+    }
     return (
         <>
 
@@ -112,7 +215,7 @@ function Message() {
                                 <div className='lg-view'>
                                     <h5 className='text-light ml-5 mb-5`'>Messages</h5>
                                     <div className={`d-flex align-items-center`}>
-                                        <Search props={'#13161A'}/>
+                                        <Search  functionHandler={handleSearchChat} props={'#13161A'}/>
                                         <CreateGroupBtn/>
                                     </div>
 
@@ -174,7 +277,7 @@ function Message() {
 
                                             </div>
                                             <div className='user-list'>
-                                                {!loading && chats ? chats?.map(chat => {
+                                                {!loading && chats !== undefined && chats !== null && chats ? chats.map(chat => {
                                                     // console.log(chat.data());
                                                     return (<>
 
