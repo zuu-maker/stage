@@ -494,7 +494,7 @@ useEffect(()=>{
                     </div>
                     <div className='text-sm-center text-lg-left text-md-left flex-grow-1 text-light guest-name'>
                         {/*{receiverEmail && <DisplayName groupName={chatRoomObject?.groupChatName} receiver={receiverEmail}/>}*/}
-                        {chatRoomObject?.isGroupChat ? chatRoomObject.groupChatName  : receiverObject[0]?.userName}
+                        {chatRoomObject?.isGroupChat ? chatRoomObject.groupChatName  : receiverObject?.userName}
 
                     </div>
 

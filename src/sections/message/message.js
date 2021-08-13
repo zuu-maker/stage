@@ -25,22 +25,13 @@ function Message() {
     const [currentUser] = useAuthState(auth)
 
     const [{user}] = useStateValue()
-    const {show, setNotificationPopup, setShow} = useChat();
+    const {show, setShow} = useChat();
     const [chats, setChats] = useState([])
     const [loading, setLoading] = useState(true)
-    const [chatRoomArraySnap, error] = useCollection(db.collection("Users").doc(user?.uid).collection('ChatRoomIds'))
-    const chatList = []
 
-    const {setLoader, loader} = useLoader();
-    let chatRoomIds = []
     let params = useParams();
     const messageId = params.id;
-    const userObj = {
-        email: user?.email,
-        objId: user?.uid,
 
-        userName: user?.displayName
-    };
 
 
     useEffect(() => {
@@ -53,131 +44,27 @@ function Message() {
     }, [])
 
     useEffect(() => {
-        // chatList = []
         if (user.uid) {
-            db.collection("Users").doc(user.uid).collection('ChatRoomIds').get()
-                .then(
-                    snapshot => {
-
-                        snapshot.docs.map((each) => {
-
-                            // chatRoomIds.push(each.data())
-                            db.collection('ChatRooms').where("chatRoomId", "==", each.data().id).orderBy('dateLastUpdated', 'desc').onSnapshot(snapshot => {
-                                // snapshot.docs.forEach(doc => {
-                                //     chats.push(doc.data())
-                                //     console.log(doc.data())
-                                // })
-
-                                // setChats(chatList)
-                                // setLoading(false)
-
-
-                                snapshot.docChanges().forEach((change) => {
-                                                           if (change.type === "added") {
-                                                               console.log("New : ", change.doc.data());
-                                                               chatList.push(change.doc.data())
-                                                               setChats(chatList)
-                                                               setLoading(false)
-
-                                                           }
-                                                           if (change.type === "modified") {
-                                                               console.log("Modified : ", change.doc.data());
-                                                               setNotificationPopup(change.doc.data())
-
-                                                           }
-                                                           if (change.type === "removed") {
-                                                               console.log("Removed : ", change.doc.data());
-                                                           }
-                                                       })
-
-
-                            })
-
-                        })
-                        console.log(chatRoomIds)
-                        // chatRoomIds?.map((each) => {
-                        //     db.collection('ChatRooms').where("chatRoomId", "==", each.id).orderBy('dateLastUpdated','desc').onSnapshot(snapshot => {
-                        //         snapshot.docs.forEach(doc => {
-                        //             chatList.push(doc.data())
-                        //             console.log(doc.data())
-                        //         })
-                        //
-                        //         setChats(chatList)
-                        //         setLoading(false)
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //         // snapshot.docChanges().forEach((change) => {
-                        //         //                            if (change.type === "added") {
-                        //         //                                console.log("New : ", change.doc.data());
-                        //         //                                chatList.push(change.doc.data())
-                        //         //
-                        //         //                            }
-                        //         //                            if (change.type === "modified") {
-                        //         //                                console.log("Modified : ", change.doc.data());
-                        //         //                                setNotificationPopup(change.doc.data())
-                        //         //
-                        //         //                            }
-                        //         //                            if (change.type === "removed") {
-                        //         //                                console.log("Removed : ", change.doc.data());
-                        //         //                            }
-                        //         //                        })
-                        //
-                        //
-                        //     })
-                        // })
-                    }
-                )
-
-
-            console.log(chatList)
-            // if (chatRoomArraySnap) {
-            //
-            //     chatRoomArraySnap.docs.map((each) => {
-            //         chatRoomIds.push(each.data())
-            //     })
-            //     // chatList=[]
-            //     // setChats([])
-            //
-            //     chatRoomIds.map((each) => {
-            //         db.collection('ChatRooms').where("chatRoomId", "==", each.id).orderBy('dateLastUpdated','desc').onSnapshot(snapshot => {
-            //             snapshot.docs.forEach(doc => {
-            //                 chatList.push(doc.data())
-            //             })
-            //
-            //
-            //
-            //
-            //
-            //
-            //             // snapshot.docChanges().forEach((change) => {
-            //             //                            if (change.type === "added") {
-            //             //                                console.log("New : ", change.doc.data());
-            //             //                                chatList.push(change.doc.data())
-            //             //
-            //             //                            }
-            //             //                            if (change.type === "modified") {
-            //             //                                console.log("Modified : ", change.doc.data());
-            //             //                                setNotificationPopup(change.doc.data())
-            //             //
-            //             //                            }
-            //             //                            if (change.type === "removed") {
-            //             //                                console.log("Removed : ", change.doc.data());
-            //             //                            }
-            //             //                        })
-            //
-            //
-            //         })
-            //     })
-            //     setChats(chatList)
-            //     console.log(chatList)
-            //
-            // }
+            db.collection("Users")
+                .doc(user.uid)
+                .collection("ChatRoomIds")
+                .get()
+                .then((snapshot) => {
+                    snapshot.docs.map((each) => {
+                        db.collection("ChatRooms")
+                            .where("chatRoomId", "==", each.data().id)
+                            .orderBy("dateLastUpdated", "desc")
+                            .onSnapshot((snapshot) => {
+                                console.log(snapshot.docs.map((doc) => doc.data()))
+                                setChats((chats) =>
+                                    chats.concat(snapshot.docs.map((doc) => doc.data()))
+                                );
+                                setLoading(false)
+                            });
+                    });
+                });
         }
-
-    }, [])
+    }, []);
     const checkName = (name, str) => {
         var pattern = str.split("").map((x) => {
             return `(?=.*${x})`
@@ -293,7 +180,7 @@ function Message() {
                                             </div>
                                             <div className='user-list'>
                                                 {!loading && chats ? chats.map(chat => {
-                                                    console.log(chat);
+
                                                     return (<>
 
                                                             <MessageCard key={chat.chatRoomId}
