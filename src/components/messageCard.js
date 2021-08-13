@@ -35,7 +35,7 @@ function MessageCard({id, chats}) {
     const [messagesSnap,error] = useCollection(db.collection('ChatRooms').doc(chats.chatRoomId).collection('chat').orderBy('dateTime','desc'))
     const [readMessagesSnap] = useCollection(db.collection('ChatRooms').doc( chats.chatRoomId).collection('chat').where('deliveredToParticipants','array-contains',currentUser?.uid))
     // const receiver = receiverSnap?.docs?.[0]?.data()
-    const [receiver] =chats.participants.filter( (receiverObj) =>{
+    const [receiver] =chats?.participants?.filter( (receiverObj) =>{
         if(receiverObj.objId !== currentUser.uid)
             return receiverObj
 

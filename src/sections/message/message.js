@@ -55,16 +55,72 @@ function Message() {
                             .where("chatRoomId", "==", each.data().id)
                             .orderBy("dateLastUpdated", "desc")
                             .onSnapshot((snapshot) => {
-                                console.log(snapshot.docs.map((doc) => doc.data()))
+                                const newChats = snapshot.docs.map((doc) => doc.data());
+                               
+
                                 setChats((chats) =>
-                                    chats.concat(snapshot.docs.map((doc) => doc.data()))
-                                );
-                                setLoading(false)
+                                    chats.filter(chat =>
+                                        !newChats.some(newChat =>
+                                            newChat.chatRoomId === chat.chatRoomId
+                                        )
+                                    ).concat(newChats).sort((c1,c2) => {
+                                        if(c1.dateLastUpdated.seconds > c2.dateLastUpdated.seconds){
+                                            return -1;
+                                        }else{
+                                            return 1;
+                                        }
+                                    })
+    
+                            );setLoading(false)
+
                             });
                     });
                 });
         }
+
+        console.clear()
+        chats.map(chat => {
+            console.log(chat)    
+        })
+
+    //     const sorted = chats.sort((c1,c2) => {
+    //         if(c1.dateLastUpdated.seconds > c2.dateLastUpdated.seconds){
+    //             return -1;
+    //         }else{
+    //             return 1;
+    //         }
+    //     })
+
+    //     console.log(sorted);
     }, []);
+
+    // useEffect(() => {
+    //     let temp = []
+    //     if (user.uid) {
+    //         db.collection("Users")
+    //             .doc(user.uid)
+    //             .collection("ChatRoomIds")
+    //             .onSnapshot((snapshot) => {
+    //                 snapshot.docs.map((each) => {
+    //                     db.collection("ChatRooms")
+    //                         .where("chatRoomId", "==", each.data().id)
+    //                         .orderBy("dateLastUpdated", "desc")
+    //                         .onSnapshot((snapshot) => {
+    //                             console.log(snapshot.docs.map((doc) => doc.data()))
+    //                             setChats((chats) =>{
+    //                                  console.clear()
+    //                                 console.log([...chats, ...snapshot.docs.map((doc) => doc.data())]);
+                                    
+    //                                 chats.concat(snapshot.docs.map((doc) => doc.data()))
+    //                             });
+    //                             setLoading(false)
+    //                         });
+    //                 });
+    //             })
+              
+    //     }
+    // }, []);
+    
     const checkName = (name, str) => {
         var pattern = str.split("").map((x) => {
             return `(?=.*${x})`
