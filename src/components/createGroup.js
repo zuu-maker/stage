@@ -138,7 +138,6 @@ function CreateGroup(props) {
 
 
         if(selectedParticipants.length > 0 )
-
         {
             const data = {
                 dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp(),

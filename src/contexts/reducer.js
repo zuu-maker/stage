@@ -59,6 +59,12 @@ export const initialState = {
                  ...state,
                  selectedParticipants:[...state.selectedParticipants,action.selectedParticipants ]
              }
+        case "REMOVE_UNSELECTED_PARTICIPANTS":
+            console.log(action.selectedParticipants)
+            return {
+                ...state,
+                selectedParticipants:action.selectedParticipants 
+            }
          case "SET_HAS_FOLLOWED":
             //  console.log(action.hasFollowed);
              return{

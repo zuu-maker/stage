@@ -64,7 +64,7 @@ function Message() {
                                             newChat.chatRoomId === chat.chatRoomId
                                         )
                                     ).concat(newChats).sort((c1,c2) => {
-                                        if(c1.dateLastUpdated.seconds > c2.dateLastUpdated.seconds){
+                                        if(c1?.dateLastUpdated?.seconds > c2?.dateLastUpdated?.seconds){
                                             return -1;
                                         }else{
                                             return 1;

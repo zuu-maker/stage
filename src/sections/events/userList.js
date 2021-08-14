@@ -22,14 +22,16 @@ const UserList = ({user,canBeSelected}) => {
 
         if(selected){
 
-
-            var [filteredArray] = selectedParticipants.filter(function(each){
-                return each.objectId !== idRef.current.id;
-            });
+            const index = selectedParticipants.findIndex(participant => participant.objId === idRef.current.id)
+            if(index >= 0){
+                selectedParticipants.splice(index,1)
+            }
+            
             dispatch({
-                type:"SET_SELECTED_PARTICIPANTS",
-                selectedParticipants:filteredArray
+                type:"REMOVE_UNSELECTED_PARTICIPANTS",
+                selectedParticipants
             })
+
             setSelected(false)
 
         }
