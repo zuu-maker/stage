@@ -239,8 +239,11 @@ function Message() {
 
                                                     return (<>
 
-                                                            <MessageCard key={chat.chatRoomId}
-                                                                         id={chat.chatRoomId} chats={chat}/>
+                                                           {currentUser && <MessageCard key={chat.chatRoomId}
+                                                                         id={chat.chatRoomId} 
+                                                                         chats={chat}
+                                                                         currentUser={currentUser}
+                                                                         />} 
 
 
                                                         </>
@@ -259,7 +262,7 @@ function Message() {
                                 <>
                                     <div className='col-md-8 p-0 col-lg-8 col-sm-12'>
                                         {
-                                            messageId && currentUser.email && <MessageWindow/>
+                                            messageId && currentUser?.email && <MessageWindow/>
 
                                         }
 

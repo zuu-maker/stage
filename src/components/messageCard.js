@@ -24,10 +24,10 @@ import { useStateValue } from '../contexts/StateProvider';
 import DisplayPicture from "./DisplayPicture";
 import moment from "moment";
 
-function MessageCard({id, chats}) {
+function MessageCard({id, chats,currentUser}) {
 
     const history = useHistory()
-    const [currentUser] = useAuthState(auth)
+    // const [currentUser] = useAuthState(auth)
     // const receiverEmail = getReceiverUid(chats?.members,currentUser)
     // const [receiverSnap] = useCollection(db.collection("Users").where("userId","==",receiverEmail));
     //Get unread messages
