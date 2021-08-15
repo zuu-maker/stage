@@ -20,6 +20,7 @@ import {useCollection} from "react-firebase-hooks/firestore";
 import Search from "../sections/search/search";
 import Icon from "./icon";
 import '../sections/message/message.css'
+import UserContact from './UserContact';
 
 function CreateGroup(props) {
     const [{user,selectedParticipants,userData},dispatch] = useStateValue()
@@ -55,58 +56,59 @@ function CreateGroup(props) {
         })
 
         //adding chats to db
+        console.clear()
         console.log(otherUser)
-        if(userData.email && otherUser?.email )
-        {
-            const data = {
-                dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-                groupChatName: '',
-                groupImageUrl: '',
-                isGroupChat: false,
-                // users: [user.email,otherUser.email],
-                participants: [
-                    {
-                        objId: userData.objectId,
-                        email: userData.email,
-                        userName:userData.userName,
-                        userProfileImage:userData.userProfileImageUrl
-                    },
-                    {
-                        objId: otherUser.objectId,
-                        email: otherUser.email,
-                        userName:otherUser.userName,
-                        userProfileImage:otherUser.userProfileImageUrl
-                    }
-                ]
-            }
-            console.log(data)
+        // if(userData.email && otherUser?.email )
+        // {
+        //     const data = {
+        //         dateLastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+        //         groupChatName: '',
+        //         groupImageUrl: '',
+        //         isGroupChat: false,
+        //         // users: [user.email,otherUser.email],
+        //         participants: [
+        //             {
+        //                 objId: userData.objectId,
+        //                 email: userData.email,
+        //                 userName:userData.userName,
+        //                 userProfileImage:userData.userProfileImageUrl
+        //             },
+        //             {
+        //                 objId: otherUser.objectId,
+        //                 email: otherUser.email,
+        //                 userName:otherUser.userName,
+        //                 userProfileImage:otherUser.userProfileImageUrl
+        //             }
+        //         ]
+        //     }
+        //     console.log(data)
 
-            db.collection("ChatRooms").add(data)
-                .then(docRef => {
-                    docRef.update({chatRoomId: docRef.id})
-                    // Redirect to the newly created chatRoom  endpoint
-                    db.collection('Users').doc(user.uid).collection('ChatRoomIds').add(
-                        {
-                            id: docRef.id,
-                            isDeleted: false,
-                            isDelivered: false,
-                        }).then(() => {
-                        setLoading(false)
+        //     db.collection("ChatRooms").add(data)
+        //         .then(docRef => {
+        //             docRef.update({chatRoomId: docRef.id})
+        //             // Redirect to the newly created chatRoom  endpoint
+        //             db.collection('Users').doc(user.uid).collection('ChatRoomIds').add(
+        //                 {
+        //                     id: docRef.id,
+        //                     isDeleted: false,
+        //                     isDelivered: false,
+        //                 }).then(() => {
+        //                 setLoading(false)
 
-                        history.push(`/messages/${docRef.id}`)
-                    }).catch((error) => {
-                        console.log(error.message)
-                        setLoading(false)
+        //                 history.push(`/messages/${docRef.id}`)
+        //             }).catch((error) => {
+        //                 console.log(error.message)
+        //                 setLoading(false)
 
-                    })
+        //             })
 
-                })
-                .catch(function (error) {
-                    setLoading(false)
+        //         })
+        //         .catch(function (error) {
+        //             setLoading(false)
 
-                    console.error("Error adding document: ", error);
-                });
-        }
+        //             console.error("Error adding document: ", error);
+        //         });
+        // }
         // else if(chatExists(otherUser.email)){
         //     setLoading(false)
         //     history.push(`/messages`)
@@ -330,21 +332,14 @@ function CreateGroup(props) {
                             </div>
                             {obj.user.map(each => {
                                 return (
-                                    <div className={`user-list`}>
-                                        <div key={each.objectId} style={{backgroundColor: selected ? '#2B3038' : 'initial'}} onClick={!loading ? handleMessage : null} ref={idRef} id={each.userId || each.objectId} userName={each.userName} userProfileImageUrl={each.userProfileImageUrl} email={each.email} className='d-flex pointer user-list-sub-section'>
-                                            <div className='user-list-thumb-wrapper'>
-                                                <img src={each.userProfileImageUrl} alt=""/>
-                                            </div>
-                                            <div className='ml-3 text-light'>
-                                                <div className='space-medium'>{each.userName}</div>
-                                                <div className="space-light">@{each.userName}</div>
-
-                                            </div>
-
-
-                                        </div>
-                                        {/*<UserList user={each} key={each.objectId}/>*/}
-                                    </div>
+                                    <UserContact
+                                       key={each.objectId}
+                                       id={each.userId || each.objectId} 
+                                       userName={each.userName}
+                                       userProfileImageUrl={each.userProfileImageUrl}
+                                       email={each.email}
+                                    />
+                                     
                                 )
                             })}
                         </>
@@ -378,6 +373,8 @@ function CreateGroup(props) {
                             </div>
                             {obj.user.map((each, index) => {
                                 return (
+
+                                   
                                     <UserList canBeSelected={true} user={each} key={each.objectId}/>
 
                                 // <div style={{backgroundColor: selected ? '#2B3038' : 'initial'}}
